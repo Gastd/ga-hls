@@ -38,17 +38,3 @@ class TestProperty:
 
         assert t is not None
         assert t.count_elements() is not None
-
-    def test_terminators(self):
-        form = json.loads('["Or",[["+",["x",10]],["<",["x",20]]]]')
-        t = get_terminators(parse(form))
-
-        assert t is not None
-
-    def test_dfs(self):
-        form = json.loads('["Or",[["+",["x",10]],["<",["x",20]]]]')
-        dfs(parse(form))
-
-    def test_bfs(self):
-        form = json.loads('["Or",[["+",["x",10]],["<",["x",20]]]]')
-        bfs(parse(form))
