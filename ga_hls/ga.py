@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 
-from treenode import Node, parse, get_terminators
-from individual import Individual
+from ga_hls.treenode import Node, parse, get_terminators
+from ga_hls.individual import Individual
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.1  ## Rate defined by Núnez-Letamendia

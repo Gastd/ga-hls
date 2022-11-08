@@ -2,7 +2,7 @@ import sys
 import math
 import random
 
-import treenode
+from ga_hls.treenode import Node
 
 MUTATION_NODES = 1
 
@@ -14,7 +14,7 @@ LOGICALS = ['Not', 'And', 'Or', 'Implies']
 
 class Individual():
     """docstring for Individual"""
-    def __init__(self, formula_root: treenode.Node, terminators):
+    def __init__(self, formula_root: Node, terminators):
         if formula_root is None:
             raise Exception(f"{self.__class__.__name__} error: Input formula cannot be empty")
 
