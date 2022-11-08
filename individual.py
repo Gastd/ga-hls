@@ -1,39 +1,96 @@
-from carpath import CarPath
+import sys
+import math
 import random
-from pgraph import UGraph
+
+import treenode
+
+MUTATION_NODES = 1
+
+OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
+QUANTIFIERS = ['ForAll', 'Exists']
+RELATIONALS = ['<', '>', '<=', '>=']
+ARITHMETICS = ['+', '-', '*', '/', '^']
+LOGICALS = ['Not', 'And', 'Or', 'Implies']
 
 class Individual():
     """docstring for Individual"""
-    def __init__(self, graph: UGraph, ncars: int = 0, positions: list = [], nchecks: int = 0):
-        if len(positions) != ncars:
-            raise Exception(f"{self.__class__.__name__} error: position list has to have the same length as # of cars: {len(positions)} != {ncars}")
+    def __init__(self, formula_root: treenode.Node, terminators):
+        if formula_root is None:
+            raise Exception(f"{self.__class__.__name__} error: Input formula cannot be empty")
 
-        self.score = 0
-        self.ncars = ncars
-        self.nchecks = nchecks
-        self.graph = graph
-        self.positions = positions
+        self.root = formula_root
+        self.fitness = -1
+        self.term = self.check_terminators(terminators)
+        self.maxint, self.minint = self.get_minmax(terminators, int)
+        # print(f'maxint = {self.maxint}, minint = {self.minint}')
+        self.maxfloat, self.minfloat = self.get_minmax(terminators, float)
+        # print(f'maxfloat = {self.maxfloat}, minfloat = {self.minfloat}')
 
-        self.init_cars()
-        self.create_checkpoints()
-        self.make_paths()
-
-    def init_cars(self):
-        self.paths = []
-        for i in range(self.ncars):
-            self.paths.append(CarPath(self.positions[i]))
-
-    def create_checkpoints(self):
-        for i in range(self.ncars):
-            self.paths[i].create_checkpoints(self.nchecks, self.graph.n)
-
-    def make_paths(self):
-        for i in range(self.ncars):
-            self.paths[i].make_path(self.graph)
-
-    def get_path(self):
-        return self.paths
+    def get_minmax(self, terminators, type):
+        t_list = [x for x in terminators if isinstance(x, type)]
+        if len(t_list) == 0:
+            return None, None
+        else:
+            return max(t_list), min(t_list)
 
     def print_genes(self):
-        for i in range(self.ncars):
-            print(self.paths[i])
+        if self.root is not None:
+            print(self.root)
+        # print()
+
+    def __repr__(self):
+        return str(self.root)
+
+    def __str__(self):
+        return str(self.root)
+
+    def mutate(self, rate: float, nmutations=MUTATION_NODES):
+        for _ in range(0, nmutations):
+            if (random.random() < rate):
+                mut_idx = random.randrange(len(self.root))
+                # print(f'from {self.root.get_subtree(mut_idx)} ->', end='')
+                if self.root.get_subtree(mut_idx).left is None:
+                    self.root.get_subtree(mut_idx).value = self.get_new_term(self.root.get_subtree(mut_idx).value)
+                else:
+                    self.root.get_subtree(mut_idx).value = self.get_new_op(self.root.get_subtree(mut_idx).value)
+                # print(f' to {self.root.get_subtree(mut_idx)}')
+
+    def get_new_term(self, t):
+        if t.__class__ in self.term.keys():
+            if isinstance(t, int):
+                if self.minint == self.maxint:
+                    return random.randint(self.minint, self.maxint)
+                else:
+                    minn = 0 if self.minint == 0 else 10 ** int(math.log(self.minint)+1)+1 if self.minint > 0 else -10 ** int(math.log(-self.minint)+1)+1
+                    # print(f'minn = {minn}, max= {10 ** int(math.log(self.maxint)+1) -1}')
+                    return random.randint(minn, 10 ** int(math.log(self.maxint)+1) -1)
+            elif isinstance(t, float):
+                return random.uniform(self.minfloat, self.maxfloat)
+            else:
+                return random.choice(self.term[t.__class__])
+        else:
+            raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
+
+    def check_terminators(self, term_list):
+        term_dict = {}
+        # print(term_list)
+        for t in term_list:
+            # print(t.__class__.__name__)
+            if t.__class__.__name__ in term_dict.keys():
+                term_dict[t.__class__] += [t]
+            else:
+                term_dict[t.__class__]  = [t]
+        return term_dict
+
+    def get_new_op(self, op):
+        # return random.choice(OPS)
+        if op in QUANTIFIERS:
+            return random.choice(QUANTIFIERS)
+        elif op in RELATIONALS:
+            return random.choice(RELATIONALS)
+        elif op in ARITHMETICS:
+            return random.choice(ARITHMETICS)
+        elif op in LOGICALS:
+            return random.choice(LOGICALS)
+        else:
+            raise ValueError(f"Operator not known: {op}")
