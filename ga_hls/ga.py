@@ -1,19 +1,24 @@
+import os
+import math
+import time
+import copy
+import random
+import datetime
+# import statistics
+
 import numpy as np
 import matplotlib.pyplot as plt
-from pgraph import UGraph, DGraph
-from individual import Individual
-# from carpath import CarPath
-import statistics
-import random
-import math
 
 from tqdm import tqdm
+
+from treenode import Node, parse, get_terminators
+from individual import Individual
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.1  ## Rate defined by Núnez-Letamendia
 POPULATION_SIZE = 30  ## Must be an EVEN number
 GENE_LENGTH = 32
-MAX_ALLOWABLE_GENERATIONS = 616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
+MAX_ALLOWABLE_GENERATIONS = 30 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 NUMBER_OF_PARAMETERS = 17 ## Number of parameters to be evolved
 CHROMOSOME_LENGTH = GENE_LENGTH * NUMBER_OF_PARAMETERS
 CHROMOSOME_TO_PRESERVE = 4            ## Must be an EVEN number
@@ -21,27 +26,39 @@ PARENTS_TO_BE_CHOSEN = 10
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self, graph: UGraph, size = 0, ncars: int = 0, positions: list = []):
+    def __init__(self, init_form):
         super(GA, self).__init__()
 
         random.seed()
-
-        self.graph = graph
-        self.size = size
-        self.ncars = ncars
-        self.pos = positions
+        self.size = POPULATION_SIZE
         self.population = []
-        self.generation_counter = 0
-        self.checks = random.randrange(4) + 1 ## 1 to 5 checkpoints
-        print(f'{self.checks} checkpoints selected.')
+        self.now = datetime.datetime.now()
+        curr_path = os.getcwd()
 
-        self.init_population()
+        self.init_population(init_form)
+        self.init_log(curr_path)
 
-    def init_population(self):
+    def init_population(self, init_form):
+        root = parse(init_form)
+        terminators = list(set(get_terminators(root)))
+        print(f'terminators = {terminators}')
+        print(f'Initial formula: {root}')
         for i in range(0, self.size):
-            solution = Individual(self.graph, self.ncars, self.pos, self.checks)
-            self.population.append(solution)
+            solution = copy.deepcopy(Individual(root, terminators))
+            n = random.randrange(len(root))
+            solution.mutate(1, n)
+            self.population.append(copy.deepcopy(solution))
         print("Population initialized. Size = {}".format(self.size))
+        # print(self.population)
+
+    def init_log(self, parent_dir):
+        directory = str(self.now)
+        self.path = os.path.join(parent_dir, directory)
+        try:
+            os.mkdir(self.path)
+            pass
+        except OSError as error:
+            print(error)
 
     def show(self):
         self.fitness()
@@ -57,6 +74,13 @@ class GA(object):
     def get_best(self):
         return self.population[0]
 
+    def write_population(self, generation):
+        with open('{}/{:0>2}.txt'.format(self.path, generation), 'w') as f:
+            for i in self.population:
+                # print(i)
+                f.write(str(i))
+                f.write('\n')
+
     def pool(self):
         return self.population[ random.randint(0, 32767) % PARENTS_TO_BE_CHOSEN]
 
@@ -70,165 +94,101 @@ class GA(object):
         # loop
         self.generation_counter = 0
         for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
+            self.write_population(self.generation_counter)
             ## score population
             self.fitness()
             ## retain elite
             self.population.sort(key=lambda x: x.fitness)
-            new_population = self.population[:4]
+            new_population = self.population[CHROMOSOME_TO_PRESERVE:]
 
-            # select parents
-            parents = new_population
-            # perform crossover and mutation
-            offsprings_size = int((self.size - len(new_population))/2)
-            for i in range(offsprings_size):
-                p1 = self.pool()
-                p2 = self.pool()
-                offsprings = self.crossover(p1, p2)
-                self.mutate(offsprings[0], MUTATION_RATE)
-                self.mutate(offsprings[1], MUTATION_RATE)
-                new_population.append(offsprings[0])
-                new_population.append(offsprings[1])
+            population_counter = CHROMOSOME_TO_PRESERVE
+            while(population_counter < POPULATION_SIZE):
+                # print(f'gen {self.generation_counter} / ind {population_counter}')
+                offspring1 = self.pool()
+                offspring2 = self.pool()
 
-            for i in range(self.size - len(new_population)):
-                p1 = self.pool()
-                offspring = self.mutate(p1)
-                new_population.append(offspring)
-            self.population = new_population
+                self.crossover(offspring1, offspring2)
+                offspring1.mutate(MUTATION_RATE)
+                offspring2.mutate(MUTATION_RATE)
+                new_population.append(offspring1)
+                new_population.append(offspring2)
+                population_counter += 2
             self.generation_counter += 1
-            if(self.check_evolution()):
-                break
-        print('Found solution!')
-        # print(f"Best solution so far have fitness = {self.population[0].fitness}")
 
-    def count_distinct_edges(self, solution):
-        w, h = self.graph.n, self.graph.n
-        adj_mtx = [[0 for x in range(w)] for y in range(h)]
-        for k in range(0, self.ncars):
-            car = solution.paths[k]
-            for i in range(0, len(car.path)-1):
-                if int(car.path[i].name) < int(car.path[i+1].name):
-                    adj_mtx[int(car.path[i].name)-1][int(car.path[i+1].name)-1] = 1
-                else:
-                    adj_mtx[int(car.path[i+1].name)-1][int(car.path[i].name)-1] = 1
+    # def count_distinct_edges(self, solution):
+    #     w, h = self.graph.n, self.graph.n
+    #     adj_mtx = [[0 for x in range(w)] for y in range(h)]
+    #     for k in range(0, self.ncars):
+    #         car = solution.paths[k]
+    #         for i in range(0, len(car.path)-1):
+    #             if int(car.path[i].name) < int(car.path[i+1].name):
+    #                 adj_mtx[int(car.path[i].name)-1][int(car.path[i+1].name)-1] = 1
+    #             else:
+    #                 adj_mtx[int(car.path[i+1].name)-1][int(car.path[i].name)-1] = 1
 
-        return np.sum(adj_mtx)
+    #     return np.sum(adj_mtx)
 
     def fitness(self):
-        for solution in self.population:
-            ## Different edges count
-            w, h = self.graph.n, self.graph.n
-            adj_mtx = [[0 for x in range(w)] for y in range(h)]
-            for k in range(0, self.ncars):
-                car = solution.paths[k]
-                for i in range(0, len(car.path)-1):
-                    if int(car.path[i].name) < int(car.path[i+1].name):
-                        adj_mtx[int(car.path[i].name)-1][int(car.path[i+1].name)-1] = 1
-                    else:
-                        adj_mtx[int(car.path[i+1].name)-1][int(car.path[i].name)-1] = 1
+        for i in self.population:
+            i.fitness = random.randrange(10)
+            # time.sleep(1)
 
-            distinct_factor = self.count_distinct_edges(solution) / len(self.graph.edges())
+    # def mutate(self, parent: Individual, rate: float):
+    #     g = parent.graph
+    #     ncars = parent.ncars
+    #     pos = parent.positions
+    #     offspring = Individual(g, ncars, pos)
+    #     offspring.paths.clear()
+    #     for i in range(0, parent.ncars):
+    #         car = parent.paths[i]
+    #         if ((random.random() > rate) or (len(car.path) <= 1)):
+    #             offs_path = CarPath(car.init_pos)
+    #             offs_path.set_path(car.path)
+    #             offspring.paths.append(offs_path)
+    #             continue
 
-            ## Standard deviation between paths
-            paths_lengths = [len(car.path) for car in solution.paths]
-            stddev_path = 0.0
-            if (len(paths_lengths) != 1):
-                stddev_path = statistics.stdev(paths_lengths)
+    #         try:
+    #             point = random.randrange(len(car.path)-2) + 1
+    #         except:
+    #             point = 1
+    #         fst_half = car.path[:point]
+    #         new_point = str(random.randrange(parent.graph.n)+1)
+    #         snd_half = car.path[point + 1:]
 
-            ## total path length
-            total_len = 0.0
-            for k in range(0, self.ncars):
-                car = solution.paths[k]
-                for i in range(len(car.path)-1):
-                    dx = car.path[i+1].coord[0] - car.path[i].coord[0]
-                    dy = car.path[i+1].coord[1] - car.path[i].coord[1]
-                    dist = math.sqrt(dx**2 + dy**2)
-                    total_len += dist
+    #         path = fst_half + g.path_Astar(fst_half[-1].name, new_point)[1:-1]
+    #         if(len(snd_half) != 0):
+    #             path += g.path_Astar(new_point, snd_half[0])[0:-1] + snd_half
 
-            solution.fitness = 20*(1 - distinct_factor) + stddev_path + 0.01*total_len
+    #         offs_path = CarPath(car.init_pos)
+    #         offs_path.set_path(path)
+    #         offspring.paths.append(offs_path)
 
-    def mutate(self, parent: Individual, rate: float):
-        g = parent.graph
-        ncars = parent.ncars
-        pos = parent.positions
-        offspring = Individual(g, ncars, pos)
-        offspring.paths.clear()
-        for i in range(0, parent.ncars):
-            car = parent.paths[i]
-            if ((random.random() > rate) or (len(car.path) <= 1)):
-                offs_path = CarPath(car.init_pos)
-                offs_path.set_path(car.path)
-                offspring.paths.append(offs_path)
-                continue
-
-            try:
-                point = random.randrange(len(car.path)-2) + 1
-            except:
-                point = 1
-            fst_half = car.path[:point]
-            new_point = str(random.randrange(parent.graph.n)+1)
-            snd_half = car.path[point + 1:]
-
-            path = fst_half + g.path_Astar(fst_half[-1].name, new_point)[1:-1]
-            if(len(snd_half) != 0):
-                path += g.path_Astar(new_point, snd_half[0])[0:-1] + snd_half
-
-            offs_path = CarPath(car.init_pos)
-            offs_path.set_path(path)
-            offspring.paths.append(offs_path)
-
-        return offspring
+    #     return offspring
 
     def crossover(self, parent1: Individual, parent2: Individual):
-        g = parent1.graph
-        ncars = parent1.ncars
-        pos = parent1.positions
-        offsprings = [
-                        Individual(g, ncars, pos),
-                        Individual(g, ncars, pos)
-                     ]
-        for o in offsprings:
-            o.paths.clear()
+        offsprings = [parent1, parent2]
 
-        for i in range(0, parent1.ncars):
+        off0_tree, off0_sub, node0 = offsprings[0].root.cut_tree_random()
+        # print(f'off0_tree = {off0_tree}')
+        # print(f'off0_sub = {off0_sub}')
+        # print(f'node0 = {node0}')
+        off1_tree, off1_sub, node1 = offsprings[1].root.cut_tree_random()
+        # print(f'off1_tree = {off1_tree}')
+        # print(f'off1_sub = {off1_sub}')
+        # print(f'node1 = {node1}')
 
-            car1 = parent1.paths[i]
-
-            try:
-                point = random.randrange(len(car1.path)-2) + 1
-            except:
-                point = 1
-
-            car1fst_half = car1.path[:point]
-            car1snd_half = car1.path[point + 1:]
-
-            car2 = parent2.paths[i]
-            try:
-                point = random.randrange(len(car2.path)-2) + 1
-            except:
-                point = 1
-
-            car2fst_half = car2.path[:point]
-            car2snd_half = car2.path[point + 1:]
-
-            new_p = self.merge_paths(g, car1fst_half, car2snd_half)
-
-            offs_path = CarPath(car1.init_pos)
-            offs_path.set_path(new_p)
-            offsprings[0].paths.append(offs_path)
-
-            new_p = self.merge_paths(g, car2fst_half, car1snd_half)
-
-            offs_path = CarPath(car2.init_pos)
-            offs_path.set_path(new_p)
-            offsprings[1].paths.append(offs_path)
+        node0 += off1_sub
+        node1 += off0_sub
+        # print(f'off0_tree = {off0_tree}')
+        # print(f'off1_tree = {off1_tree}')
 
         return offsprings
 
-    def merge_paths(self, graph, path1: list, path2: list):
-        if((len(path1) == 0) or (len(path2) == 0)):
-            return path1 + path2
-        elif(path1[-1].name == path2[0].name):
-            return path1 + path2[1:]
-        else:
-            p = graph.path_Astar(path1[-1].name, path2[0].name)
-            return path1 + p[1:-1] + path2
+    # def merge_paths(self, graph, path1: list, path2: list):
+    #     if((len(path1) == 0) or (len(path2) == 0)):
+    #         return path1 + path2
+    #     elif(path1[-1].name == path2[0].name):
+    #         return path1 + path2[1:]
+    #     else:
+    #         p = graph.path_Astar(path1[-1].name, path2[0].name)
+    #         return path1 + p[1:-1] + path2
