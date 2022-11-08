@@ -69,18 +69,13 @@ class Node(object):
         return None
 
     def cut_tree_random(self):
-        # print(self)
         subtree = self.get_random_subtree()
-        # print(subtree)
+
         childs, parents = bfs(self)
-        # print('childs = ', childs)
-        # print('parents = ', parents)
+
         child_idx = childs.index(subtree)
+
         parent = self.get_parent_node(subtree)
-        # print('child_idx = ', child_idx)
-        # print('len(childs) = ', len(childs))
-        # print('childs[6] = ', childs[6])
-        # print('parents[6] = ', self.get_parent_node(subtree).value)
 
         if parent is not None:
             if parent.left is subtree:
@@ -176,14 +171,10 @@ def get_terminators(node):
 
 # A function to do inorder tree traversal
 def printInorder(root):
- 
     if root:
- 
         # First recur on left child
         printInorder(root.left)
- 
         # then print the data of node
         print(root.value),
- 
         # now recur on right child
         printInorder(root.right)

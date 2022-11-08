@@ -49,7 +49,6 @@ class GA(object):
             solution.mutate(1, n)
             self.population.append(copy.deepcopy(solution))
         print("Population initialized. Size = {}".format(self.size))
-        # print(self.population)
 
     def init_log(self, parent_dir):
         directory = str(self.now)
@@ -115,55 +114,10 @@ class GA(object):
                 population_counter += 2
             self.generation_counter += 1
 
-    # def count_distinct_edges(self, solution):
-    #     w, h = self.graph.n, self.graph.n
-    #     adj_mtx = [[0 for x in range(w)] for y in range(h)]
-    #     for k in range(0, self.ncars):
-    #         car = solution.paths[k]
-    #         for i in range(0, len(car.path)-1):
-    #             if int(car.path[i].name) < int(car.path[i+1].name):
-    #                 adj_mtx[int(car.path[i].name)-1][int(car.path[i+1].name)-1] = 1
-    #             else:
-    #                 adj_mtx[int(car.path[i+1].name)-1][int(car.path[i].name)-1] = 1
-
-    #     return np.sum(adj_mtx)
-
     def fitness(self):
         for i in self.population:
             i.fitness = random.randrange(10)
             # time.sleep(1)
-
-    # def mutate(self, parent: Individual, rate: float):
-    #     g = parent.graph
-    #     ncars = parent.ncars
-    #     pos = parent.positions
-    #     offspring = Individual(g, ncars, pos)
-    #     offspring.paths.clear()
-    #     for i in range(0, parent.ncars):
-    #         car = parent.paths[i]
-    #         if ((random.random() > rate) or (len(car.path) <= 1)):
-    #             offs_path = CarPath(car.init_pos)
-    #             offs_path.set_path(car.path)
-    #             offspring.paths.append(offs_path)
-    #             continue
-
-    #         try:
-    #             point = random.randrange(len(car.path)-2) + 1
-    #         except:
-    #             point = 1
-    #         fst_half = car.path[:point]
-    #         new_point = str(random.randrange(parent.graph.n)+1)
-    #         snd_half = car.path[point + 1:]
-
-    #         path = fst_half + g.path_Astar(fst_half[-1].name, new_point)[1:-1]
-    #         if(len(snd_half) != 0):
-    #             path += g.path_Astar(new_point, snd_half[0])[0:-1] + snd_half
-
-    #         offs_path = CarPath(car.init_pos)
-    #         offs_path.set_path(path)
-    #         offspring.paths.append(offs_path)
-
-    #     return offspring
 
     def crossover(self, parent1: Individual, parent2: Individual):
         offsprings = [parent1, parent2]
@@ -183,12 +137,3 @@ class GA(object):
         # print(f'off1_tree = {off1_tree}')
 
         return offsprings
-
-    # def merge_paths(self, graph, path1: list, path2: list):
-    #     if((len(path1) == 0) or (len(path2) == 0)):
-    #         return path1 + path2
-    #     elif(path1[-1].name == path2[0].name):
-    #         return path1 + path2[1:]
-    #     else:
-    #         p = graph.path_Astar(path1[-1].name, path2[0].name)
-    #         return path1 + p[1:-1] + path2

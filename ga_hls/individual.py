@@ -73,7 +73,6 @@ class Individual():
 
     def check_terminators(self, term_list):
         term_dict = {}
-        # print(term_list)
         for t in term_list:
             # print(t.__class__.__name__)
             if t.__class__.__name__ in term_dict.keys():
