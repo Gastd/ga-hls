@@ -2,7 +2,8 @@ import sys
 import math
 import random
 
-from ga_hls.treenode import Node
+# from .treenode import 
+import treenode
 
 MUTATION_NODES = 1
 
@@ -14,7 +15,7 @@ LOGICALS = ['Not', 'And', 'Or', 'Implies']
 
 class Individual():
     """docstring for Individual"""
-    def __init__(self, formula_root: Node, terminators):
+    def __init__(self, formula_root: treenode.Node, terminators):
         if formula_root is None:
             raise Exception(f"{self.__class__.__name__} error: Input formula cannot be empty")
 
@@ -25,6 +26,7 @@ class Individual():
         # print(f'maxint = {self.maxint}, minint = {self.minint}')
         self.maxfloat, self.minfloat = self.get_minmax(terminators, float)
         # print(f'maxfloat = {self.maxfloat}, minfloat = {self.minfloat}')
+        self.madeit = False
 
     def get_minmax(self, terminators, type):
         t_list = [x for x in terminators if isinstance(x, type)]
@@ -93,3 +95,29 @@ class Individual():
             return random.choice(LOGICALS)
         else:
             raise ValueError(f"Operator not known: {op}")
+
+    def format(self):
+        return build_str(self.root)
+
+def build_str(root):
+    s = ''
+    if root is None:
+        return ''
+    if root.left is None:
+        try:
+            s = root.value.replace(')', ']')
+            s = s.replace('(', '[')
+            return f'{s}'
+        except:
+            return f'{root.value}'
+
+    if root.value in QUANTIFIERS:
+        # print(root.left.value, root.right.value)
+        # print(f'{root.value}([{root.left.value}], {build_str(root.right)})')
+        return f'{root.value}([{root.left.value}], {build_str(root.right)})'
+    elif root.value in LOGICALS:
+        return f'{root.value}({build_str(root.left)}, {build_str(root.right)})'
+    elif root.value in RELATIONALS:
+        return f'({build_str(root.left)} {root.value} {build_str(root.right)})'
+    elif root.value in ARITHMETICS:
+        return f'({build_str(root.left)} {root.value} {build_str(root.right)})'
