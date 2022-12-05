@@ -2,23 +2,26 @@ import os
 import math
 import time
 import copy
+import shlex
 import random
 import datetime
 # import statistics
+import subprocess
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 
-from ga_hls.treenode import Node, parse, get_terminators
-from ga_hls.individual import Individual
+import treenode
+import individual
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.1  ## Rate defined by Núnez-Letamendia
 POPULATION_SIZE = 30  ## Must be an EVEN number
 GENE_LENGTH = 32
 MAX_ALLOWABLE_GENERATIONS = 30 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
+# MAX_ALLOWABLE_GENERATIONS = 1 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 NUMBER_OF_PARAMETERS = 17 ## Number of parameters to be evolved
 CHROMOSOME_LENGTH = GENE_LENGTH * NUMBER_OF_PARAMETERS
 CHROMOSOME_TO_PRESERVE = 4            ## Must be an EVEN number
@@ -37,14 +40,16 @@ class GA(object):
 
         self.init_population(init_form)
         self.init_log(curr_path)
+        self.s, self.e = self.get_line('ga_hls')
+        print(f's = {self.s}, e = {self.e}')
 
     def init_population(self, init_form):
-        root = parse(init_form)
-        terminators = list(set(get_terminators(root)))
+        root = treenode.parse(init_form)
+        terminators = list(set(treenode.get_terminators(root)))
         print(f'terminators = {terminators}')
         print(f'Initial formula: {root}')
         for i in range(0, self.size):
-            solution = copy.deepcopy(Individual(root, terminators))
+            solution = copy.deepcopy(individual.Individual(root, terminators))
             n = random.randrange(len(root))
             solution.mutate(1, n)
             self.population.append(copy.deepcopy(solution))
@@ -70,14 +75,46 @@ class GA(object):
             car = self.population[0].paths[i]
             print('->'.join([str(x.name) for x in car.path]))
 
+    def get_line(self, file):
+        print(f'Running on {os.getcwd()} folder')
+        file_path = 'ga_hls/prop_ctrl.py'
+        # f = open("ga_hls/prop_ctrl.py")
+        newf_str = ''
+        with open(file_path) as f:
+            for l in f:
+                # print(l)
+                if l.find('z3solver.check') > 0:
+                    break
+                else:
+                    newf_str += l
+            print(f'py file seek at = {len(newf_str)}')
+            d1 = newf_str.rfind('\t')
+            d2 = newf_str[1:d1-1].rfind('\t')
+            print(f'py file seek at = {d2}')
+            self.first = newf_str
+            return d2, newf_str.rfind('\n')
+
+    def save_file(self, s, e, nline):
+        src = 'ga_hls/prop_ctrl.py'
+        dst = 'ga_hls/temp.py'
+        with open(src) as firstfile, open(dst,'w') as secondfile:
+            firstfile.seek(e)
+            secondfile.write(self.first[:s])
+            secondfile.write('\n\n')
+            secondfile.write(f'\tz3solver.add({nline})\n')
+            for l in firstfile:
+                secondfile.write(l)
+
     def get_best(self):
         return self.population[0]
 
     def write_population(self, generation):
         with open('{}/{:0>2}.txt'.format(self.path, generation), 'w') as f:
+            f.write('Formula\tFitness\tSatisfied\n')
             for i in self.population:
-                # print(i)
                 f.write(str(i))
+                f.write(f'\t{i.fitness}')
+                f.write(f'\t{i.madeit}')
                 f.write('\n')
 
     def pool(self):
@@ -93,7 +130,6 @@ class GA(object):
         # loop
         self.generation_counter = 0
         for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
-            self.write_population(self.generation_counter)
             ## score population
             self.fitness()
             ## retain elite
@@ -113,13 +149,33 @@ class GA(object):
                 new_population.append(offspring2)
                 population_counter += 2
             self.generation_counter += 1
+            self.write_population(self.generation_counter)
 
     def fitness(self):
         for i in self.population:
-            i.fitness = random.randrange(10)
+            # print(i.format())
+            self.save_file(self.s, self.e, i.format())
+
+            # folder_name = os.getcwd()[os.getcwd().rfind('/')+1:]
+            folder_name = 'ga_hls'
+            # print(f'Running on {os.getcwd()} folder')
+            run_str = f'python3 {folder_name}/demo.py'
+            run_tk = shlex.split(run_str)
+            run_process = subprocess.run(run_tk,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             universal_newlines=True)
+            # print(run_process.stdout.find('SATISFIED'))
+            if run_process.stdout.find('SATISFIED') > 0:
+                i.fitness = (1+random.randrange(10))/10
+                i.madeit = True
+            else:
+                i.fitness = (1+random.randrange(10))*10
+                i.madeit = False
+            # print(run_process.stderr)
             # time.sleep(1)
 
-    def crossover(self, parent1: Individual, parent2: Individual):
+    def crossover(self, parent1: individual.Individual, parent2: individual.Individual):
         offsprings = [parent1, parent2]
 
         off0_tree, off0_sub, node0 = offsprings[0].root.cut_tree_random()
