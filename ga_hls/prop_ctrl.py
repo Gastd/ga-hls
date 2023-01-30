@@ -62,7 +62,8 @@ def property_01():
 
 
 	interval_s=And(s>0, s<10)
-	conditions_s=And(signal_4[s]<1000, signal_2[s]>=-(15.27))
+	# conditions_s=And(signal_4[s]<1000, signal_2[s]>=-(15.27))
+	conditions_s=And(signal_4[s]<50, signal_2[s]>=-(15.27))
 	# x = ["Not",["ForAll",[["s"],["Implies",["And",[[">",["s",0]],["<",["s",10]]],["And",[["<",["signal_4(s)",1000]],[[">=",["signal_2(s)",-15.27]]]]]]]]]]
 	z3solver.add(Not(ForAll([s], Implies(interval_s, conditions_s))))
 	status=z3solver.check()

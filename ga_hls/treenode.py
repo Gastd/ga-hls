@@ -1,6 +1,31 @@
 import random
 from collections import deque
 
+def node_depth_first_iter(node):
+    stack = deque([node])
+    while stack:
+        # Pop out the first element in the stack
+        node = stack.popleft()
+        yield node
+        # push children onto the front of the stack.
+        # Note that with a deque.extendleft, the first on in is the last
+        # one out, so we need to push them in reverse order.
+        children = []
+        if node.left:
+            children.append(node.left)
+        if node.right:
+            children.append(node.right)
+        stack.extendleft(reversed(children))
+
+def strcmp(str1, str2):
+    c1 = 0
+    c2 = 0
+    l = len(str1) if len(str1) < len(str2) else len(str2)
+    for i in range(l):
+        c1 += ord(str1[i])
+        c2 += ord(str2[i])
+    return c1-c2
+
 class Node(object):
     """docstring for Node"""
     def __init__(self, value):
@@ -8,6 +33,7 @@ class Node(object):
         self.value = value
         self.left = None
         self.right = None
+        # self.iterator = InorderIterator(self)
 
     def count_elements(self):
         nel = 0
@@ -18,25 +44,51 @@ class Node(object):
 
         return 1 + nel
 
+    def __iter__(self):
+        return node_depth_first_iter(self)
+
+    # def __sub__(self, other):
+    #     try:
+    #         if isinstance(self.value, str) and isinstance(other.value, str):
+    #             return strcmp(self.value, other.value)
+    #         elif isinstance(self.value, str):
+    #             return ord(self.value[0]) - other.value
+    #         elif isinstance(other.value, str):
+    #             return self.value - ord(other.value[0])
+    #         else:
+    #             return self.value - other.value
+    #     except:
+    #         pass
+
+    def __eq__(self, other):
+        return self.value == other.value
+
     def __repr__(self):
-        if (self.left is None) and (self.right is None):
-            return f'{repr(self.value)}'
+        if isinstance(self.value, float):
+            # return f'{repr(self.value)}'
+            return f'{repr(self.value):.2f}'
         else:
-            return f'[{repr(self.value)}, [{repr(self.left)},{repr(self.right)}]]'
+            return f'{repr(self.value)}'
+        # if (self.left is None) and (self.right is None):
+        #     return f'{repr(self.value)}'
+        # else:
+        #     return f'[{repr(self.value)}, [{repr(self.left)},{repr(self.right)}]]'
 
     def __str__(self):
         if self.left is None:
             left = ''
         else:
-            left = str(self.left)
+            left = f'{str(self.left)}\t'
 
         if self.right is None:
             right = ''
         else:
-            right = str(self.right)
+            right = f'\t{str(self.right)}'
 
-        return left + ' ' + str(self.value) + ' ' + right
-        return f'{left} {self.value} {right}'
+        if isinstance(self.value, float):
+            return f'{left}{self.value:.2f}{right}'
+        else:
+            return f'{left}{self.value}{right}'
 
     def __len__(self):
         return self.count_elements()
@@ -45,9 +97,13 @@ class Node(object):
         self.merge(other)
 
     def get_subtree(self, node_idx: int):
-        # print(bfs(self))
-        # print(len(bfs(self)[0]))
-        return bfs(self)[0][node_idx]
+        if node_idx >= len(self):
+            raise Exception("Node idx greater than or equal tree length node_idx >= len(self): {} > {}"\
+                .format(node_idx, len(self)))
+        subtrees, parents = bfs(self)
+        # print(f'get_subtree: {subtrees}, {parents}')
+        # print(f'get_subtree: {subtrees[node_idx]}, {parents[node_idx]}')
+        return subtrees[node_idx], parents[node_idx]
 
     def get_random_subtree(self):
         return random.choice(bfs(self)[0][1:])
@@ -68,13 +124,28 @@ class Node(object):
 
         return None
 
+    def cut_tree(self, idx):
+        if idx >= len(self):
+            raise Exception(f"Index out of range: {idx} >= {len(self)}")
+        subtree = self.get_subtree(idx)
+        childs, parents = bfs(self)
+        parent = self.get_parent_node(subtree)
+
+        if parent is not None:
+            if parent.left is subtree:
+                parent.left = None
+            elif parent.right is subtree:
+                parent.right = None
+            else:
+                raise Exception("Tree cut failed")
+            return self, subtree, parent
+        else:
+            raise Exception(f"Tree cut failed: {self}, {subtree}, {parent}")
+
     def cut_tree_random(self):
         subtree = self.get_random_subtree()
-
         childs, parents = bfs(self)
-
         child_idx = childs.index(subtree)
-
         parent = self.get_parent_node(subtree)
 
         if parent is not None:
