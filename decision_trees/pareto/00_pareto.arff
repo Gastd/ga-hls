@@ -22,7 +22,7 @@
 Exists,s,>,0,And,s,<,10,Implies,signal_4(s),<,50,And,signal_2(s),>=,-15.27,TRUE
 ForAll,s,>,0,And,s,<,-55,Implies,signal_4(s),<,50,Or,signal_2(s),>=,-15.27,TRUE
 ForAll,s,>,-1,And,s,<,-6,Implies,signal_4(s),<,50,And,signal_2(s),>=,79.78,TRUE
-Exists,s,>,-1,And,s,>=,0),Implie,(signal_4(s),<,50,And,signal_2(s),>=,-15.27,TRUE
+Exists,s,>,-1,And,s,>=,0,Implies,signal_4(s),<,50,And,signal_2(s),>=,-15.27,TRUE
 ForAll,s,>,0,And,s,<,-52,Implies,signal_4(s),<,50,Or,signal_2(s),<=,-15.27,TRUE
 Exists,s,>,0,And,s,<,10,Implies,signal_4(s),>=,50,Or,signal_2(s),>=,-31.58,TRUE
 ForAll,s,>,0,And,s,<,10,Implies,signal_4(s),<,50,And,signal_2(s),>=,-15.27,FALSE
