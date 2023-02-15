@@ -1,0 +1,52 @@
+@relation all.generation2
+
+@attribute QUANTIFIERS {ForAll, Exists}
+@attribute VARIABLE {s}
+@attribute RELATIONALS {<,>,<=,>=, =}
+@attribute NUMBER NUMERIC
+@attribute LOGICALS1 {And, Or}
+@attribute VARIABLE1 {s}
+@attribute RELATIONALS1 {<,>,<=,>=, =}
+@attribute NUMBER1 NUMERIC
+@attribute IMP1 {Implies}
+@attribute SIGNALS {signal_2(s),signal_4(s)}
+@attribute RELATIONALS2 {<,>,<=,>=, =}
+@attribute NUMBER2 NUMERIC
+@attribute LOGICALS2 {And, Or}
+@attribute SIGNALS1 {signal_2(s),signal_4(s)}
+@attribute RELATIONALS3 {<,>,<=,>=, =}
+@attribute NUMBER3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE}
+
+
+@data
+ForAll,s,<,0,And,s,<=,-13,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-29.31,FALSE
+ForAll,s,<,0,And,s,<=,151,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-29.31,FALSE
+ForAll,s,<,1,Or,s,<=,10,Implies,signal_4(s),>,50,And,signal_2(s),<=,-15.27,FALSE
+ForAll,s,<,1,Or,s,<=,10,Implies,signal_4(s),>,50,And,signal_2(s),<=,-15.27,FALSE
+ForAll,s,<,1,Or,s,<=,10,Implies,signal_4(s),>,50,And,signal_2(s),<=,-15.27,FALSE
+ForAll,s,<,1,Or,s,<=,10,Implies,signal_4(s),>,50,Or,signal_2(s),<=,-15.27,FALSE
+ForAll,s,<,0,And,s,<,10,Implies,signal_4(s),<=,50,And,signal_2(s),>=,-15.27,FALSE
+ForAll,s,<,-7,Or,s,>=,10,Implies,signal_4(s),<=,50,And,signal_2(s),<,-15.27,FALSE
+ForAll,s,<,0,And,s,>,40,Implies,signal_4(s),<=,50,And,signal_2(s),<,-15.27,TRUE
+ForAll,s,<,1,And,s,>=,10,Implies,signal_4(s),>,50,And,signal_2(s),<=,-15.27,TRUE
+ForAll,s,<,0,Or,s,<,10,Implies,signal_4(s),<=,50,Or,signal_2(s),<,-46.31,FALSE
+ForAll,s,<,-1,And,s,<=,10,Implies,signal_4(s),<=,-31,And,signal_2(s),>=,-15.27,FALSE
+ForAll,s,<,0,And,s,<,-3,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-29.31,FALSE
+ForAll,s,>=,1,Or,s,<,10,Implies,signal_4(s),>,50,And,signal_2(s),<=,-79.33,FALSE
+ForAll,s,<,0,And,s,<,-4,Implies,signal_4(s),<=,50,And,signal_2(s),>=,-15.27,FALSE
+ForAll,s,<,0,And,s,<,-4,Implies,signal_4(s),<=,50,And,signal_2(s),>=,-15.27,FALSE
+ForAll,s,<,0,And,s,<,3,Implies,signal_4(s),<=,11,And,signal_2(s),>,-15.27,FALSE
+Exists,s,<=,1,And,s,<=,59,Implies,signal_4(s),>,50,Or,signal_2(s),<,-15.27,TRUE
+ForAll,s,<,1,Or,s,<=,-13,Implies,signal_4(s),>,50,And,signal_2(s),<=,-60.35,FALSE
+ForAll,s,<,1,And,s,>=,10,Implies,signal_4(s),>,64,Or,signal_2(s),<=,-15.27,TRUE
+ForAll,s,<,1,And,s,>=,10,Implies,signal_4(s),>,50,And,signal_2(s),<,-15.27,TRUE
+ForAll,s,<,0,And,s,>=,87,Implies,signal_4(s),>,-40,And,signal_2(s),<,-15.27,TRUE
+ForAll,s,>=,0,And,s,<,2,Implies,signal_4(s),<=,53,And,signal_2(s),>=,5.18,FALSE
+ForAll,s,>=,-5,Or,s,<,-74,Implies,signal_4(s),>,50,Or,signal_2(s),<=,115.26,FALSE
+ForAll,s,>,1,And,s,>,49,Implies,signal_4(s),>=,74,Or,signal_2(s),<=,49.08,FALSE
+ForAll,s,<,0,And,s,<,-9,Implies,signal_4(s),>=,50,And,signal_2(s),>=,-101.91,FALSE
+ForAll,s,<=,1,And,s,<=,70,Implies,signal_4(s),>=,37,Or,signal_2(s),>=,-15.27,FALSE
+ForAll,s,>,1,Or,s,>=,10,Implies,signal_4(s),>,74,And,signal_2(s),<=,-125.33,FALSE
+ForAll,s,<,0,And,s,<,-20,Implies,signal_4(s),>,26,And,signal_2(s),>=,36.12,FALSE
+ForAll,s,<=,-1,And,s,>,-45,Implies,signal_4(s),<,336,And,signal_2(s),<=,-29.31,FALSE

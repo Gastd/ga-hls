@@ -1,0 +1,2 @@
+Formula	SW_Score	Satisfied
+SEED: ForAll s In (s > 0 And s < 10) Implies (signal_4(s) < 50 And signal_2(s) >= -15.27)	-	-

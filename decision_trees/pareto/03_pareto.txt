@@ -1,0 +1,33 @@
+@relation pareto.generation3
+
+@attribute QUANTIFIERS {ForAll, Exists}
+@attribute VARIABLE {s}
+@attribute RELATIONALS {<,>,<=,>=, =}
+@attribute NUMBER NUMERIC
+@attribute LOGICALS1 {And, Or}
+@attribute VARIABLE1 {s}
+@attribute RELATIONALS1 {<,>,<=,>=, =}
+@attribute NUMBER1 NUMERIC
+@attribute IMP1 {Implies}
+@attribute SIGNALS {signal_2(s),signal_4(s)}
+@attribute RELATIONALS2 {<,>,<=,>=, =}
+@attribute NUMBER2 NUMERIC
+@attribute LOGICALS2 {And, Or}
+@attribute SIGNALS1 {signal_2(s),signal_4(s)}
+@attribute RELATIONALS3 {<,>,<=,>=, =}
+@attribute NUMBER3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE}
+
+@data
+ForAll,s,>,0,And,s,<=,-13,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-29.31,TRUE
+ForAll,s,<,-4,And,s,>=,10,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-15.27,TRUE
+ForAll,s,<,0,And,s,>=,40,Implies,signal_4(s),<=,26,And,signal_2(s),<,-15.27,TRUE
+ForAll,s,<,-1,And,s,>=,640,Implies,signal_4(s),>,48,And,signal_2(s),>=,-15.27,TRUE
+ForAll,s,<,0,And,s,>=,151,Implies,signal_4(s),>,50,Or,signal_2(s),<=,-29.31,TRUE
+Exists,s,<,-1,Or,s,<=,304,Implies,signal_4(s),>=,50,And,signal_2(s),>=,-47.45,TRUE
+ForAll,s,<,0,And,s,<=,-13,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-29.31,FALSE
+ForAll,s,<,0,And,s,<=,151,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-29.31,FALSE
+ForAll,s,<,1,Or,s,<=,10,Implies,signal_4(s),<=,50,And,signal_2(s),<=,-15.27,FALSE
+ForAll,s,<,-5,Or,s,<=,-4,Implies,signal_4(s),<,50,And,signal_2(s),>,-15.27,FALSE
+ForAll,s,<,1,Or,s,<=,10,Implies,signal_4(s),>,50,And,signal_2(s),<=,-15.27,FALSE
+ForAll,s,<,1,And,s,<=,-61,Implies,signal_4(s),>,50,And,signal_2(s),<=,-15.27,FALSE
