@@ -3,3 +3,4 @@ __pycache__
 2023*/
 ga_hls/prop_ctrl.py
 ga_hls/temp.py
+ga_hls/z3check.py
