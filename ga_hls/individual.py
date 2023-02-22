@@ -12,7 +12,7 @@ MUTATION_NODES = 5
 
 # OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
 QUANTIFIERS = ['ForAll', 'Exists']
-RELATIONALS = ['<', '>', '<=', '>=']
+RELATIONALS = ['<', '>', '<=', '>=', '==']
 EQUAL = ['=']
 ARITHMETICS = ['+', '-']
 MULDIV = ['*', '/']

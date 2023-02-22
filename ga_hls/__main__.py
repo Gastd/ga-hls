@@ -16,7 +16,7 @@ form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t"
 
 
 
-# exemple = json.loads('[]')
+example = json.loads('["ForAll", ["s", ["Implies", [["And", [[">", ["s",0]], ["<", ["s",18] ] ]], ["And", [["Implies", [ ["==", ["signal_5[s]",0]], ["==", ["signal_6[s]",1]] ]], ["Implies", [ ["==", ["signal_5[s]",1]], ["==", ["signal_6[s]",0]] ]]]]]]]]')
 
 
 
@@ -56,7 +56,8 @@ form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t"
 # print(ind2.root.cut_tree_random())
 
 # ga = GA(form5)
-ga = GA(form1)
+# ga = GA(form1)
+ga = GA(example)
 # ga.write_population(0)
 ga.evolve()
 # print("offsprings")

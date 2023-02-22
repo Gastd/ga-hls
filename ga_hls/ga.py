@@ -31,6 +31,8 @@ import matplotlib
 # import analyse
 # from analyse import Smith_Waterman
 
+import defs
+
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia
 POPULATION_SIZE = 30 #100 #30  ## Must be an EVEN number
@@ -47,11 +49,13 @@ FOLDS = 10
 
 SCALE = 0.5
 
-FILEPATH = 'ga_hls/prop_ctrl.py'
-FILEPATH2 = 'ga_hls/prop_ctrl1.py'
-# FILEPATH = 'ga_hls/property_distance_obs_r2.py'
-# FILEPATH2 = 'ga_hls/property_distance_obs_r2.py'
+# defs.FILEPATH = 'ga_hls/prop_ctrl.py'
+# defs.FILEPATH2 = 'ga_hls/prop_ctrl1.py'
+# defs.FILEPATH = 'ga_hls/property_distance_obs_r2.py'
+# defs.FILEPATH2 = 'ga_hls/property_distance_obs_r2.py'
 
+FILEPATH = 'ga_hls/property_04_two.py'
+FILEPATH2 = 'ga_hls/property_04_two.py'
 
 class GA(object):
     """docstring for GA"""
@@ -139,7 +143,7 @@ class GA(object):
 
     def get_line(self, file):
         # print(f'Running on {os.getcwd()} folder')
-        file_path = FILEPATH
+        file_path = defs.FILEPATH
         newf_str = ''
         print(f'Running on {file_path} folder')
         with open(file_path) as f:
@@ -157,9 +161,9 @@ class GA(object):
             return d2, newf_str.rfind('\n')
 
     def save_file(self, s, e, nline):
-        src = FILEPATH
+        src = defs.FILEPATH
         dst = 'ga_hls/temp.py'
-        # print(f'Running on {FILEPATH} folder')
+        # print(f'Running on {defs.FILEPATH} folder')
         with open(src) as firstfile, open(dst,'w') as secondfile:
             firstfile.seek(e)
             secondfile.write(self.first[:s])
@@ -173,7 +177,7 @@ class GA(object):
 
     def test_chromosome(self, chromosome):
         # print(f'writing test for: {str(chromosome)}')
-        def find_traces_in_file(file_path = FILEPATH2):
+        def find_traces_in_file(file_path = defs.FILEPATH2):
             print(f'Running on {os.getcwd()} folder')
             print(f'Running on {file_path} folder')
             newf_str1 = ''
@@ -197,7 +201,7 @@ class GA(object):
                 self.first = newf_str1
                 return newf_str1.rfind('\n'), d2
         def save_z3check(s, e, nline):
-            src = FILEPATH2
+            src = defs.FILEPATH2
             file = 'ga_hls/z3check.py'
             print(f'Running on {file} folder')
             form_line = ''
@@ -235,7 +239,7 @@ class GA(object):
                 # z3check_file.seek(0, 0)
                 # firstfile.seek(0, 0)
 
-        def get_file_w_traces(file_path = FILEPATH2):
+        def get_file_w_traces(file_path = defs.FILEPATH2):
             s = e = -1
             lines = []
             with open(file_path) as f:
@@ -275,7 +279,7 @@ class GA(object):
 
         start, end, lines = get_file_w_traces()
         save_check_wo_traces(start, end, lines, f'Not({chromosome.format()})')
-        f = open(FILEPATH2, 'r')
+        f = open(defs.FILEPATH2, 'r')
         f.seek(0, 0)
         f.close()
 
