@@ -26,6 +26,21 @@ def strcmp(str1, str2):
         c2 += ord(str2[i])
     return c1-c2
 
+def compare_tree(root1, root2, level=0):
+    MISMATCH = 5
+
+    if root1.left is None and root1.right is None:
+        return 0
+
+    l = compare_tree(root1.left, root2.left, level+1)
+    r = compare_tree(root1.right, root2.right, level+1)
+    node_match = 0
+
+    if root1.value != root2.value:
+        node_match = MISMATCH*2**level
+
+    return l + r + node_match
+
 class Node(object):
     """docstring for Node"""
     def __init__(self, value):
@@ -61,12 +76,15 @@ class Node(object):
     #         pass
 
     def __eq__(self, other):
-        return self.value == other.value
+        if not isinstance(other, Node):
+            return self.value == other
+        else:
+            return self.value == other.value
 
     def __repr__(self):
         if isinstance(self.value, float):
             # return f'{repr(self.value)}'
-            return f'{repr(self.value):.2f}'
+            return f'{self.value:.2f}'
         else:
             return f'{repr(self.value)}'
         # if (self.left is None) and (self.right is None):

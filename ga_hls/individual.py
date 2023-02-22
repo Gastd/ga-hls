@@ -1,18 +1,24 @@
 import sys
 import math
+import shlex
 import random
+import subprocess
 
 # from .treenode import 
 import treenode
+import defs
 
-MUTATION_NODES = 1
+MUTATION_NODES = 5
 
-OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
+# OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
 QUANTIFIERS = ['ForAll', 'Exists']
 RELATIONALS = ['<', '>', '<=', '>=']
-ARITHMETICS = ['+', '-', '*', '/', '^']
+EQUAL = ['=']
+ARITHMETICS = ['+', '-']
+MULDIV = ['*', '/']
+EXP = ['^']
 LOGICALS = ['And', 'Or']
-NEG = ['Not']
+NEG = ['Not']   # PROBLEM
 IMP = ['Implies']
 
 def show_arg_ret_decorator(function):
@@ -32,6 +38,8 @@ class Individual():
         self.fitness = -1
         self.term = self.check_terminators(terminators)
         self.madeit = False
+        self.sw_score = -1
+        self.self_test = None
         # self.maxint, self.minint = self.get_minmax(terminators, int)
         # self.maxfloat, self.minfloat = self.get_minmax(terminators, float)
 
@@ -42,6 +50,71 @@ class Individual():
     #     else:
     #         return max(t_list), min(t_list)
 
+    def is_viable(self):
+        def get_file_w_traces(file_path = defs.FILEPATH2):
+            s = e = -1
+            lines = []
+            with open(file_path) as f:
+                for l in f:
+                    lines.append(l)
+            # print('lines')
+            for idx, l in enumerate(lines):
+                if l.find('z3solver.add') >= 0:
+                    # print(idx, l)
+                    s = idx
+                    break
+            for idx, l in enumerate(lines):
+                # print(l, l.find('z3solver.check'))
+                if l.find('z3solver.check') >= 0:
+                    # print(idx, l)
+                    e = idx
+                    break
+            # print('lines')
+            return s, e, lines
+
+        def save_check_wo_traces(start, end, lines, nline, file_path = 'ga_hls/z3check.py'):
+            before = lines[:start]
+            after = lines[end:]
+            with open(file_path,'w') as z3check_file:
+                for l in before:
+                    z3check_file.write(l)
+                form_line = (f'\tz3solver.add({nline})\n')
+                z3check_file.write('\n')
+                # print(form_line)
+                z3check_file.write(form_line)
+                z3check_file.write('\n')
+                for l in after:
+                    z3check_file.write(l)
+
+        start, end, lines = get_file_w_traces()
+        save_check_wo_traces(start, end, lines, f'Not({self.format()})')
+        f = open(defs.FILEPATH2, 'r')
+        f.seek(0, 0)
+        f.close()
+
+        folder_name = 'ga_hls'
+        run_str = f'python3 {folder_name}/z3check.py'
+        run_tk = shlex.split(run_str)
+        try:
+            run_process = subprocess.run(run_tk,
+                                         stderr=subprocess.PIPE,
+                                         stdout=subprocess.PIPE,
+                                         universal_newlines=True,
+                                         timeout=10)
+        except:
+            return False
+        # print(run_process.stdout)
+        if run_process.stdout.find('SATISFIED') > 0:
+            # print('Chromosome not viable')
+            return False
+        elif run_process.stdout.find('VIOLATED') > 0:
+            # print('Chromosome viable')
+            return True
+        else:
+            # print('Chromosome not viable')
+            return False
+        return
+
     def reset(self):
         self.fitness = -1
 
@@ -49,6 +122,9 @@ class Individual():
         if self.root is not None:
             print(self.root)
         # print()
+
+    def __eq__(self, other):
+        return str(self) == str(other)
 
     def __iter__(self):
         return iter(self.root)
@@ -146,7 +222,7 @@ def readable(root):
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in RELATIONALS:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
-    elif root.value in ARITHMETICS:
+    elif root.value in ARITHMETICS+MULDIV+EXP:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
 
 def build_str(root):
@@ -155,8 +231,9 @@ def build_str(root):
         return ''
     if root.left is None:
         try:
-            s = root.value#.replace(')', ']')
-            # s = s.replace('(', '[')
+            # s = root.value#.replace(')', ']')
+            s = root.value.replace(')', ']')
+            s = s.replace('(', '[')
             return f'{s}'
         except:
             return f'{root.value}'
