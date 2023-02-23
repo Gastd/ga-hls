@@ -18,6 +18,8 @@ import treenode
 import individual
 import diagnosis
 
+from individual import QUANTIFIERS, RELATIONALS, EQUAL, ARITHMETICS, MULDIV, EXP, LOGICALS, NEG, IMP
+
 # from anytree import Node
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -38,7 +40,7 @@ MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia
 POPULATION_SIZE = 30 #100 #30  ## Must be an EVEN number
 GENE_LENGTH = 32
 MAX_ALLOWABLE_GENERATIONS = 30 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
-# MAX_ALLOWABLE_GENERATIONS = 10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
+# MAX_ALLOWABLE_GENERATIONS = 3 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 NUMBER_OF_PARAMETERS = 17 ## Number of parameters to be evolved
 CHROMOSOME_LENGTH = GENE_LENGTH * NUMBER_OF_PARAMETERS
 CHROMOSOME_TO_PRESERVE = 0 #4            ## Must be an EVEN number
@@ -56,6 +58,13 @@ SCALE = 0.5
 
 FILEPATH = 'ga_hls/property_04_two.py'
 FILEPATH2 = 'ga_hls/property_04_two.py'
+
+def isfloat(num):
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
 
 class GA(object):
     """docstring for GA"""
@@ -366,46 +375,154 @@ class GA(object):
         # print(f'\nWe have so far {len(self.sats)} satisfied')
         # print(f'and {len(self.unsats)} unsatisfied')
 
+    def build_attributes(self, formulae: list):
+        count_op = {
+            'QUANTIFIERS': 0,
+            'RELATIONALS': 0,
+            'EQUAL': 0,
+            'ARITHMETICS': 0,
+            'MULDIV': 0,
+            'EXP': 0,
+            'LOGICALS': 0,
+            'NEG': 0,
+            'IMP': 0,
+            'NUM': 0,
+            'SINGALS': 0,
+            'TERM': 0
+        }
+        terminators = list(set(treenode.get_terminators(self.seed)))
+        terminators = [value for value in terminators if not isinstance(value, int) and not isinstance(value, float)]
+        ret = []
+        for term in formulae:
+            if term in QUANTIFIERS:
+                qstring = str(QUANTIFIERS)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'QUANTIFIERS{count_op["QUANTIFIERS"]} {qstring}')
+                count_op['QUANTIFIERS'] = count_op['QUANTIFIERS'] + 1
+            if term in RELATIONALS:
+                qstring = str(RELATIONALS)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'RELATIONALS{count_op["RELATIONALS"]} {qstring}')
+                count_op['RELATIONALS'] = count_op['RELATIONALS'] + 1
+            if term in EQUAL:
+                qstring = str(EQUAL)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'EQUAL{count_op["EQUAL"]} {qstring}')
+                count_op['EQUAL'] = count_op['EQUAL'] + 1
+            if term in ARITHMETICS:
+                qstring = str(ARITHMETICS)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'ARITHMETICS{count_op["ARITHMETICS"]} {qstring}')
+                count_op['ARITHMETICS'] = count_op['ARITHMETICS'] + 1
+            if term in MULDIV:
+                qstring = str(MULDIV)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'MULDIV{count_op["MULDIV"]} {qstring}')
+                count_op['MULDIV'] = count_op['MULDIV'] + 1
+            if term in EXP:
+                qstring = str(EXP)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'EXP{count_op["EXP"]} {qstring}')
+                count_op['EXP'] = count_op['EXP'] + 1
+            if term in LOGICALS:
+                qstring = str(LOGICALS)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'LOGICALS{count_op["LOGICALS"]} {qstring}')
+                count_op['LOGICALS'] = count_op['LOGICALS'] + 1
+            if term in NEG:
+                qstring = str(NEG)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'NEG{count_op["NEG"]} {qstring}')
+                count_op['NEG'] = count_op['NEG'] + 1
+            if term in IMP:
+                qstring = str(IMP)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'IMP{count_op["IMP"]} {qstring}')
+                count_op['IMP'] = count_op['IMP'] + 1
+            if term in terminators:
+                qstring = str(terminators)
+                qstring = qstring.replace('\'', '')
+                qstring = '{'+qstring[1:-1]+'}'
+                ret.append(f'TERM{count_op["TERM"]} {qstring}')
+                count_op['TERM'] = count_op['TERM'] + 1
+            if term.isnumeric() or isfloat(term):
+                ret.append(f'NUM{count_op["NUM"]} NUMERIC')
+                count_op['NUM'] = count_op['NUM'] + 1
+        return ret
+
     def store_dataset_qty(self, per_cut: float):
         self.sats.sort(key=lambda x : x.sw_score, reverse=True)
         self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
 
         per_qty = math.ceil(len(self.sats) * per_cut)
-        if len(self.sats) > per_qty:
-            self.sats = self.sats[:per_qty]
-        if len(self.unsats) > per_qty:
-            self.unsats = self.unsats[:per_qty]
+        sats = self.sats
+        unsats = self.unsats
+        if len(sats) > per_qty:
+            sats = sats[:per_qty]
+        if len(unsats) > per_qty:
+            unsats = unsats[:per_qty]
 
-        with open('{}/dataset_qty_{}.arff'.format(self.path, self.now), 'w') as f:
+        chstr = str(sats[0])
+        chstr = chstr.replace(' ', ',')
+        chstr = chstr.replace(',s,In,(', ',')
+        chstr = chstr.replace('),Implies,(', ',Implies,')
+        chstr = chstr[:-1]
+        # print(chstr.split(','))
+        attrs = self.build_attributes(chstr.split(','))
+        # for att in attrs:
+        #     print(att)
+
+        with open('{}/dataset_qty_{}_per{}.arff'.format(self.path, self.now, int(per_cut*100)), 'w') as f:
             f.write('@relation all.generationall\n')
             f.write('\n')
-            f.write('@attribute QUANTIFIERS {ForAll, Exists}\n')
-            f.write('@attribute VARIABLE {s}\n')
-            f.write('@attribute RELATIONALS {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER NUMERIC\n')
-            f.write('@attribute LOGICALS1 {And, Or}\n')
-            f.write('@attribute VARIABLE1 {s}\n')
-            f.write('@attribute RELATIONALS1 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER1 NUMERIC\n')
-            f.write('@attribute IMP1 {Implies}\n')
-            f.write('@attribute SIGNALS {signal_2(s),signal_4(s)}\n')
-            f.write('@attribute RELATIONALS2 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER2 NUMERIC\n')
-            f.write('@attribute LOGICALS2 {And, Or}\n')
-            f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
-            f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER3 NUMERIC\n')
+            for att in attrs:
+                f.write(f'@attribute {att}\n')
+
+            # f.write('@attribute QUANTIFIERS {ForAll, Exists}\n')
+            # f.write('@attribute VARIABLE {s}\n')
+            # f.write('@attribute RELATIONALS {<,>,<=,>=, =}\n')
+            # f.write('@attribute NUMBER NUMERIC\n')
+            # f.write('@attribute LOGICALS1 {And, Or}\n')
+            # f.write('@attribute VARIABLE1 {s}\n')
+            # f.write('@attribute RELATIONALS1 {<,>,<=,>=, =}\n')
+            # f.write('@attribute NUMBER1 NUMERIC\n')
+            # f.write('@attribute IMP1 {Implies}\n')
+            # f.write('@attribute SIGNALS {signal_2(s),signal_4(s)}\n')
+            # f.write('@attribute RELATIONALS2 {<,>,<=,>=, =}\n')
+            # f.write('@attribute NUMBER2 NUMERIC\n')
+            # f.write('@attribute LOGICALS2 {And, Or}\n')
+            # f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
+            # f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
+            # f.write('@attribute NUMBER3 NUMERIC\n')
             f.write('@attribute VEREDICT {TRUE, FALSE}\n')
             f.write('\n')
             f.write('@data\n')
-            for chromosome in self.sats:
+            for chromosome in sats:
                 ch_str = str(chromosome)
                 ch_str = ch_str.replace(' ', ',')
                 ch_str = ch_str.replace(',s,In,(', ',')
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
                 f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
-            for chromosome in self.unsats:
+            for chromosome in unsats:
                 ch_str = str(chromosome)
                 ch_str = ch_str.replace(' ', ',')
                 ch_str = ch_str.replace(',s,In,(', ',')
@@ -574,6 +691,7 @@ class GA(object):
             self.population = new_population
             self.diagnosis()
         self.store_dataset_qty(1.)
+        self.store_dataset_qty(.2)
 
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             for hypot in self.hypots:
