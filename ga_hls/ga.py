@@ -56,8 +56,8 @@ SCALE = 0.5
 # defs.FILEPATH = 'ga_hls/property_distance_obs_r2.py'
 # defs.FILEPATH2 = 'ga_hls/property_distance_obs_r2.py'
 
-FILEPATH = 'ga_hls/benchmark/property_01_err_two.py'
-FILEPATH2 = 'ga_hls/benchmark/property_01_err_two.py'
+# FILEPATH = 'ga_hls/benchmark/property_01_err_eight.py'
+# FILEPATH2 = 'ga_hls/benchmark/property_01_err_eight.py'
 
 def isfloat(num):
     try:
@@ -90,6 +90,7 @@ class GA(object):
         self.unsats = []
         # self.diag = diagnosis.Diagnosis()
         # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
+        print(f'Runnnig script {defs.FILEPATH} and {defs.FILEPATH2}')
 
     def check_highest_sat(self, chromosome):
         if chromosome is None:
@@ -709,7 +710,6 @@ class GA(object):
             else:
                 l.append(tk)
         return l
-
 
     def diagnosis(self):
         return

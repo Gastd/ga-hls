@@ -9,6 +9,7 @@ import treenode
 import defs
 
 MUTATION_NODES = 5
+MUT_IDXS =[13, 16]
 
 # OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
 QUANTIFIERS = ['ForAll', 'Exists']
@@ -141,7 +142,28 @@ class Individual():
     def mutate(self, rate: float, nmutations=MUTATION_NODES):
         for _ in range(0, nmutations):
             if (random.random() < rate):
-                mut_idx = random.randrange(len(self.root))
+                # mut_idx = random.randrange(len(self.root))
+                mut_idx = random.choice(MUT_IDXS)
+                subtree, parent = self.root.get_subtree(mut_idx)
+                if subtree.left is None:
+                    subtree.value = self.get_new_term(subtree.value)
+                else:
+                    new_operator = self.get_new_op(subtree.value)
+                    if parent:
+                        if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
+                            # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
+                            continue
+                    subtree.value = new_operator
+
+    def force_mutate(self, mut_idxs=[], nmutations=MUTATION_NODES):
+        if len(mut_idxs) == 0:
+            print('MUT_IDX')
+            return
+        rate = 1.0
+        for _ in range(0, nmutations):
+            if (random.random() < rate):
+                # mut_idx = random.randrange(len(self.root))
+                mut_idx = random.choice(MUT_IDXS)
                 subtree, parent = self.root.get_subtree(mut_idx)
                 if subtree.left is None:
                     subtree.value = self.get_new_term(subtree.value)
@@ -231,9 +253,9 @@ def build_str(root):
         return ''
     if root.left is None:
         try:
-            # s = root.value#.replace(')', ']')
-            s = root.value.replace(')', ']')
-            s = s.replace('(', '[')
+            s = root.value#.replace(')', ']')
+            # s = root.value.replace(')', ']')
+            # s = s.replace('(', '[')
             return f'{s}'
         except:
             return f'{root.value}'

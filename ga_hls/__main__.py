@@ -2,6 +2,8 @@ import json
 import treenode
 from individual import Individual
 from ga import GA
+import defs
+import sys
 
 ## interval_s=And(s>0, s<10)
 ## conditions_s=And(signal_4[s]<1000, signal_2[s]>=-(15.27))
@@ -19,7 +21,7 @@ form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t"
 example = json.loads('["ForAll", ["s", ["Implies", [["And", [[">", ["s",0]], ["<", ["s",18] ] ]], ["And", [["Implies", [ ["==", ["signal_5[s]",0]], ["==", ["signal_6[s]",0]] ]], ["Implies", [ ["==", ["signal_5[s]",1]], ["==", ["signal_6[s]",0]] ]]]]]]]]')
 example1= json.loads('["ForAll", ["t", ["Implies", [["And", [["<=", [0,"t"]], ["<=", ["t",6.525E7] ] ]], [">", ["d_aramis_porthos[ToInt(RealVal(0)+(t-0.0)/25000.0)]",0.5]] ]] ]]')
 example2= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[t]",0.7]], [">=", ["err[t]",-0.7]]]]]]]]')
-example2_1= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[t]",0.7]], [">=", ["err[t]",-0.7]]]]]]]]')
+experiment1= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.007]], [">=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",-0.007]]]]]]]]')
 
 
 
@@ -30,7 +32,7 @@ example2_1= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], 
 # print(len(form1[1][1][1][1][1]))
 # print(    form1[1][1][1][1][1][1][0][1])
 
-# root1 = treenode.parse(form5)
+root1 = treenode.parse(form5)
 # root2 = treenode.parse(form2)
 
 # print(root1)
@@ -43,23 +45,43 @@ example2_1= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], 
 # treenode.printInorder(root1)
 # treenode.dfs(root1)
 # print('')
-# v, p = treenode.bfs(root1)
 
-# print(v)
-# print(p)
 
-# ind1 = Individual(treenode.parse(form3))
-# ind2 = Individual(treenode.parse(form4))
-# ind1.mutate()
+
+# vertices, parents = treenode.bfs(root1)
+# for i, v in enumerate(vertices):
+# 	print(i, v.value)
+# print('')
+# for i, p in enumerate(parents):
+# 	if p is not None:
+# 		print(i, p.value)
+
+# x = input("Choose what vertices to mutate, chose -1 for cancel: ([1,2,3])\n")
+# x = list(x)
+# l = [int(a) for a in x if a != ',']
+# x.remove(',')
+# print(l)
+
+# t1 = list(set(treenode.get_terminators(treenode.parse(form5))))
+# ind1 = Individual(treenode.parse(form5), t1)
+# ind1.print_genes()
+# ind1.force_mutate(l)
 # print("parents")
 # ind1.print_genes()
+
+
+# ind2 = Individual(treenode.parse(form4))
 # ind2.print_genes()
 # print(ind2.root.cut_tree_random())
 
 # ga = GA(form5)
 # ga = GA(form1)
 # ga = GA(example)
-ga = GA(example2_1)
+defs.FILEPATH = sys.argv[1]
+defs.FILEPATH2= sys.argv[1]
+
+
+ga = GA(experiment1)
 # ga.write_population(0)
 ga.evolve()
 # print("offsprings")
