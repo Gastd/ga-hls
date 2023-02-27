@@ -6,7 +6,7 @@ def property_01():
 	z3solver=Solver() 
 
 	#err contained in the file
-	t=Int('t') 
+	t=Real('t') 
 
 	#Trace: property_01
 	timestamps=Array('timestamps', RealSort(), IntSort())
@@ -10027,8 +10027,8 @@ def property_01():
 
 
 
-	interval_t=And(t>=11, t<=50)
-	conditions_t=And(err[t]<=0.7, err[t]>=-(0.7))
+	interval_t=And(11<=t, t<=50)
+	conditions_t=And(err[ToInt(RealVal(0)+(t-0.0)/10000.0)]<=0.007, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]>=-(0.007))
 	z3solver.add(Not(ForAll([t], Implies(interval_t, conditions_t))))
 	status=z3solver.check()
 	print(status)
