@@ -3,5 +3,5 @@
 # FILEPATH = 'ga_hls/property_distance_obs_r2.py'
 # FILEPATH2 = 'ga_hls/property_distance_obs_r2.py'
 
-FILEPATH = 'ga_hls/property_04_two.py'
-FILEPATH2 = 'ga_hls/property_04_two.py'
+FILEPATH = 'ga_hls/benchmark/property_01_err_two.py'
+FILEPATH2 = 'ga_hls/benchmark/property_01_err_two.py'

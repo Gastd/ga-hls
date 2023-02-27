@@ -12,8 +12,8 @@ MUTATION_NODES = 5
 
 # OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
 QUANTIFIERS = ['ForAll', 'Exists']
-RELATIONALS = ['<', '>', '<=', '>=', '==']
-EQUAL = ['=']
+RELATIONALS = ['<', '>', '<=', '>=']
+EQUAL = ['==']
 ARITHMETICS = ['+', '-']
 MULDIV = ['*', '/']
 EXP = ['^']
@@ -220,7 +220,7 @@ def readable(root):
         return f'{root.value} {readable(root.left)} In ({readable(root.right.left)}) Implies ({readable(root.right.right)})'
     elif root.value in LOGICALS+IMP+NEG:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
-    elif root.value in RELATIONALS:
+    elif root.value in RELATIONALS+EQUAL:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in ARITHMETICS+MULDIV+EXP:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'

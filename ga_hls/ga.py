@@ -56,8 +56,8 @@ SCALE = 0.5
 # defs.FILEPATH = 'ga_hls/property_distance_obs_r2.py'
 # defs.FILEPATH2 = 'ga_hls/property_distance_obs_r2.py'
 
-FILEPATH = 'ga_hls/property_04_two.py'
-FILEPATH2 = 'ga_hls/property_04_two.py'
+FILEPATH = 'ga_hls/benchmark/property_01_err_two.py'
+FILEPATH2 = 'ga_hls/benchmark/property_01_err_two.py'
 
 def isfloat(num):
     try:
@@ -115,17 +115,17 @@ class GA(object):
         self.seed = root
         terminators = list(set(treenode.get_terminators(root)))
         self.seed_ch = deepcopy(individual.Individual(root, terminators))
-        print(f'terminators = {terminators}')
-        print(f'Initial formula: {root}')
+        # print(f'terminators = {terminators}')
+        # print(f'Initial formula: {root}')
         for i in tqdm(range(0, self.size)):
             chromosome = deepcopy(individual.Individual(root, terminators))
             n = random.randrange(len(root))
             chromosome.mutate(1, n)
-            print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
+            # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
             while not chromosome.is_viable():
                 chromosome = deepcopy(individual.Individual(root, terminators))
                 chromosome.mutate(1, random.randrange(len(chromosome)))
-                print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
+                # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
             self.population.append(deepcopy(chromosome))
         # raise Exception('')
         print("Population initialized. Size = {}".format(self.size))
@@ -482,7 +482,7 @@ class GA(object):
 
         chstr = str(sats[0])
         chstr = chstr.replace(' ', ',')
-        chstr = chstr.replace(',s,In,(', ',')
+        chstr = chstr.replace(',t,In,(', ',')
         chstr = chstr.replace('),Implies,(', ',Implies,')
         chstr = chstr[:-1]
         # print(chstr.split(','))
@@ -690,8 +690,11 @@ class GA(object):
             self.generation_counter += 1
             self.population = new_population
             self.diagnosis()
-        self.store_dataset_qty(1.)
-        self.store_dataset_qty(.2)
+        self.store_dataset_qty(1.0)
+        self.store_dataset_qty(.25)
+        self.store_dataset_qty(.20)
+        self.store_dataset_qty(.15)
+        self.store_dataset_qty(.10)
 
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             for hypot in self.hypots:
@@ -741,7 +744,7 @@ class GA(object):
                 continue
 
             # self.test_chromosome(chromosome)
-            print(f'Chromosome {chromosome.format()}')
+            # print(f'Chromosome {chromosome.format()}')
             # if self.test_chromosome(chromosome) == False:
             #     continue
             # print(f'self.s={self.s}, self.e={self.e}')
@@ -770,10 +773,19 @@ class GA(object):
                 else:
                     errorn = run_process.stdout.find('REQUIREMENT')
                     err = run_process.stdout[errorn:-1]
+
                 if err in self.execution_report.keys():
                     self.execution_report[err] += 1
                 else:
                     self.execution_report[err] = 1
+
+                if run_process.stdout.find('SATISFIED') > 0:
+                    chromosome.madeit = True
+                    self.check_highest_sat(chromosome)
+                elif run_process.stdout.find('VIOLATED') > 0:
+                    chromosome.madeit = False
+                else:
+                    chromosome.madeit = False
             except:
                 chromosome.madeit = False
             # print(self.execution_report)
@@ -798,13 +810,6 @@ class GA(object):
             # print(f'\n')
 
             chromosome.fitness = int(100 * (new_result + new_result_seed) / self.max_score)# + (treenode.compare_tree(self.seed, chromosome.root) * SCALE)
-            if run_process.stdout.find('SATISFIED') > 0:
-                chromosome.madeit = True
-                self.check_highest_sat(chromosome)
-            elif run_process.stdout.find('VIOLATED') > 0:
-                chromosome.madeit = False
-            else:
-                chromosome.madeit = False
                 # chromosome.madeit = '\n'+run_process.stderr
                 # print(run_process.stdout)
 

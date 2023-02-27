@@ -16,9 +16,10 @@ form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t"
 
 
 
-example = json.loads('["ForAll", ["s", ["Implies", [["And", [[">", ["s",0]], ["<", ["s",18] ] ]], ["And", [["Implies", [ ["==", ["signal_5[s]",0]], ["==", ["signal_6[s]",1]] ]], ["Implies", [ ["==", ["signal_5[s]",1]], ["==", ["signal_6[s]",0]] ]]]]]]]]')
-
-
+example = json.loads('["ForAll", ["s", ["Implies", [["And", [[">", ["s",0]], ["<", ["s",18] ] ]], ["And", [["Implies", [ ["==", ["signal_5[s]",0]], ["==", ["signal_6[s]",0]] ]], ["Implies", [ ["==", ["signal_5[s]",1]], ["==", ["signal_6[s]",0]] ]]]]]]]]')
+example1= json.loads('["ForAll", ["t", ["Implies", [["And", [["<=", [0,"t"]], ["<=", ["t",6.525E7] ] ]], [">", ["d_aramis_porthos[ToInt(RealVal(0)+(t-0.0)/25000.0)]",0.5]] ]] ]]')
+example2= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[t]",0.7]], [">=", ["err[t]",-0.7]]]]]]]]')
+example2_1= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[t]",0.7]], [">=", ["err[t]",-0.7]]]]]]]]')
 
 
 
@@ -57,7 +58,8 @@ example = json.loads('["ForAll", ["s", ["Implies", [["And", [[">", ["s",0]], ["<
 
 # ga = GA(form5)
 # ga = GA(form1)
-ga = GA(example)
+# ga = GA(example)
+ga = GA(example2_1)
 # ga.write_population(0)
 ga.evolve()
 # print("offsprings")
