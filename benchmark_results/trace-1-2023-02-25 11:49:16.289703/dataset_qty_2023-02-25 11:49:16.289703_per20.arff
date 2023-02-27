@@ -1,0 +1,45 @@
+@relation all.generationall
+
+@attribute QUANTIFIERS0 {ForAll, Exists}
+@attribute TERM0 {err[t], t}
+@attribute RELATIONALS0 {<, >, <=, >=}
+@attribute NUM0 NUMERIC
+@attribute LOGICALS0 {And, Or}
+@attribute TERM1 {err[t], t}
+@attribute RELATIONALS1 {<, >, <=, >=}
+@attribute NUM1 NUMERIC
+@attribute IMP0 {Implies}
+@attribute TERM2 {err[t], t}
+@attribute RELATIONALS2 {<, >, <=, >=}
+@attribute NUM2 NUMERIC
+@attribute LOGICALS1 {And, Or}
+@attribute TERM3 {err[t], t}
+@attribute RELATIONALS3 {<, >, <=, >=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE}
+
+@data
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,0.70,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,0.70,And,err[t],>=,-1.22,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,0.70,And,err[t],>,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>,0.70,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,0.38,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,1.33,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,33,And,t,<,50,Implies,err[t],>=,0.70,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<,68,Implies,err[t],>=,0.70,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,44,And,t,<,50,Implies,err[t],>=,0.70,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,0.60,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,1.26,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<=,50,Implies,err[t],>=,0.70,And,err[t],>,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.70,FALSE
+ForAll,t,>=,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.70,FALSE
+ForAll,t,>,11,And,t,<=,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.70,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,0.15,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-1.19,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,4.55,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-6.01,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.27,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-1.27,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.94,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-1.20,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-1.18,FALSE
