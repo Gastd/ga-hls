@@ -142,8 +142,7 @@ class Individual():
     def mutate(self, rate: float, nmutations=MUTATION_NODES):
         for _ in range(0, nmutations):
             if (random.random() < rate):
-                # mut_idx = random.randrange(len(self.root))
-                mut_idx = random.choice(MUT_IDXS)
+                mut_idx = random.randrange(len(self.root))
                 subtree, parent = self.root.get_subtree(mut_idx)
                 if subtree.left is None:
                     subtree.value = self.get_new_term(subtree.value)
@@ -162,8 +161,7 @@ class Individual():
         rate = 1.0
         for _ in range(0, nmutations):
             if (random.random() < rate):
-                mut_idx = random.randrange(len(self.root))
-                # mut_idx = random.choice(MUT_IDXS)
+                mut_idx = random.choice(MUT_IDXS)
                 subtree, parent = self.root.get_subtree(mut_idx)
                 if subtree.left is None:
                     subtree.value = self.get_new_term(subtree.value)

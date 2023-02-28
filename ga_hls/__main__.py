@@ -21,7 +21,7 @@ form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t"
 example = json.loads('["ForAll", ["s", ["Implies", [["And", [[">", ["s",0]], ["<", ["s",18] ] ]], ["And", [["Implies", [ ["==", ["signal_5[s]",0]], ["==", ["signal_6[s]",0]] ]], ["Implies", [ ["==", ["signal_5[s]",1]], ["==", ["signal_6[s]",0]] ]]]]]]]]')
 example1= json.loads('["ForAll", ["t", ["Implies", [["And", [["<=", [0,"t"]], ["<=", ["t",6.525E7] ] ]], [">", ["d_aramis_porthos[ToInt(RealVal(0)+(t-0.0)/25000.0)]",0.5]] ]] ]]')
 example2= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[t]",0.7]], [">=", ["err[t]",-0.7]]]]]]]]')
-experiment1= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.007]], [">=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",-0.007]]]]]]]]')
+experiment1=json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.007]], [">=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",-0.007]]]]]]]]')
 
 
 
