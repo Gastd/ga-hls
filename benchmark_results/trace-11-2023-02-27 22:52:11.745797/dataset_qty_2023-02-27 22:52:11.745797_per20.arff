@@ -1,0 +1,43 @@
+@relation all.generationall
+
+@attribute QUANTIFIERS0 {ForAll, Exists}
+@attribute TERM0 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS0 {<, >, <=, >=}
+@attribute NUM0 NUMERIC
+@attribute LOGICALS0 {And, Or}
+@attribute TERM1 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS1 {<, >, <=, >=}
+@attribute NUM1 NUMERIC
+@attribute IMP0 {Implies}
+@attribute TERM2 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS2 {<, >, <=, >=}
+@attribute NUM2 NUMERIC
+@attribute LOGICALS1 {And, Or}
+@attribute TERM3 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS3 {<, >, <=, >=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE}
+
+@data
+ForAll,t,In,(t,>=,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+ForAll,t,In,(t,>,11,And,t,<=,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+Exists,t,In,(t,>,11,Or,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>,-0.01,TRUE
+ForAll,t,In,(t,>,11,And,t,<=,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+ForAll,t,In,(t,>,11,And,t,<=,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>,-0.01,TRUE
+Exists,t,In,(t,>=,11,Or,t,<=,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+Exists,t,In,(t,>,11,Or,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.95,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.10,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.86,TRUE
+Exists,t,In,(t,>,11,Or,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.07,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,TRUE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,FALSE
+ForAll,t,In,(t,>=,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,FALSE
+ForAll,t,In,(t,>,11,And,t,<=,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.01,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.35,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.10,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.18,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.21,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.67,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.58,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.81,FALSE
+ForAll,t,In,(t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.01,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.68,FALSE
