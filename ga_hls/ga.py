@@ -16,7 +16,6 @@ from tqdm import tqdm
 
 import treenode
 import individual
-import diagnosis
 
 from individual import QUANTIFIERS, RELATIONALS, EQUAL, ARITHMETICS, MULDIV, EXP, LOGICALS, NEG, IMP
 
