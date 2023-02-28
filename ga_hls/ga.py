@@ -90,6 +90,8 @@ class GA(object):
         # self.diag = diagnosis.Diagnosis()
         # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
         print(f'Runnnig script {defs.FILEPATH} and {defs.FILEPATH2}')
+        with open('{}/hypot.txt'.format(self.path), 'a') as f:
+            f.write(f'\t{defs.FILEPATH}\n')
 
     def check_highest_sat(self, chromosome):
         if chromosome is None:
@@ -640,6 +642,9 @@ class GA(object):
         return (evolved)
 
     def evolve(self):
+        with open('{}/hypot.txt'.format(self.path), 'a') as f:
+            for hypot in self.hypots:
+                f.write(f'\t{hypot[1]}\n')
         # loop
         self.generation_counter = 0
         # for i in range(MAX_ALLOWABLE_GENERATIONS):
@@ -696,9 +701,6 @@ class GA(object):
         self.store_dataset_qty(.15)
         self.store_dataset_qty(.10)
 
-        with open('{}/hypot.txt'.format(self.path), 'a') as f:
-            for hypot in self.hypots:
-                f.write(f'\t{hypot[1]}\n')
 
     def replace_token(self, tk_list):
         l = list()
