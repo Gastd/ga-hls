@@ -1,0 +1,80 @@
+Goal: generate
+Sample_Step: fixed-min
+//choose "fixed-min" to use the smallest sample-step used in the trace
+//choose "fixed manual" to use the  sample-step specified when the trace is defined
+//choose "variable" to use the original, variable sample step of the traces
+
+property_01::=
+{
+	Signal signal_4 Interpolation Constant;
+	//you can also choose "Interpolation Linear", which could be useful to represent continuous signals
+	Signal signal_2 Interpolation Linear;
+	Index s;
+	Requirement::='signal 4 must always stay under the 1000 threshold and signal 2 must be greater or equal than -15.27';
+	Specification::=ForAll Index s In (0,FinalIndex): (signal_4(@index s)<1000 And signal_2(@index s)>=(-15.27));
+}
+
+property_02::=
+{
+	Signal signal_7 Interpolation Linear;
+	Num c;
+	Timestamp t;
+	Requirement::= 'In the first 10 hours of operation, signal 7 must stay around a value c between -200 and 200,
+with a maximum error of 10';
+//hours [h], minutes [m], seconds [s], milliseconds [ms], microseconds [micros], nanoseconds [nanos]
+	Specification::=Exists Value c In ((-200),200):
+	ForAll Timestamp t In (0, 10 [h]): (signal_7(@timestamp t)< c +10 And signal_7(@timestamp t)> c-10);
+
+
+}
+
+property_03::=
+{
+	Signal signal_1 Interpolation Constant;
+	Timestamp t;
+	Requirement::= 'Signal 1 must at all times be equal to 1 or 2';
+	Specification::=
+	ForAll Timestamp t In [0, FinalTimestamp]: (signal_1(@timestamp t)==1 Or signal_1(@timestamp t)==2) ;
+}
+
+property_04::=
+{
+	Signal signal_5 Interpolation Constant;
+	Signal signal_6 Interpolation Constant;
+	Index s;
+	Requirement::= 'whenever signal 5 is equal to 1 signal 6 must be equal to 0 and viceversa';
+	Specification::=
+	ForAll Index s In (0, FinalIndex):
+	((signal_5(@index s)==0->signal_6(@index s)==1 ) And (signal_5(@index s)==1->signal_6(@index s)==0));
+}
+
+
+
+property_05::=
+{
+	Signal signal_8 Interpolation Linear;
+	Timestamp t;
+	Requirement::='After 36000 seconds, signal 8 is smaller than 1000 and has been sampled at least 3 times';
+	Specification::= signal_8(@timestamp 36000[s])<1000 And t2i(36000)>=3;
+}
+
+property_06::=
+{
+	Signal signal_1 Interpolation Linear;
+	Signal signal_4 Interpolation Linear;
+	Index s;
+	Requirement::='When signal_1 passes from 0 to 1, the value of signal_8 must be greater than 30';
+	Specification::=ForAll Index s In [0, FinalIndex-1]: signal_1(@index s)==0 And signal_1(@index s+1)==1->signal_4(@index s+1)>30;
+
+
+}
+
+Trace one 'trace1.tsv'  SampleStep= 1 [h]
+{
+	Properties={property_01, property_03, property_06}
+}
+
+Trace two 'trace2.tsv'  SampleStep= 3 [h]
+{
+	Properties={property_02, property_04, property_05}
+}

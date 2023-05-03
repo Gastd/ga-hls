@@ -4,9 +4,8 @@ import shlex
 import random
 import subprocess
 
-# from .treenode import 
-import treenode
-import defs
+from components import treenode
+from config import filepath
 
 MUTATION_NODES = 5
 
@@ -51,10 +50,17 @@ class Individual():
     #         return max(t_list), min(t_list)
 
     def is_viable(self):
-        def get_file_w_traces(file_path = defs.FILEPATH2):
+        def get_file_w_traces(file_path = filepath.FILEPATH2):
             s = e = -1
             lines = []
-            with open(file_path) as f:
+            
+            try:
+                f = open(file_path)
+            except FileNotFoundError as e:
+                raise FileNotFoundError("Could not open/read file: ", file_path)
+                sys.exit()
+
+            with f:
                 for l in f:
                     lines.append(l)
             # print('lines')
@@ -88,7 +94,7 @@ class Individual():
 
         start, end, lines = get_file_w_traces()
         save_check_wo_traces(start, end, lines, f'Not({self.format()})')
-        f = open(defs.FILEPATH2, 'r')
+        f = open(filepath.FILEPATH2, 'r')
         f.seek(0, 0)
         f.close()
 

@@ -18,7 +18,7 @@
     3. The file will be in src-gen/*.py
 2. Configure ga-hls
     1. (1min) Copy-paste the generated property_X.py into ga-hls.
-    2. (2min) Set filepath (ga-hls/defs.py) for the properties_X.py containing the formula.
+    2. (2min) Set filepath (ga-hls/configs/filepath.py) for the properties_X.py containing the formula.
     3. (~30min) Tranform formula from property_X.py into list of list. Example:
 
         Input: 
