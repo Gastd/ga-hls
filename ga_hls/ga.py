@@ -16,6 +16,7 @@ from tqdm import tqdm
 
 from components import treenode
 from components import individual
+from components.helper import get_file_w_traces, save_check_wo_traces
 
 from analysis.smith_waterman import Smith_Waterman, SW_Result
 from analysis.dendogram import create_dendrogram
@@ -35,7 +36,6 @@ import matplotlib
 # import analyse
 # from analyse import Smith_Waterman
 
-from config import filepath
 from config.ga_params import *
 
 def isfloat(num):
@@ -47,7 +47,7 @@ def isfloat(num):
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self, init_form):
+    def __init__(self, property_str, trace_file):
         super(GA, self).__init__()
 
         random.seed()
@@ -56,9 +56,11 @@ class GA(object):
         self.now = datetime.datetime.now()
         curr_path = os.getcwd()
 
-        self.init_population(init_form)
+        self.trace_file = "ga_hls/config/" + trace_file
+
+        self.init_population(property_str)
         self.init_log(curr_path)
-        self.s, self.e = self.get_line('ga_hls')
+        self.s, self.e = self.get_line(file= self.trace_file)
         self.execution_report = {'TOTAL': 0}
 
         self.SW = Smith_Waterman()
@@ -89,20 +91,20 @@ class GA(object):
         result = self.SW.compare(self.replace_token(list(self.seed)), self.replace_token(list(self.seed)), 0,0)
         self.max_score = result.traceback_score
 
-    def init_population(self, init_form):
-        root = treenode.parse(init_form)
+    def init_population(self, property_str):
+        root = treenode.parse(property_str)
         self.seed = root
         terminators = list(set(treenode.get_terminators(root)))
-        self.seed_ch = deepcopy(individual.Individual(root, terminators))
+        self.seed_ch = deepcopy(individual.Individual(root, terminators,self.trace_file))
         print(f'terminators = {terminators}')
         print(f'Initial formula: {root}')
         for i in tqdm(range(0, self.size)):
-            chromosome = deepcopy(individual.Individual(root, terminators))
+            chromosome = deepcopy(individual.Individual(root, terminators,self.trace_file))
             n = random.randrange(len(root))
             chromosome.mutate(1, n)
             print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
             while not chromosome.is_viable():
-                chromosome = deepcopy(individual.Individual(root, terminators))
+                chromosome = deepcopy(individual.Individual(root, terminators,self.trace_file))
                 chromosome.mutate(1, random.randrange(len(chromosome)))
                 print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
             self.population.append(deepcopy(chromosome))
@@ -131,10 +133,9 @@ class GA(object):
 
     def get_line(self, file):
         # print(f'Running on {os.getcwd()} folder')
-        file_path = filepath.FILEPATH
         newf_str = ''
-        print(f'Running on {file_path} folder')
-        with open(file_path) as f:
+        print(f'Running on {file} folder')
+        with open(file) as f:
             f.seek(0, 0)
             for l in f:
                 if l.find('z3solver.check') > 0:
@@ -148,11 +149,10 @@ class GA(object):
             self.first = newf_str
             return d2, newf_str.rfind('\n')
 
-    def save_file(self, s, e, nline):
-        src = filepath.FILEPATH
+    def save_file(self, s, e, nline, file):
         dst = 'ga_hls/temp.py'
-        # print(f'Running on {filepath.FILEPATH} folder')
-        with open(src) as firstfile, open(dst,'w') as secondfile:
+        # print(f'Running on {self.file_trace} folder')
+        with open(file) as firstfile, open(dst,'w') as secondfile:
             firstfile.seek(e)
             secondfile.write(self.first[:s])
             secondfile.write('\n\n')
@@ -165,31 +165,30 @@ class GA(object):
 
     def test_chromosome(self, chromosome):
         # print(f'writing test for: {str(chromosome)}')
-        def find_traces_in_file(file_path = filepath.FILEPATH2):
-            print(f'Running on {os.getcwd()} folder')
-            print(f'Running on {file_path} folder')
-            newf_str1 = ''
-            newf_str2 = ''
-            with open(file_path) as f:
-                for l in f:
-                    if l.find('z3solver.check') > 0:
-                        break
-                    else:
-                        newf_str2 += l
-                f.seek(0, 0)
-                for l in f:
-                    if l.find('z3solver.add') > 0:
-                        break
-                    else:
-                        newf_str1 += l
-                print(f'py file seek at = {len(newf_str1)}')
-                d1 = newf_str2.rfind('\n')
-                d2 = newf_str2[1:d1-1].rfind('\t')
-                print(f'py file seek at = {d2}')
-                self.first = newf_str1
-                return newf_str1.rfind('\n'), d2
+        # def find_traces_in_file(file):
+        #     print(f'Running on {os.getcwd()} folder')
+        #     print(f'Running on {file} folder')
+        #     newf_str1 = ''
+        #     newf_str2 = ''
+        #     with open(file) as f:
+        #         for l in f:
+        #             if l.find('z3solver.check') > 0:
+        #                 break
+        #             else:
+        #                 newf_str2 += l
+        #         f.seek(0, 0)
+        #         for l in f:
+        #             if l.find('z3solver.add') > 0:
+        #                 break
+        #             else:
+        #                 newf_str1 += l
+        #         print(f'py file seek at = {len(newf_str1)}')
+        #         d1 = newf_str2.rfind('\n')
+        #         d2 = newf_str2[1:d1-1].rfind('\t')
+        #         print(f'py file seek at = {d2}')
+        #         self.first = newf_str1
+        #         return newf_str1.rfind('\n'), d2
         def save_z3check(s, e, nline):
-            src = filepath.FILEPATH2
             file = 'ga_hls/z3check.py'
             print(f'Running on {file} folder')
             form_line = ''
@@ -227,47 +226,12 @@ class GA(object):
                 # z3check_file.seek(0, 0)
                 # firstfile.seek(0, 0)
 
-        def get_file_w_traces(file_path = filepath.FILEPATH2):
-            s = e = -1
-            lines = []
-            with open(file_path) as f:
-                for l in f:
-                    lines.append(l)
-            # print('lines')
-            for idx, l in enumerate(lines):
-                if l.find('z3solver.add') >= 0:
-                    # print(idx, l)
-                    s = idx
-                    break
-            for idx, l in enumerate(lines):
-                # print(l, l.find('z3solver.check'))
-                if l.find('z3solver.check') >= 0:
-                    # print(idx, l)
-                    e = idx
-                    break
-            # print('lines')
-            return s, e, lines
-        
-        def save_check_wo_traces(start, end, lines, nline, file_path = 'ga_hls/z3check.py'):
-            before = lines[:start]
-            after = lines[end:]
-            with open(file_path,'w') as z3check_file:
-                for l in before:
-                    z3check_file.write(l)
-                form_line = (f'\tz3solver.add({nline})\n')
-                z3check_file.write('\n')
-                # print(form_line)
-                z3check_file.write(form_line)
-                z3check_file.write('\n')
-                for l in after:
-                    z3check_file.write(l)
-
         # s, e = find_traces_in_file()
         # save_z3check(s, e, f'Not({chromosome.format()})')
 
-        start, end, lines = get_file_w_traces()
+        start, end, lines = get_file_w_traces(self.trace_file)
         save_check_wo_traces(start, end, lines, f'Not({chromosome.format()})')
-        f = open(filepath.FILEPATH2, 'r')
+        f = open(self.trace_file, 'r')
         f.seek(0, 0)
         f.close()
 
@@ -647,13 +611,13 @@ class GA(object):
                 # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
 
                 while not offspring1.is_viable():
-                    offspring1 = deepcopy(individual.Individual(self.seed, terminators))
+                    offspring1 = deepcopy(individual.Individual(self.seed, terminators,self.trace_file))
                     offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
                     # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
                 offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
                 # print(f"offspring1 is {'viable' if offspring2.is_viable() else 'not viable'}")
                 while not offspring2.is_viable():
-                    offspring2 = deepcopy(individual.Individual(self.seed, terminators))
+                    offspring2 = deepcopy(individual.Individual(self.seed, terminators,self.trace_file))
                     offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
                     # print(f"offspring2 is {'viable' if offspring2.is_viable() else 'not viable'}")
                 
@@ -724,7 +688,7 @@ class GA(object):
             # if self.test_chromosome(chromosome) == False:
             #     continue
             # print(f'self.s={self.s}, self.e={self.e}')
-            self.save_file(self.s, self.e, f'Not({chromosome.format()})')
+            self.save_file(self.s, self.e, f'Not({chromosome.format()})', self.trace_file)
 
             folder_name = 'ga_hls'
             run_str = f'python3 {folder_name}/temp.py'

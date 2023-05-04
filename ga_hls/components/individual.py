@@ -5,7 +5,7 @@ import random
 import subprocess
 
 from components import treenode
-from config import filepath
+from components.helper import get_file_w_traces, save_check_wo_traces
 
 MUTATION_NODES = 5
 
@@ -29,10 +29,11 @@ def show_arg_ret_decorator(function):
 
 class Individual():
     """docstring for Individual"""
-    def __init__(self, formula_root: treenode.Node, terminators):
+    def __init__(self, formula_root: treenode.Node, terminators, trace_file):
         if formula_root is None:
             raise Exception(f"{self.__class__.__name__} error: Input formula cannot be empty")
 
+        self.trace_file = trace_file
         self.root = formula_root
         self.fitness = -1
         self.term = self.check_terminators(terminators)
@@ -50,51 +51,9 @@ class Individual():
     #         return max(t_list), min(t_list)
 
     def is_viable(self):
-        def get_file_w_traces(file_path = filepath.FILEPATH2):
-            s = e = -1
-            lines = []
-            
-            try:
-                f = open(file_path)
-            except FileNotFoundError as e:
-                raise FileNotFoundError("Could not open/read file: ", file_path)
-                sys.exit()
-
-            with f:
-                for l in f:
-                    lines.append(l)
-            # print('lines')
-            for idx, l in enumerate(lines):
-                if l.find('z3solver.add') >= 0:
-                    # print(idx, l)
-                    s = idx
-                    break
-            for idx, l in enumerate(lines):
-                # print(l, l.find('z3solver.check'))
-                if l.find('z3solver.check') >= 0:
-                    # print(idx, l)
-                    e = idx
-                    break
-            # print('lines')
-            return s, e, lines
-
-        def save_check_wo_traces(start, end, lines, nline, file_path = 'ga_hls/z3check.py'):
-            before = lines[:start]
-            after = lines[end:]
-            with open(file_path,'w') as z3check_file:
-                for l in before:
-                    z3check_file.write(l)
-                form_line = (f'\tz3solver.add({nline})\n')
-                z3check_file.write('\n')
-                # print(form_line)
-                z3check_file.write(form_line)
-                z3check_file.write('\n')
-                for l in after:
-                    z3check_file.write(l)
-
-        start, end, lines = get_file_w_traces()
+        start, end, lines = get_file_w_traces(self.trace_file)
         save_check_wo_traces(start, end, lines, f'Not({self.format()})')
-        f = open(filepath.FILEPATH2, 'r')
+        f = open(self.trace_file, 'r')
         f.seek(0, 0)
         f.close()
 
