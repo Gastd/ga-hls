@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 from components import treenode
 from components import individual
-from components.helper import get_file_w_traces, save_check_wo_traces
+from components.helper import *
 
 from analysis.smith_waterman import Smith_Waterman, SW_Result
 from analysis.dendogram import create_dendrogram
@@ -60,7 +60,7 @@ class GA(object):
 
         self.init_population(property_str)
         self.init_log(curr_path)
-        self.s, self.e = self.get_line(file= self.trace_file)
+        self.first, self.s, self.e = get_line(file= self.trace_file)
         self.execution_report = {'TOTAL': 0}
 
         self.SW = Smith_Waterman()
@@ -131,35 +131,6 @@ class GA(object):
             car = self.population[0].paths[i]
             print('->'.join([str(x.name) for x in car.path]))
 
-    def get_line(self, file):
-        # print(f'Running on {os.getcwd()} folder')
-        newf_str = ''
-        print(f'Running on {file} folder')
-        with open(file) as f:
-            f.seek(0, 0)
-            for l in f:
-                if l.find('z3solver.check') > 0:
-                    break
-                else:
-                    newf_str += l
-            # print(f'py file seek at = {len(newf_str)}')
-            d1 = newf_str.rfind('\t')
-            d2 = newf_str[1:d1-1].rfind('\t')
-            # print(f'py file seek at = {d2}')
-            self.first = newf_str
-            return d2, newf_str.rfind('\n')
-
-    def save_file(self, s, e, nline, file):
-        dst = 'ga_hls/temp.py'
-        # print(f'Running on {self.file_trace} folder')
-        with open(file) as firstfile, open(dst,'w') as secondfile:
-            firstfile.seek(e)
-            secondfile.write(self.first[:s])
-            secondfile.write('\n\n')
-            secondfile.write(f'\tz3solver.add({nline})\n')
-            for l in firstfile:
-                secondfile.write(l)
-
     def set_sat_check(self, chromosome):
         pass
 
@@ -188,44 +159,6 @@ class GA(object):
         #         print(f'py file seek at = {d2}')
         #         self.first = newf_str1
         #         return newf_str1.rfind('\n'), d2
-        def save_z3check(s, e, nline):
-            file = 'ga_hls/z3check.py'
-            print(f'Running on {file} folder')
-            form_line = ''
-            newf_str2 = ''
-            newf_str3 = ''
-            with open(file,'r+') as z3check_file:
-                for l in z3check_file:
-                    if l.find('z3solver.check') > 0:
-                        # form_line = l
-                        print('found: '+l)
-                        break
-                    else:
-                        newf_str2 += l
-                d1 = newf_str2.rfind('\n')
-                d2 = newf_str2[1:d1-1].rfind('\n')
-            with open(file,'r+') as z3check_file:
-                for l in z3check_file:
-                    if l.find('z3solver.check') > 0:
-                        # form_line = l
-                        print('found: '+l)
-                        break
-                    else:
-                        newf_str3 += l
-                newf_str2 = newf_str2[1:d2]
-                z3check_file.seek(0, 0)
-                print(newf_str2)
-                z3check_file.write('\n')
-                z3check_file.write(newf_str2)
-                form_line = (f'\tz3solver.add({nline})\n')
-                print(form_line)
-                z3check_file.write(form_line)
-                z3check_file.write('\n')
-                # for l in z3check_file:
-                #     z3check_file.write(l)
-                # z3check_file.seek(0, 0)
-                # firstfile.seek(0, 0)
-
         # s, e = find_traces_in_file()
         # save_z3check(s, e, f'Not({chromosome.format()})')
 
@@ -257,25 +190,6 @@ class GA(object):
 
     def get_best(self):
         return self.population[0]
-
-    def write_population(self, generation):
-        with open('{}/{:0>2}.txt'.format(self.path, generation), 'w') as f:
-            f.write('Formula\tFitness\tSatisfied\n')
-            if self.highest_sat:
-                f.write('HC: ')
-                f.write(str(self.highest_sat))
-                f.write(f'\t{self.highest_sat.fitness}')
-                f.write(f'\t{self.highest_sat.madeit}')
-                f.write('\n')
-            for i, chromosome in enumerate(self.population):
-                f.write('{:0>2}'.format(i)+': ')
-                f.write(str(chromosome))
-                f.write(f'\t{chromosome.fitness}')
-                f.write(f'\t{chromosome.madeit}')
-                f.write('\n')
-        json_object = json.dumps(self.execution_report, indent=4)
-        with open(f"{self.path}/report.json", "w") as outfile:
-            outfile.write(json_object)
 
     def clusterize(self, generation):
         # this method applies the SW algorithm to all formulas
@@ -411,162 +325,6 @@ class GA(object):
                 count_op['NUM'] = count_op['NUM'] + 1
         return ret
 
-    def store_dataset_qty(self, per_cut: float):
-        self.sats.sort(key=lambda x : x.sw_score, reverse=True)
-        self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
-
-        per_qty = math.ceil(len(self.sats) * per_cut)
-        sats = self.sats
-        unsats = self.unsats
-        if len(sats) > per_qty:
-            sats = sats[:per_qty]
-        if len(unsats) > per_qty:
-            unsats = unsats[:per_qty]
-
-        chstr = str(sats[0])
-        chstr = chstr.replace(' ', ',')
-        chstr = chstr.replace(',s,In,(', ',')
-        chstr = chstr.replace('),Implies,(', ',Implies,')
-        chstr = chstr[:-1]
-        # print(chstr.split(','))
-        attrs = self.build_attributes(chstr.split(','))
-        # for att in attrs:
-        #     print(att)
-
-        with open('{}/dataset_qty_{}_per{}.arff'.format(self.path, self.now, int(per_cut*100)), 'w') as f:
-            f.write('@relation all.generationall\n')
-            f.write('\n')
-            for att in attrs:
-                f.write(f'@attribute {att}\n')
-
-            # f.write('@attribute QUANTIFIERS {ForAll, Exists}\n')
-            # f.write('@attribute VARIABLE {s}\n')
-            # f.write('@attribute RELATIONALS {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER NUMERIC\n')
-            # f.write('@attribute LOGICALS1 {And, Or}\n')
-            # f.write('@attribute VARIABLE1 {s}\n')
-            # f.write('@attribute RELATIONALS1 {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER1 NUMERIC\n')
-            # f.write('@attribute IMP1 {Implies}\n')
-            # f.write('@attribute SIGNALS {signal_2(s),signal_4(s)}\n')
-            # f.write('@attribute RELATIONALS2 {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER2 NUMERIC\n')
-            # f.write('@attribute LOGICALS2 {And, Or}\n')
-            # f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
-            # f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER3 NUMERIC\n')
-            f.write('@attribute VEREDICT {TRUE, FALSE}\n')
-            f.write('\n')
-            f.write('@data\n')
-            for chromosome in sats:
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
-            for chromosome in unsats:
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
-
-    def store_dataset_threshold(self):
-        self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
-        if len(self.unsats) > len(self.sats):
-            self.unsats = self.unsats[:len(self.sats)]
-        else:
-            self.sats = self.sats[:len(self.unsats)]
-
-        with open('{}/dataset_{}.arff'.format(self.path, self.now), 'w') as f:
-            f.write('@relation all.generationall\n')
-            f.write('\n')
-            f.write('@attribute QUANTIFIERS {ForAll, Exists}\n')
-            f.write('@attribute VARIABLE {s}\n')
-            f.write('@attribute RELATIONALS {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER NUMERIC\n')
-            f.write('@attribute LOGICALS1 {And, Or}\n')
-            f.write('@attribute VARIABLE1 {s}\n')
-            f.write('@attribute RELATIONALS1 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER1 NUMERIC\n')
-            f.write('@attribute IMP1 {Implies}\n')
-            f.write('@attribute SIGNALS {signal_2(s),signal_4(s)}\n')
-            f.write('@attribute RELATIONALS2 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER2 NUMERIC\n')
-            f.write('@attribute LOGICALS2 {And, Or}\n')
-            f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
-            f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER3 NUMERIC\n')
-            f.write('@attribute VEREDICT {TRUE, FALSE}\n')
-            f.write('\n')
-            f.write('@data\n')
-            for chromosome in self.sats:
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
-            for chromosome in self.unsats:
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
-
-    def dist2VF(self, generation):
-        res = []
-        [res.append(x) for x in self.population if x not in res]
-        # print(res)
-        
-        sats = []
-        unsats = []
-        for chromosome in res:
-            if chromosome.madeit == False:
-                unsats.append(chromosome)
-            else:
-                sats.append(chromosome)
-
-        # print(sats)
-        # print(unsats)
-
-        sats.sort(key=lambda x : x.sw_score, reverse=True)
-        unsats.sort(key=lambda x : x.sw_score, reverse=True)
-
-        per20 = int(POPULATION_SIZE * .20)
-        if len(sats) > per20:
-            sats = sats[:per20]
-        if len(unsats) > per20:
-            unsats = unsats[:per20]
-
-        with open('{}/{:0>2}_pareto.txt'.format(self.path, generation), 'w') as f:
-            f.write('Formula\tSW_Score\tSatisfied\n')
-            f.write('SEED: ')
-            f.write(str(self.seed_ch))
-            f.write(f'\t-')
-            f.write(f'\t-')
-            f.write('\n')
-            for i, chromosome in enumerate(sats):
-                f.write('{:0>2}'.format(i)+': ')
-                f.write(str(chromosome))
-                f.write(f'\t{chromosome.sw_score}')
-                f.write(f'\t{chromosome.madeit}')
-                f.write('\n')
-            f.write('\n')
-            f.write('\n')
-            for i, chromosome in enumerate(unsats):
-                f.write('{:0>2}'.format(i)+': ')
-                f.write(str(chromosome))
-                f.write(f'\t{chromosome.sw_score}')
-                f.write(f'\t{chromosome.madeit}')
-                f.write('\n')
-        json_object = json.dumps(self.execution_report, indent=4)
-        with open(f"{self.path}/report.json", "w") as outfile:
-            outfile.write(json_object)
-
     def pool(self):
         return deepcopy(self.population[random.randint(0, 32767) % PARENTS_TO_BE_CHOSEN])
 
@@ -592,8 +350,8 @@ class GA(object):
 
             ## retain elite
             self.population.sort(key=lambda x: x.fitness, reverse=True)
-            self.write_population(self.generation_counter)
-            self.dist2VF(self.generation_counter)
+            write_population(generation=self.generation_counter, path=self.path, highest_sat=self.highest_sat, population=self.population, execution_report=self.execution_report)
+            dist2VF(generation=self.generation_counter,population=self.population,path=self.path,seed_ch=self.seed_ch,execution_report=self.execution_report)
             self.generate_dataset_qty()
             # self.clusterize(self.generation_counter)
             new_population = self.population[:CHROMOSOME_TO_PRESERVE]
@@ -633,12 +391,11 @@ class GA(object):
             self.generation_counter += 1
             self.population = new_population
             self.diagnosis()
-        self.store_dataset_qty(1.)
-        self.store_dataset_qty(.2)
 
-        with open('{}/hypot.txt'.format(self.path), 'a') as f:
-            for hypot in self.hypots:
-                f.write(f'\t{hypot[1]}\n')
+        store_dataset_qty(per_cut=1., sats=self.sats, unsats=self.unsats, build_attributes=self.build_attributes, path=self.path, now=self.now)
+        store_dataset_qty(per_cut=.2, sats=self.sats, unsats=self.unsats, build_attributes=self.build_attributes, path=self.path, now=self.now)
+
+        write_hypothesis(self.path, self.hypots)
 
     def replace_token(self, tk_list):
         l = list()
@@ -688,7 +445,7 @@ class GA(object):
             # if self.test_chromosome(chromosome) == False:
             #     continue
             # print(f'self.s={self.s}, self.e={self.e}')
-            self.save_file(self.s, self.e, f'Not({chromosome.format()})', self.trace_file)
+            save_file(self.first, self.s, self.e, f'Not({chromosome.format()})', self.trace_file)
 
             folder_name = 'ga_hls'
             run_str = f'python3 {folder_name}/temp.py'
