@@ -50,6 +50,8 @@ FOLDS = 10
 
 SCALE = 0.5
 
+MTX_IDX = [4,7]
+
 # defs.FILEPATH = 'ga_hls/prop_ctrl.py'
 # defs.FILEPATH2 = 'ga_hls/prop_ctrl1.py'
 # defs.FILEPATH = 'ga_hls/property_distance_obs_r2.py'
@@ -75,8 +77,11 @@ class GA(object):
         self.population = []
         self.now = datetime.datetime.now()
         curr_path = os.getcwd()
+        self.force_mutation = False
+        self.ranges = None
 
-        self.init_population(init_form)
+        self.init_form = init_form
+        self.init_population()
         self.init_log(curr_path)
         self.s, self.e = self.get_line('ga_hls')
         self.execution_report = {'TOTAL': 0}
@@ -112,8 +117,16 @@ class GA(object):
         result = self.SW.compare(self.replace_token(list(self.seed)), self.replace_token(list(self.seed)), 0,0)
         self.max_score = result.traceback_score
 
-    def init_population(self, init_form):
-        root = treenode.parse(init_form)
+    def set_force_mutations(self, forced: bool):
+        self.force_mutation = forced
+        self.init_population()
+
+    def set_mutation_ranges(self, ranges: dict):
+        self.ranges = ranges
+
+    def init_population(self):
+        self.population = []
+        root = treenode.parse(self.init_form)
         self.seed = root
         terminators = list(set(treenode.get_terminators(root)))
         self.seed_ch = deepcopy(individual.Individual(root, terminators))
@@ -122,12 +135,19 @@ class GA(object):
         for i in tqdm(range(0, self.size)):
             chromosome = deepcopy(individual.Individual(root, terminators))
             n = random.randrange(len(root))
-            chromosome.mutate(1, n)
+            if self.force_mutation:
+                chromosome.force_mutate(MTX_IDX, n)
+            else:
+                chromosome.mutate(1, n)
             # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
             while not chromosome.is_viable():
                 chromosome = deepcopy(individual.Individual(root, terminators))
-                chromosome.mutate(1, random.randrange(len(chromosome)))
+                if self.force_mutation:
+                    chromosome.force_mutate(MTX_IDX, random.randrange(len(chromosome)))
+                else:
+                    chromosome.mutate(1, random.randrange(len(chromosome)))
                 # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
+            chromosome.ranges = self.ranges
             self.population.append(deepcopy(chromosome))
         # raise Exception('')
         print("Population initialized. Size = {}".format(self.size))
@@ -182,9 +202,6 @@ class GA(object):
             secondfile.write(f'\tz3solver.add({nline})\n')
             for l in firstfile:
                 secondfile.write(l)
-
-    def set_sat_check(self, chromosome):
-        pass
 
     def test_chromosome(self, chromosome):
         # print(f'writing test for: {str(chromosome)}')
@@ -493,41 +510,28 @@ class GA(object):
         #     print(att)
 
         with open('{}/dataset_qty_{}_per{}.arff'.format(self.path, self.now, int(per_cut*100)), 'w') as f:
-            f.write('@relation all.generationall\n')
+            nowstr = f'{self.now}\n'
+            nowstr = nowstr.replace(' ', '_')
+            s = f'@relation all.{nowstr}\n'
+            f.write(s)
             f.write('\n')
             for att in attrs:
                 f.write(f'@attribute {att}\n')
 
-            # f.write('@attribute QUANTIFIERS {ForAll, Exists}\n')
-            # f.write('@attribute VARIABLE {s}\n')
-            # f.write('@attribute RELATIONALS {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER NUMERIC\n')
-            # f.write('@attribute LOGICALS1 {And, Or}\n')
-            # f.write('@attribute VARIABLE1 {s}\n')
-            # f.write('@attribute RELATIONALS1 {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER1 NUMERIC\n')
-            # f.write('@attribute IMP1 {Implies}\n')
-            # f.write('@attribute SIGNALS {signal_2(s),signal_4(s)}\n')
-            # f.write('@attribute RELATIONALS2 {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER2 NUMERIC\n')
-            # f.write('@attribute LOGICALS2 {And, Or}\n')
-            # f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
-            # f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
-            # f.write('@attribute NUMBER3 NUMERIC\n')
             f.write('@attribute VEREDICT {TRUE, FALSE}\n')
             f.write('\n')
             f.write('@data\n')
             for chromosome in sats:
                 ch_str = str(chromosome)
                 ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
+                ch_str = ch_str.replace(',t,In,(', ',')
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
                 f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
             for chromosome in unsats:
                 ch_str = str(chromosome)
                 ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
+                ch_str = ch_str.replace(',t,In,(', ',')
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
                 f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
@@ -669,20 +673,30 @@ class GA(object):
 
                 self.crossover(offspring1, offspring2)
                 
-                offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
+                if self.force_mutation:
+                    offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
+                else:
+                    offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
                 # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
 
                 while not offspring1.is_viable():
                     offspring1 = deepcopy(individual.Individual(self.seed, terminators))
-                    offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
+                    if self.force_mutation:
+                        offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
+                    else:
+                        offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
                     # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
-                offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
+                offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
                 # print(f"offspring1 is {'viable' if offspring2.is_viable() else 'not viable'}")
                 while not offspring2.is_viable():
                     offspring2 = deepcopy(individual.Individual(self.seed, terminators))
-                    offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
+                    if self.force_mutation:
+                        offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
+                    else:
+                        offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
                     # print(f"offspring2 is {'viable' if offspring2.is_viable() else 'not viable'}")
-                
+                offspring1.ranges = self.ranges
+                offspring2.ranges = self.ranges
                 new_population.append(offspring1)
                 new_population.append(offspring2)
                 # raise Exception('')

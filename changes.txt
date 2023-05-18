@@ -1,0 +1,14 @@
+- check if the formulas are sat or not without trace
+- prioritize deep changes on the tree	
+- check the distance (metric)
+- crossover and mutation keeps the length
+- not mutate on interval
+ 
+
+
+wheight for the change + arith + logic + 
+wheight the mismatch based on the node level(tree)
+
+
+
+- rerun the running example and keep the car close to crash but not so much, change the obs position

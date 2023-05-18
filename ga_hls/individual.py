@@ -9,7 +9,7 @@ import treenode
 import defs
 
 MUTATION_NODES = 5
-MUT_IDXS =[13, 16]
+MUT_IDXS =[4, 7]
 
 # OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
 QUANTIFIERS = ['ForAll', 'Exists']
@@ -29,6 +29,13 @@ def show_arg_ret_decorator(function):
         return ret
     return wrapper
 
+def choose_mutation(function):
+    def wrapper(self, *args, **kwargs):
+        print(f'{self.ranges}')
+        ret = function(self, *args, **kwargs)
+        return ret
+    return wrapper
+
 class Individual():
     """docstring for Individual"""
     def __init__(self, formula_root: treenode.Node, terminators):
@@ -41,6 +48,7 @@ class Individual():
         self.madeit = False
         self.sw_score = -1
         self.self_test = None
+        self.ranges = None
         # self.maxint, self.minint = self.get_minmax(terminators, int)
         # self.maxfloat, self.minfloat = self.get_minmax(terminators, float)
 
@@ -156,13 +164,18 @@ class Individual():
 
     def force_mutate(self, mut_idxs=[], nmutations=MUTATION_NODES):
         if len(mut_idxs) == 0:
-            print('MUT_IDX')
+            print('MUT_IDX is empty')
+            return
+        # print(self.ranges)
+        if self.ranges is not None:
+            self.force_mutate_with_ranges(mut_idxs)
             return
         rate = 1.0
-        for _ in range(0, nmutations):
+        for mut_idx in mut_idxs:
             if (random.random() < rate):
-                mut_idx = random.choice(MUT_IDXS)
+                # mut_idx = random.choice(mut_idxs)
                 subtree, parent = self.root.get_subtree(mut_idx)
+                # print(f"Mutating {mut_idx} from {subtree.value}")
                 if subtree.left is None:
                     subtree.value = self.get_new_term(subtree.value)
                 else:
@@ -172,6 +185,51 @@ class Individual():
                             # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
                             continue
                     subtree.value = new_operator
+                # print(f"To {subtree.value}")
+
+    # @show_arg_ret_decorator
+    def force_mutate_with_ranges(self, mut_idxs=[], nmutations=MUTATION_NODES):
+        rate = 1.0
+        for idx in mut_idxs:
+            if (random.random() < rate):
+                subtree, parent = self.root.get_subtree(idx)
+                # print(f"Mutating {idx} from {subtree.value} with {self.ranges[str(idx)]}")
+                if subtree.left is None:
+                    subtree.value = self.get_new_forced_term(subtree.value, self.ranges[str(idx)])
+                # else:
+                #     new_operator = self.get_new_op(subtree.value)
+                #     if parent:
+                #         if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
+                #             # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
+                #             continue
+                #     subtree.value = new_operator
+                # print(f"To {subtree.value}")
+
+    def get_new_forced_term(self, t, interval):
+        if interval[0] == 'int':
+            lower = int(interval[1])
+            upper = int(interval[2])
+        if interval[0] == 'float':
+            lower = float(interval[1])
+            upper = float(interval[2])
+        # print(f'For term {t} we have interval [{lower,upper}]')
+        if t.__class__ in self.term.keys():
+            if isinstance(t, int):
+                if t == 0:
+                    if random.random() > 0.5:
+                        return t + 1
+                    else:
+                        return t - 1
+                if random.random() > 0.5:
+                    ## Change the terminator inside the same maginitude order from the input
+                    return random.randint(lower, upper)
+            elif isinstance(t, float):
+                    return random.uniform(lower, upper)
+            else:
+                # return random.choice(self.term[t.__class__])
+                return t
+        else:
+            raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
 
     # @show_arg_ret_decorator
     def get_new_term(self, t):
@@ -189,10 +247,14 @@ class Individual():
                 else:
                     return t - random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
             elif isinstance(t, float):
-                if random.random() > 0.5:
-                    return t + random.uniform(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
+                if abs(t) >= 1.0:
+                    diff = random.uniform(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1))
                 else:
-                    return t - random.uniform(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
+                    diff = random.uniform(0, 10 ** int(math.log(abs(t),10)))
+                if random.random() > 0.5:
+                    return t + diff
+                else:
+                    return t - diff
             else:
                 # return random.choice(self.term[t.__class__])
                 return t
@@ -232,7 +294,7 @@ def readable(root):
         return ''
     if root.left is None:
         if isinstance(root.value, float):
-            return f'{root.value:.2f}'
+            return f'{root.value:.6f}'
         else:
             return f'{root.value}'
 

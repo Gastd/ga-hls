@@ -1,0 +1,186 @@
+@relation all.2023-03-07_04:47:46.534771
+
+
+@attribute QUANTIFIERS0 {ForAll, Exists}
+@attribute TERM0 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS0 {<, >, <=, >=}
+@attribute NUM0 NUMERIC
+@attribute LOGICALS0 {And, Or}
+@attribute TERM1 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS1 {<, >, <=, >=}
+@attribute NUM1 NUMERIC
+@attribute IMP0 {Implies}
+@attribute TERM2 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS2 {<, >, <=, >=}
+@attribute NUM2 NUMERIC
+@attribute LOGICALS1 {And, Or}
+@attribute TERM3 {t, err[ToInt(RealVal(0)+(t-0.0)/10000.0)]}
+@attribute RELATIONALS3 {<, >, <=, >=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE}
+
+@data
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1035.968755,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-48.148712,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1068.824524,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-202.894087,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,978.166319,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-11.481699,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,985.489739,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-37.428656,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1088.275994,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-351.032456,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1060.619374,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-938.379251,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1068.300328,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-887.964031,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,991.308616,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-761.985704,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1015.140031,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-658.009948,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1091.866091,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-613.350408,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1002.144475,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-22.664800,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,980.102605,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-994.649709,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1016.306050,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-702.038535,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1011.635582,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-698.559530,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1081.301580,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-97.980671,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1098.188756,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-608.589723,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1013.794601,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-90.502905,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1073.626979,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1086.482190,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,987.933459,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-308.062185,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1005.005586,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-922.515499,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1093.649753,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-382.160109,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1003.001283,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-970.446268,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1028.607009,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-885.901712,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1078.845061,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-189.966309,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1048.382822,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-457.264471,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1079.018587,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-588.084510,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1082.453325,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-984.803482,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1036.603403,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-219.398922,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1022.787243,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-343.009798,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1049.356068,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-560.389918,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1076.039592,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-407.107213,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,993.497483,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-46.015267,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,994.177463,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1090.339535,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1069.007807,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-744.131948,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1004.090629,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-245.855352,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,996.090431,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-612.800434,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1071.532640,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-662.712938,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1011.855648,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-665.907654,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1085.713233,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-273.869969,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1040.851002,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-176.584222,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1025.781766,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-685.098929,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1039.676072,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1087.048331,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1039.883928,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-308.132778,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1045.952288,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-230.805154,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,988.029022,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-683.304453,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,987.866900,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-393.074285,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1037.972586,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-584.083591,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1017.595288,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-214.432348,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1041.862594,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-686.633776,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1095.583555,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-400.063083,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1048.544987,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-117.064628,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1067.997796,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-499.519863,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,979.641977,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-875.645115,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1017.631780,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-989.642936,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1010.646693,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-157.444530,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1066.025395,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-43.157324,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1055.444714,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-852.048223,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,991.030832,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-103.263569,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1025.547793,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1.978698,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1097.996115,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-679.708689,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1049.310428,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-767.590785,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1097.915281,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-859.601584,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1008.897195,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-753.156089,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1070.396211,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-362.200265,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1062.273974,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-340.921943,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1041.936366,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-563.592355,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1096.716193,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-401.464654,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1019.381106,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-444.257795,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,986.863118,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-129.507919,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,983.485592,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1033.028238,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1041.020980,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-704.815536,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1080.101473,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-854.905934,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1042.749228,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-3.199598,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,999.993910,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-94.815100,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1038.843750,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-696.311366,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1078.671180,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-520.774900,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1028.145734,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-860.908996,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1065.353825,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-969.899837,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1069.631967,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-350.971876,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1075.843019,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-650.252933,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1047.664064,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-252.245652,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,1081.009369,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-312.644155,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.014261,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.004578,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.004010,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.013103,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.002705,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.000508,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.002565,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.014623,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.012862,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.005878,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.002754,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.007241,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.000079,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.002872,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.001488,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.009471,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.002539,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.000696,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.012562,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.001306,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.000584,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.015302,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.016873,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.002156,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.013032,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.016947,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.010823,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.006841,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.016727,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.013027,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.013445,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.001404,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.008104,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.000291,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.004811,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.008163,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.004598,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.008166,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.005759,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.016603,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.000860,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.001854,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.001528,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.003830,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.001516,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.004247,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.006703,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.016669,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.009882,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.001414,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.000048,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.000446,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.012299,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.001682,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.005167,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.004778,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,-0.002413,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,0.002773,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,0.012352,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-0.009046,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,479.953555,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-577.441523,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,636.391820,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-282.762320,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,439.888144,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-711.486976,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,967.418486,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-583.732996,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,161.663816,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-488.841690,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,74.914292,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-806.740712,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,662.574532,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-63.975680,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,550.316435,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-898.266182,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,243.207329,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-534.182386,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,301.084887,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-869.304423,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,377.482762,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1044.371211,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,919.985243,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-677.792452,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,717.904836,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-916.825786,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,963.846848,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-666.643178,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,469.128346,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-907.037305,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,906.563672,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-54.769709,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,414.164483,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-249.978747,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,594.181324,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1077.115808,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,490.664534,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-470.498558,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,577.482494,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1044.040225,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,816.383430,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-217.875936,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,582.660238,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-530.716517,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,199.654087,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-640.686289,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,824.906030,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-400.968547,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,622.046157,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-431.409513,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,767.843775,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1039.643289,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,900.587176,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-728.456642,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,484.676597,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-898.406140,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,524.025598,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1018.301122,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,417.460569,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-621.387162,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,302.741235,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-532.242231,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,886.029569,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-504.808094,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,18.964531,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-858.583979,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,285.388340,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-11.941714,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,61.333688,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-831.718539,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,228.650489,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-698.007340,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,402.901990,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-450.432918,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,429.094509,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-221.363800,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,329.762312,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-459.940901,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,367.863634,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1000.948306,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,94.929905,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-367.452745,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,509.052163,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-718.455450,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,387.408477,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-838.860202,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,25.225536,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-316.074842,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,169.977127,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-33.768734,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,720.996706,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-329.050986,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,171.254450,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-199.200472,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,773.283105,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-110.896477,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,466.014718,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-216.081799,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,138.011211,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-1043.894605,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,200.415372,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-58.435313,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],<=,872.617946,And,err[ToInt(RealVal(0)+(t-0.0)/10000.0)],>=,-563.459840,FALSE

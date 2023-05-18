@@ -5,6 +5,8 @@ from ga import GA
 import defs
 import sys
 
+# from parsing import Parser
+
 ## interval_s=And(s>0, s<10)
 ## conditions_s=And(signal_4[s]<1000, signal_2[s]>=-(15.27))
 ## formula = (Not(ForAll([s], Implies((And(s>0, s<10)), (And(signal_4[s]<1000, signal_2[s]>=-(15.27)))))))
@@ -23,6 +25,16 @@ example1= json.loads('["ForAll", ["t", ["Implies", [["And", [["<=", [0,"t"]], ["
 example2= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[t]",0.7]], [">=", ["err[t]",-0.7]]]]]]]]')
 experiment1=json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.007]], [">=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",-0.007]]]]]]]]')
 
+# ForAll([t], Implies(And(0<=t, t<=(50*1000000)), (v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<120))
+at = json.loads('["ForAll", ["t", ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",50000000]] ]], ["<",["v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",120]]]]]]')
+
+### TODO: TEST NEW AST PARSER ##########################################################
+# conditions_s="And(signal_4[s]<50, signal_2[s]>=-(15.27))"
+# parser = Parser()
+# print(parser.parse_formula(conditions_s))
+
+# sys.exit()
+### TODO: TEST NEW AST PARSER ##########################################################
 
 
 # form5 = json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",18]]]],["And",[["==",["signal_5(s)",0]],["==",["signal_6(s)",1]]]]]]]]')
@@ -32,7 +44,7 @@ experiment1=json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], 
 # print(len(form1[1][1][1][1][1]))
 # print(    form1[1][1][1][1][1][1][0][1])
 
-root1 = treenode.parse(form5)
+root1 = treenode.parse(at)
 # root2 = treenode.parse(form2)
 
 # print(root1)
@@ -48,13 +60,13 @@ root1 = treenode.parse(form5)
 
 
 
-# vertices, parents = treenode.bfs(root1)
-# for i, v in enumerate(vertices):
-# 	print(i, v.value)
-# print('')
-# for i, p in enumerate(parents):
-# 	if p is not None:
-# 		print(i, p.value)
+vertices, parents = treenode.bfs(root1)
+for i, v in enumerate(vertices):
+	print(i, v.value)
+print('')
+for i, p in enumerate(parents):
+	if p is not None:
+		print(i, p.value)
 
 # x = input("Choose what vertices to mutate, chose -1 for cancel: ([1,2,3])\n")
 # x = list(x)
@@ -77,15 +89,29 @@ root1 = treenode.parse(form5)
 # ga = GA(form5)
 # ga = GA(form1)
 # ga = GA(example)
+
+
+
 defs.FILEPATH = sys.argv[1]
 defs.FILEPATH2= sys.argv[1]
 
 
-ga = GA(experiment1)
-# ga.write_population(0)
+# run 1
+ga = GA(at)
 ga.evolve()
 # print("offsprings")
 # of[0].print_genes()
 # of[1].print_genes()
 # print(treenode.parse(form1))
 # print(set((treenode.get_terminators(root1))))
+
+ranges = {
+	'4': ['float',-1100, -0.007],
+	'7': ['float', 0.007, 1100]
+}
+
+# run 2
+# ga = GA(experiment1)
+# ga.set_mutation_ranges(ranges)
+# ga.set_force_mutations(True)
+# ga.evolve()

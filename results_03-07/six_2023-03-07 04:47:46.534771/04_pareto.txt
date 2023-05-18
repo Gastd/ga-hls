@@ -1,0 +1,13 @@
+Formula	SW_Score	Satisfied
+SEED: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.007000 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.007000)	-	-
+00: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 980.102605 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -994.649709)	48.0	True
+01: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 1016.306050 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -702.038535)	48.0	True
+02: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 1011.635582 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -698.559530)	48.0	True
+
+
+00: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 121.769461 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -609.289458)	48.0	False
+01: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 169.415846 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -795.097426)	48.0	False
+02: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 357.877800 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -733.087528)	48.0	False
+03: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 497.471600 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -180.790362)	48.0	False
+04: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 44.379142 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -22.452617)	48.0	False
+05: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 173.508310 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -382.238764)	48.0	False
