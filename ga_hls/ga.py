@@ -17,7 +17,7 @@ from tqdm import tqdm
 import treenode
 import individual
 
-from individual import QUANTIFIERS, RELATIONALS, EQUAL, ARITHMETICS, MULDIV, EXP, LOGICALS, NEG, IMP
+from individual import QUANTIFIERS, RELATIONALS, EQUALS, ARITHMETICS, MULDIV, EXP, LOGICALS, NEG, IMP
 
 # from anytree import Node
 from matplotlib import pyplot as plt
@@ -38,7 +38,7 @@ CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia
 POPULATION_SIZE = 30 #100 #30  ## Must be an EVEN number
 GENE_LENGTH = 32
-MAX_ALLOWABLE_GENERATIONS = 30 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
+MAX_ALLOWABLE_GENERATIONS = 3 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 # MAX_ALLOWABLE_GENERATIONS = 3 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 NUMBER_OF_PARAMETERS = 17 ## Number of parameters to be evolved
 CHROMOSOME_LENGTH = GENE_LENGTH * NUMBER_OF_PARAMETERS
@@ -130,7 +130,7 @@ class GA(object):
         self.seed = root
         terminators = list(set(treenode.get_terminators(root)))
         self.seed_ch = deepcopy(individual.Individual(root, terminators))
-        # print(f'terminators = {terminators}')
+        print(f'terminators = {terminators}')
         # print(f'Initial formula: {root}')
         for i in tqdm(range(0, self.size)):
             chromosome = deepcopy(individual.Individual(root, terminators))
@@ -155,6 +155,9 @@ class GA(object):
     def init_log(self, parent_dir):
         directory = str(self.now)
         self.path = os.path.join(parent_dir, directory)
+        self.path = self.path.replace(' ', '_')
+        self.path = self.path.replace(':', '_')
+        print(self.path)
         try:
             os.mkdir(self.path)
             pass
@@ -398,7 +401,7 @@ class GA(object):
         count_op = {
             'QUANTIFIERS': 0,
             'RELATIONALS': 0,
-            'EQUAL': 0,
+            'EQUALSS': 0,
             'ARITHMETICS': 0,
             'MULDIV': 0,
             'EXP': 0,
@@ -427,13 +430,13 @@ class GA(object):
                 qstring = qstring.replace('[', '{')
                 ret.append(f'RELATIONALS{count_op["RELATIONALS"]} {qstring}')
                 count_op['RELATIONALS'] = count_op['RELATIONALS'] + 1
-            if term in EQUAL:
-                qstring = str(EQUAL)
+            if term in EQUALS:
+                qstring = str(EQUALS)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
-                ret.append(f'EQUAL{count_op["EQUAL"]} {qstring}')
-                count_op['EQUAL'] = count_op['EQUAL'] + 1
+                ret.append(f'EQUALS{count_op["EQUALS"]} {qstring}')
+                count_op['EQUALS'] = count_op['EQUALS'] + 1
             if term in ARITHMETICS:
                 qstring = str(ARITHMETICS)
                 qstring = qstring.replace('\'', '')
@@ -509,8 +512,11 @@ class GA(object):
         # for att in attrs:
         #     print(att)
 
-        with open('{}/dataset_qty_{}_per{}.arff'.format(self.path, self.now, int(per_cut*100)), 'w') as f:
-            nowstr = f'{self.now}\n'
+        nowstr = f'{self.now}'.replace(' ', '_')
+        nowstr = nowstr.replace(':', '_')
+        filename_str = '{}/dataset_qty_{}_per{}.arff'.format(self.path, nowstr, int(per_cut*100))
+        with open(filename_str, 'w') as f:
+            nowstr = f'{nowstr}\n'
             nowstr = nowstr.replace(' ', '_')
             s = f'@relation all.{nowstr}\n'
             f.write(s)
@@ -535,6 +541,7 @@ class GA(object):
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
                 f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
+        return filename_str
 
     def store_dataset_threshold(self):
         self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
@@ -709,11 +716,16 @@ class GA(object):
             self.generation_counter += 1
             self.population = new_population
             self.diagnosis()
-        self.store_dataset_qty(1.0)
-        self.store_dataset_qty(.25)
-        self.store_dataset_qty(.20)
-        self.store_dataset_qty(.15)
-        self.store_dataset_qty(.10)
+        s100 = self.store_dataset_qty(1.0)
+        s025 = self.store_dataset_qty(.25)
+        s020 = self.store_dataset_qty(.20)
+        s015 = self.store_dataset_qty(.15)
+        s010 = self.store_dataset_qty(.10)
+        self.j48(s100, 1.0)
+        self.j48(s025, .25)
+        self.j48(s020, .20)
+        self.j48(s015, .15)
+        self.j48(s010, .10)
 
 
     def replace_token(self, tk_list):
@@ -848,6 +860,32 @@ class GA(object):
         node1 += off0_sub
 
         return offsprings
+
+    def j48(self, arff_file, qty):
+        # filename_str = '{}/dataset_qty_{}_per{}.arff'.format(self.path, self.now, int(per_cut*100))
+
+        # export CLASSPATH="/home/gabriel/Downloads/weka-3-8-6/weka.jar"
+        # java -Xmx1024m weka.classifiers.trees.J48 -t data/breast-cancer.arff -k -d J48-data.model >& J48-data.out
+        weka_path='/home/gabriel/Downloads/weka-3-8-6/'
+        arff = '\''+arff_file+'\''
+        path = '\''+self.path+'\''
+        weka = f'java -Xmx1024m weka.classifiers.trees.J48 -t {arff_file} -k -d {self.path}/J48-data-{int(qty*100)}.model' # >& J48-data.out'
+        print(weka)
+        weka_tk = shlex.split(weka)
+        try:
+            run_process = subprocess.run(weka_tk,
+                                         stderr=subprocess.PIPE,
+                                         stdout=subprocess.PIPE,
+                                         universal_newlines=True,
+                                         timeout=10)
+            print(run_process.stdout)
+            print(run_process.stderr)
+            filename_str = f'{self.path}/J48-data-{int(qty*100)}.out'
+            with open(filename_str, 'w') as f:
+                f.write(run_process.stdout)
+                f.write(run_process.stderr)
+        except:
+            pass
 
 # this class is used to calculate the Smith-Waterman scores
 class Smith_Waterman(object):
