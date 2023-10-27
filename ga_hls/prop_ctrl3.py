@@ -48,7 +48,7 @@ def property_03():
 
 
 	interval_t=And(0<=t, t<=3.6E10)
-	conditions_t=Or(signal_1[ToInt(RealVal(0)+(t-0.0)/3.6E9)]==1, signal_1[ToInt(RealVal(0)+(t-0.0)/3.6E9)]==2)
+	conditions_t=Or(signal_1[ToInt(RealVal(0)+(t-0.0)/3.6E9)]>=1, signal_1[ToInt(RealVal(0)+(t-0.0)/3.6E9)]<=2)
 	z3solver.add(Not(ForAll([t], Implies(interval_t, conditions_t))))
 	status=z3solver.check()
 	print(status)

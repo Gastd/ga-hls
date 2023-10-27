@@ -3,7 +3,32 @@ import treenode
 from individual import Individual
 from ga import GA
 import defs
+import shlex
 import sys
+import subprocess
+
+def check_if_sat(filepath):
+    ret = False
+    folder_name = 'ga_hls'
+    run_str = f'python3 {filepath}'
+    run_tk = shlex.split(run_str)
+    lines = []
+    try:
+        run_process = subprocess.run(run_tk,
+                                     stderr=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,
+                                     universal_newlines=True,
+                                     timeout=10)
+
+        if run_process.stdout.find('SATISFIED') > 0:
+            ret = True
+        elif run_process.stdout.find('VIOLATED') > 0:
+            ret = False
+        else:
+            ret = False
+    except:
+        ret = False
+    return ret
 
 # from parsing import Parser
 
@@ -25,8 +50,50 @@ example1= json.loads('["ForAll", ["t", ["Implies", [["And", [["<=", [0,"t"]], ["
 example2= json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[t]",0.7]], [">=", ["err[t]",-0.7]]]]]]]]')
 experiment1=json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], ["<", ["t",50]] ]], ["And", [["<=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.007]], [">=", ["err[ToInt(RealVal(0)+(t-0.0)/10000.0)]",-0.007]]]]]]]]')
 
+
+
 # ForAll([t], Implies(And(0<=t, t<=(50*1000000)), (v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<120))
-at = json.loads('["ForAll", ["t", ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",50000000]] ]], ["<",["v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",120]]]]]]')
+at1  = json.loads('["ForAll", ["t",  ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",50000000]] ]], ["<",["v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",120]]]]]]')
+# ForAll([t], Implies(And(0<=t, t<=(50*1000000)), (e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<4750))
+at2  = json.loads('["ForAll", ["t",  ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",10000000]] ]], ["<",["e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",4750]]]]]]')
+at51 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]] ] ], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+(30-0.0)/10000.0)"]] ] ], ["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2.5]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 1]]] ]]] ]]]]]]]] ] ]')
+at52 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]] ] ], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)"]]] ], ["Implies", [["And",[["!=", ["gear[(i-1)]", 2]], ["==", ["gear[i]", 2]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["t1","t2"]], ["<=", ["t2", ["+",["t1",2500000]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 2]]]]]] ]]]]]]]]]]')
+at53 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30]]]],         ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+(30-0.0)/10000.0)"]]]],   ["Implies", [["And",[["!=", ["gear[(i-1)]", 3]], ["==", ["gear[i]",3]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2.5]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 3]]]]]] ]]]]]]]]]]')
+at54 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<",["i","ToInt(RealVal(0)+(30-0.0)/10000.0)"]]]], ["Implies", [["And",[["!=", ["gear[(i-1)]", 4]], ["==", ["gear[i]", 4]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2.5]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 4]]]]]] ]]]]]]]]]]')
+at6a = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",4]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]]]]]]]]]]]')
+at6b = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",8]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 50]]]]]]]]]]]]')
+at6c = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",20]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 65]]]]]]]]]]]]')
+
+# ForAll([t], Implies(And(0<=t, t<=(100*1000000)), ((y5[ToInt(RealVal(0)+(t-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t-0.0)/10000.0)]))<=40))
+cc1  = json.loads('["ForAll", ["t", ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",100000000]] ]], ["<=", [ ["-", ["y5[ToInt(RealVal(0)+(t-0.0)/10000.0)]","y4[ToInt(RealVal(0)+(t-0.0)/10000.0)]"]] , 40]] ]] ]]')
+# ForAll([t1], Implies(And(0<=t1, t1<=(70*1000000)), conditions_t1))
+# Exists([t2], And(And(t1<=t2, t2<=t1+(30*1000000)), ((y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]))>15))
+#cc2  = json.loads('["Exists", ["t2", ["Implies", [["And", [["<=",["t1","t2"]], ["<=",["t2",["+", ["t1", 30000000]] ]] ]], [">", [ ["-", ["y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)]","y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]"]] , 15]] ]] ]]')
+cc2  = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 70000000]]]], ["Exists", ["t2", ["Implies", [["And", [["<=",["t1","t2"]], ["<=",["t2",["+", ["t1", 30000000]] ]] ]], [">", [ ["-", ["y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)]","y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]"]] , 15]] ]] ]]]] ]]')
+
+
+
+req2form = {
+    "AT1" : at1 ,
+    "AT2" : at2 ,
+    "AT51": at51,
+    "AT52": at52,
+    "AT53": at53,
+    "AT54": at54,
+    "AT6A": at6a,
+    "AT6B": at6b,
+    "AT6C": at6c,
+    "CC1" : cc1 ,
+    "CC2" : cc2
+}
+
+if True:
+    sat = check_if_sat(sys.argv[2])
+
+    if sat:
+        print(sat)
+        print('Already SATISFIED')
+        sys.exit()
 
 ### TODO: TEST NEW AST PARSER ##########################################################
 # conditions_s="And(signal_4[s]<50, signal_2[s]>=-(15.27))"
@@ -44,7 +111,7 @@ at = json.loads('["ForAll", ["t", ["Implies", [["And", [["<=",[0,"t"]], ["<=",["
 # print(len(form1[1][1][1][1][1]))
 # print(    form1[1][1][1][1][1][1][0][1])
 
-root1 = treenode.parse(at)
+root1 = treenode.parse(at1)
 # root2 = treenode.parse(form2)
 
 # print(root1)
@@ -62,11 +129,11 @@ root1 = treenode.parse(at)
 
 vertices, parents = treenode.bfs(root1)
 for i, v in enumerate(vertices):
-	print(i, v.value)
+    print(i, v.value)
 print('')
 for i, p in enumerate(parents):
-	if p is not None:
-		print(i, p.value)
+    if p is not None:
+        print(i, p.value)
 
 # x = input("Choose what vertices to mutate, chose -1 for cancel: ([1,2,3])\n")
 # x = list(x)
@@ -91,13 +158,15 @@ for i, p in enumerate(parents):
 # ga = GA(example)
 
 
-
-defs.FILEPATH = sys.argv[1]
-defs.FILEPATH2= sys.argv[1]
+form = req2form[sys.argv[1]]
+print(form)
+defs.FILEPATH = sys.argv[2]
+defs.FILEPATH2= sys.argv[2]
 
 
 # run 1
-ga = GA(at)
+ga = GA(form)
+# ga.j48('')
 ga.evolve()
 # print("offsprings")
 # of[0].print_genes()
@@ -106,8 +175,8 @@ ga.evolve()
 # print(set((treenode.get_terminators(root1))))
 
 ranges = {
-	'4': ['float',-1100, -0.007],
-	'7': ['float', 0.007, 1100]
+    '4': ['float',-1100, -0.007],
+    '7': ['float', 0.007, 1100]
 }
 
 # run 2

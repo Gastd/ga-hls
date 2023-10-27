@@ -14,7 +14,7 @@ MUT_IDXS =[4, 7]
 # OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
 QUANTIFIERS = ['ForAll', 'Exists']
 RELATIONALS = ['<', '>', '<=', '>=']
-EQUAL = ['==']
+EQUALS = ['==', '!=']
 ARITHMETICS = ['+', '-']
 MULDIV = ['*', '/']
 EXP = ['^']
@@ -279,6 +279,8 @@ class Individual():
             return random.choice(ARITHMETICS)
         elif op in LOGICALS:
             return random.choice(LOGICALS)
+        elif op in EQUALS:
+            return random.choice(EQUALS)
         elif op in QUANTIFIERS:
             return random.choice(QUANTIFIERS)
         else:
@@ -302,7 +304,7 @@ def readable(root):
         return f'{root.value} {readable(root.left)} In ({readable(root.right.left)}) Implies ({readable(root.right.right)})'
     elif root.value in LOGICALS+IMP+NEG:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
-    elif root.value in RELATIONALS+EQUAL:
+    elif root.value in RELATIONALS+EQUALS:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in ARITHMETICS+MULDIV+EXP:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
@@ -326,7 +328,7 @@ def build_str(root):
         return f'{root.value}([{root.left.value}], {build_str(root.right)})'
     elif root.value in LOGICALS+IMP+NEG:
         return f'{root.value}({build_str(root.left)}, {build_str(root.right)})'
-    elif root.value in RELATIONALS:
+    elif root.value in RELATIONALS+EQUALS:
         return f'({build_str(root.left)} {root.value} {build_str(root.right)})'
     elif root.value in ARITHMETICS:
         return f'({build_str(root.left)} {root.value} {build_str(root.right)})'
