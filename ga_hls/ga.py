@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from copy import deepcopy
-from tqdm import tqdm
+# from tqdm import tqdm
 
 import treenode
 import individual
@@ -38,7 +38,7 @@ CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia
 POPULATION_SIZE = 30 #100 #30  ## Must be an EVEN number
 GENE_LENGTH = 32
-MAX_ALLOWABLE_GENERATIONS = 3 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
+MAX_ALLOWABLE_GENERATIONS = 50 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 # MAX_ALLOWABLE_GENERATIONS = 3 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 NUMBER_OF_PARAMETERS = 17 ## Number of parameters to be evolved
 CHROMOSOME_LENGTH = GENE_LENGTH * NUMBER_OF_PARAMETERS
@@ -132,7 +132,9 @@ class GA(object):
         self.seed_ch = deepcopy(individual.Individual(root, terminators))
         print(f'terminators = {terminators}')
         # print(f'Initial formula: {root}')
-        for i in tqdm(range(0, self.size)):
+        # for i in tqdm(range(0, self.size)):
+        for i in range(0, self.size):
+            print(i)
             chromosome = deepcopy(individual.Individual(root, terminators))
             n = random.randrange(len(root))
             if self.force_mutation:
@@ -658,8 +660,8 @@ class GA(object):
                 f.write(f'\t{hypot[1]}\n')
         # loop
         self.generation_counter = 0
-        # for i in range(MAX_ALLOWABLE_GENERATIONS):
-        for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
+        for i in range(MAX_ALLOWABLE_GENERATIONS):
+        # for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
             ## score population
             self.evaluate()
 
@@ -765,8 +767,8 @@ class GA(object):
         print(diag)
 
     def evaluate(self):
-        # for chromosome in self.population:
-        for chromosome in tqdm(self.population):
+        for chromosome in self.population:
+        # for chromosome in tqdm(self.population):
             if chromosome.fitness != -1:
                 continue
 
