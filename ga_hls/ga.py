@@ -36,9 +36,9 @@ import defs
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia
-POPULATION_SIZE = 30 #100 #30  ## Must be an EVEN number
+POPULATION_SIZE = 50 #100 #30  ## Must be an EVEN number
 GENE_LENGTH = 32
-MAX_ALLOWABLE_GENERATIONS = 50 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
+MAX_ALLOWABLE_GENERATIONS = 1000 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 # MAX_ALLOWABLE_GENERATIONS = 3 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
 NUMBER_OF_PARAMETERS = 17 ## Number of parameters to be evolved
 CHROMOSOME_LENGTH = GENE_LENGTH * NUMBER_OF_PARAMETERS
