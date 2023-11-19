@@ -74,6 +74,7 @@ cc2  = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<
 
 
 req2form = {
+    "AS"  : at1 ,
     "AT1" : at1 ,
     "AT2" : at2 ,
     "AT51": at51,
@@ -165,7 +166,7 @@ defs.FILEPATH2= sys.argv[2]
 
 
 # run 1
-ga = GA(form)
+ga = GA(form, sys.argv[3])
 # ga.j48('')
 ga.evolve()
 # print("offsprings")

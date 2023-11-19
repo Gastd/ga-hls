@@ -69,7 +69,7 @@ def isfloat(num):
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self, init_form):
+    def __init__(self, init_form, target_sats = 2):
         super(GA, self).__init__()
 
         random.seed()
@@ -94,6 +94,7 @@ class GA(object):
         self.unsats = []
         # self.diag = diagnosis.Diagnosis()
         # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
+        self.target_sats = int(target_sats)
         print(f'Runnnig script {defs.FILEPATH} and {defs.FILEPATH2}')
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             f.write(f'\t{defs.FILEPATH}\n')
@@ -649,7 +650,7 @@ class GA(object):
         return deepcopy(np.random.choice(self.population, p=chromosome_probabilities))
 
     def check_evolution(self):
-        evolved = self.count_distinct_edges(self.population[0]) >= len(self.graph.edges())
+        evolved = True if len(self.sats) >= self.target_sats else False
         # max_allowed = self.generation_counter < MAX_ALLOWABLE_GENERATIONS
         # print(f"{self.count_distinct_edges(self.population[0])} < {len(self.graph.edges())} = {evolved}")
         return (evolved)
@@ -660,7 +661,8 @@ class GA(object):
                 f.write(f'\t{hypot[1]}\n')
         # loop
         self.generation_counter = 0
-        for i in range(MAX_ALLOWABLE_GENERATIONS):
+        while not self.check_evolution():
+        # for i in range(MAX_ALLOWABLE_GENERATIONS):
         # for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
             ## score population
             self.evaluate()
