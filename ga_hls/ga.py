@@ -50,7 +50,7 @@ FOLDS = 10
 
 SCALE = 0.5
 
-MTX_IDX = [4,7]
+MTX_IDX = [3, 7, 11]
 
 # defs.FILEPATH = 'ga_hls/prop_ctrl.py'
 # defs.FILEPATH2 = 'ga_hls/prop_ctrl1.py'
@@ -69,8 +69,9 @@ def isfloat(num):
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self, init_form, target_sats = 2):
+    def __init__(self, init_form, ranges = None, target_sats = 2):
         super(GA, self).__init__()
+
 
         random.seed()
         self.size = POPULATION_SIZE
@@ -79,8 +80,13 @@ class GA(object):
         curr_path = os.getcwd()
         self.force_mutation = False
         self.ranges = None
-
         self.init_form = init_form
+
+        print(ranges)
+        if ranges is not None:
+            self.set_mutation_ranges(ranges)
+            self.set_force_mutations(True)
+
         self.init_population()
         self.init_log(curr_path)
         self.s, self.e = self.get_line('ga_hls')
@@ -92,6 +98,7 @@ class GA(object):
         self.hypots = []
         self.sats = []
         self.unsats = []
+
         # self.diag = diagnosis.Diagnosis()
         # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
         self.target_sats = int(target_sats)
@@ -120,7 +127,6 @@ class GA(object):
 
     def set_force_mutations(self, forced: bool):
         self.force_mutation = forced
-        self.init_population()
 
     def set_mutation_ranges(self, ranges: dict):
         self.ranges = ranges
@@ -131,6 +137,7 @@ class GA(object):
         self.seed = root
         terminators = list(set(treenode.get_terminators(root)))
         self.seed_ch = deepcopy(individual.Individual(root, terminators))
+        self.seed_ch.show_idx()
         print(f'terminators = {terminators}')
         # print(f'Initial formula: {root}')
         # for i in tqdm(range(0, self.size)):
@@ -151,6 +158,7 @@ class GA(object):
                     chromosome.mutate(1, random.randrange(len(chromosome)))
                 # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
             chromosome.ranges = self.ranges
+            print(f'chromosome.ranges = {chromosome.ranges}')
             self.population.append(deepcopy(chromosome))
         # raise Exception('')
         print("Population initialized. Size = {}".format(self.size))
@@ -707,6 +715,7 @@ class GA(object):
                         offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
                     # print(f"offspring2 is {'viable' if offspring2.is_viable() else 'not viable'}")
                 offspring1.ranges = self.ranges
+                print(f'offspring1.ranges = {offspring1.ranges}')
                 offspring2.ranges = self.ranges
                 new_population.append(offspring1)
                 new_population.append(offspring2)
