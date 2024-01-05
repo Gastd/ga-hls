@@ -53,7 +53,7 @@ experiment1=json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], 
 
 
 # ForAll([t], Implies(And(0<=t, t<=(50*1000000)), (v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<120))
-at1  = json.loads('["ForAll", ["t",  ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",50000000]] ]], ["<",["v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",120]]]]]]')
+at1  = json.loads('["ForAll", ["t",  ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",20000000]] ]], ["<",["v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",120]]]]]]')
 # ForAll([t], Implies(And(0<=t, t<=(50*1000000)), (e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<4750))
 at2  = json.loads('["ForAll", ["t",  ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",10000000]] ]], ["<",["e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",4750]]]]]]')
 at51 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]] ] ], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+(30-0.0)/10000.0)"]] ] ], ["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2.5]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 1]]] ]]] ]]]]]]]] ] ]')
@@ -166,9 +166,9 @@ defs.FILEPATH2= sys.argv[2]
 
 
 # run 1
-ga = GA(form, sys.argv[3])
+# ga = GA(form, sys.argv[3])
 # ga.j48('')
-ga.evolve()
+# ga.evolve()
 # print("offsprings")
 # of[0].print_genes()
 # of[1].print_genes()
@@ -176,12 +176,13 @@ ga.evolve()
 # print(set((treenode.get_terminators(root1))))
 
 ranges = {
-    '4': ['float',-1100, -0.007],
-    '7': ['float', 0.007, 1100]
+    '3': ['int',0, 120],
+    '7': ['int', 10000000, 20000000],
+    '11': ['int', 0, 20000000]
 }
-
+print(ranges)
 # run 2
-# ga = GA(experiment1)
+ga = GA(form, ranges, sys.argv[3])
 # ga.set_mutation_ranges(ranges)
 # ga.set_force_mutations(True)
-# ga.evolve()
+ga.evolve()

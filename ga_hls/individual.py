@@ -187,13 +187,18 @@ class Individual():
                     subtree.value = new_operator
                 # print(f"To {subtree.value}")
 
+    def show_idx(self):
+        for idx in range(0, len(self)):
+            subtree, parent = self.root.get_subtree(idx)
+            print(f"{idx} = {subtree.value}")
+
     # @show_arg_ret_decorator
     def force_mutate_with_ranges(self, mut_idxs=[], nmutations=MUTATION_NODES):
         rate = 1.0
         for idx in mut_idxs:
             if (random.random() < rate):
                 subtree, parent = self.root.get_subtree(idx)
-                # print(f"Mutating {idx} from {subtree.value} with {self.ranges[str(idx)]}")
+                print(f"Mutating {idx} from {subtree.value} with {self.ranges[str(idx)]}")
                 if subtree.left is None:
                     subtree.value = self.get_new_forced_term(subtree.value, self.ranges[str(idx)])
                 # else:
@@ -203,7 +208,7 @@ class Individual():
                 #             # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
                 #             continue
                 #     subtree.value = new_operator
-                # print(f"To {subtree.value}")
+                print(f"To {subtree.value}")
 
     def get_new_forced_term(self, t, interval):
         if interval[0] == 'int':
@@ -212,19 +217,17 @@ class Individual():
         if interval[0] == 'float':
             lower = float(interval[1])
             upper = float(interval[2])
-        # print(f'For term {t} we have interval [{lower,upper}]')
+        print(f'For term {t} we have interval {lower},{upper}')
         if t.__class__ in self.term.keys():
             if isinstance(t, int):
-                if t == 0:
-                    if random.random() > 0.5:
-                        return t + 1
-                    else:
-                        return t - 1
-                if random.random() > 0.5:
-                    ## Change the terminator inside the same maginitude order from the input
-                    return random.randint(lower, upper)
+                ## Change the terminator inside the same maginitude order from the input
+                ret = random.randint(lower, upper)
+                print(ret)
+                return ret
             elif isinstance(t, float):
-                    return random.uniform(lower, upper)
+                ret = random.uniform(lower, upper)
+                print(ret)
+                return ret
             else:
                 # return random.choice(self.term[t.__class__])
                 return t
@@ -238,9 +241,9 @@ class Individual():
             if isinstance(t, int):
                 if t == 0:
                     if random.random() > 0.5:
-                        return t + 1
+                        return +1
                     else:
-                        return t - 1
+                        return -1
                 if random.random() > 0.5:
                     ## Change the terminator inside the same maginitude order from the input
                     return t + random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
