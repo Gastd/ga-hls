@@ -144,6 +144,8 @@ class GA(object):
         for i in range(0, self.size):
             print(i)
             chromosome = deepcopy(individual.Individual(root, terminators))
+            chromosome.ranges = deepcopy(self.ranges)
+            # print(f'chromosome.ranges = {chromosome.ranges}')
             n = random.randrange(len(root))
             if self.force_mutation:
                 chromosome.force_mutate(MTX_IDX, n)
@@ -152,13 +154,12 @@ class GA(object):
             # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
             while not chromosome.is_viable():
                 chromosome = deepcopy(individual.Individual(root, terminators))
+                chromosome.ranges = deepcopy(self.ranges)
                 if self.force_mutation:
                     chromosome.force_mutate(MTX_IDX, random.randrange(len(chromosome)))
                 else:
                     chromosome.mutate(1, random.randrange(len(chromosome)))
                 # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
-            chromosome.ranges = self.ranges
-            print(f'chromosome.ranges = {chromosome.ranges}')
             self.population.append(deepcopy(chromosome))
         # raise Exception('')
         print("Population initialized. Size = {}".format(self.size))
@@ -696,30 +697,27 @@ class GA(object):
                     offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
                 else:
                     offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
-                # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
 
                 while not offspring1.is_viable():
                     offspring1 = deepcopy(individual.Individual(self.seed, terminators))
+                    offspring1.ranges = self.ranges
                     if self.force_mutation:
                         offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
                     else:
                         offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
                     # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
+
                 offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
-                # print(f"offspring1 is {'viable' if offspring2.is_viable() else 'not viable'}")
                 while not offspring2.is_viable():
                     offspring2 = deepcopy(individual.Individual(self.seed, terminators))
+                    offspring2.ranges = self.ranges
                     if self.force_mutation:
                         offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
                     else:
                         offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
                     # print(f"offspring2 is {'viable' if offspring2.is_viable() else 'not viable'}")
-                offspring1.ranges = self.ranges
-                print(f'offspring1.ranges = {offspring1.ranges}')
-                offspring2.ranges = self.ranges
                 new_population.append(offspring1)
                 new_population.append(offspring2)
-                # raise Exception('')
 
                 # Reset fitness
                 offspring1.reset()
