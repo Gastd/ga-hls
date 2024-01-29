@@ -175,10 +175,15 @@ defs.FILEPATH2= sys.argv[2]
 # print(treenode.parse(form1))
 # print(set((treenode.get_terminators(root1))))
 
+# ranges = {
+#     '3': ['int',0, 120],
+#     '7': ['int', 10000000, 20000000],
+#     '11': ['int', 0, 20000000]
+# }
 ranges = {
-    '3': ['int',0, 120],
-    '7': ['int', 10000000, 20000000],
-    '11': ['int', 0, 20000000]
+    '3': ['int',100, 140],
+    '7': ['int', 10000000, 30000000],
+    '11': ['int', 0, 10000000]
 }
 print(ranges)
 # run 2
