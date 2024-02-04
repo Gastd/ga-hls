@@ -116,20 +116,20 @@ class Individual():
                                          stderr=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
                                          universal_newlines=True,
-                                         timeout=10)
+                                         timeout=25)
         except:
             return False
         # print(run_process.stdout)
         if run_process.stdout.find('SATISFIED') > 0:
             # print('Chromosome not viable')
-            return False
+            return True
         elif run_process.stdout.find('VIOLATED') > 0:
             # print('Chromosome viable')
             return True
         else:
             # print('Chromosome not viable')
             return False
-        return
+        return False
 
     def reset(self):
         self.fitness = -1
@@ -154,7 +154,7 @@ class Individual():
     def __len__(self):
         return len(self.root)
 
-    @check_call
+    # @check_call
     # def mutate(self, rate: float, nmutations=MUTATION_NODES):
     #     for _ in range(0, nmutations):
     #         if (random.random() < rate):
@@ -170,12 +170,12 @@ class Individual():
     #                         continue
     #                 subtree.value = new_operator
 
-    @check_call
+    # @check_call
     def force_mutate(self, mut_idxs=[], nmutations=MUTATION_NODES):
         if len(mut_idxs) == 0:
             print('MUT_IDX is empty')
             return
-        print(self.ranges)
+        # print(self.ranges)
         if self.ranges is not None:
             self.force_mutate_with_ranges(mut_idxs)
             return
@@ -186,7 +186,7 @@ class Individual():
                 if (random.random() < rate):
                     # mut_idx = random.choice(mut_idxs)
                     subtree, parent = self.root.get_subtree(mut_idx)
-                    print(f"Mutating {mut_idx} from {subtree.value}")
+                    # print(f"Mutating {mut_idx} from {subtree.value}")
                     if subtree.left is None:
                         subtree.value = self.get_new_term(subtree.value)
                     else:
@@ -196,7 +196,7 @@ class Individual():
                                 # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
                                 continue
                         subtree.value = new_operator
-                    print(f"To {subtree.value}")
+                    # print(f"To {subtree.value}")
 
     def show_idx(self):
         for idx in range(0, len(self)):
@@ -229,7 +229,7 @@ class Individual():
         if interval[0] == 'float':
             lower = float(interval[1])
             upper = float(interval[2])
-        print(f'For term {t} we have interval {lower}, {upper}')
+        # print(f'For term {t} we have interval {lower}, {upper}')
         if t.__class__ in self.term.keys():
             if isinstance(t, int):
                 ## Change the terminator inside the same maginitude order from the input
