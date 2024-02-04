@@ -107,6 +107,9 @@ class GA(object):
             f.write(f'\t{defs.FILEPATH}\n')
 
     def check_highest_sat(self, chromosome):
+        self.max_score += self.SW.compare(list(self.seed), list(self.seed), 0,0).traceback_score
+        self.highest_sat = None
+        return
         if chromosome is None:
             self.highest_sat = None
         else:
@@ -337,7 +340,7 @@ class GA(object):
         # print(run_process.stdout)
         if run_process.stdout.find('SATISFIED') > 0:
             # print('Chromosome not viable')
-            return False
+            return True
         elif run_process.stdout.find('VIOLATED') > 0:
             # print('Chromosome viable')
             return True
@@ -375,7 +378,7 @@ class GA(object):
         labels = []
         SW = Smith_Waterman()
         for idx, el in enumerate(self.population):
-            labels.append('{:0>2}{}'.format(idx,'T' if el.madeit else 'F'))
+            labels.append('{:0>2}{}'.format(idx,'T' if el.madeit == 'True' else 'F'))
         for i, c1 in enumerate(self.population):
             for j, c2 in zip(range(i+1, self.size), self.population[i+1:]):
                 new_result = SW.compare(list(c1), list(c2), i, j)
@@ -388,7 +391,7 @@ class GA(object):
         Z = create_dendrogram('{}/sw_ga_{:0>2}'.format(self.path, generation), score_matrix, labels, inverse_score=True)
         if Z is not None:
             for idx, el in enumerate(self.population):
-                if el.madeit is True: #and Z[idx-1][2] < 0.0333:
+                if el.madeit is 'True': #and Z[idx-1][2] < 0.0333:
                     print(f'{idx}: {Z[idx-1][2]}: {el}')
                     self.hypots.append([Z[idx-1][2], el])
                     # if hypot[0] > Z[idx-1][2]:
@@ -398,14 +401,14 @@ class GA(object):
     def generate_dataset_qty(self):
         res = []
         [res.append(x) for x in self.population if x not in res]
-        [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == False)]
-        [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.madeit == True)]
+        [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
+        [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.madeit == 'True')]
 
     def generate_dataset_threshold(self):
         res = []
         [res.append(x) for x in self.population if x not in res]
-        [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == False)]
-        [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.sw_score > SW_THRESHOLD) and (x.madeit == True)]
+        [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
+        [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.sw_score > SW_THRESHOLD) and (x.madeit == 'True')]
         # print(f'\nWe have so far {len(self.sats)} satisfied')
         # print(f'and {len(self.unsats)} unsatisfied')
 
@@ -506,13 +509,16 @@ class GA(object):
         self.sats.sort(key=lambda x : x.sw_score, reverse=True)
         self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
 
-        per_qty = math.ceil(len(self.sats) * per_cut)
+        per_qty = math.ceil((len(self.sats) * per_cut) if (len(self.sats) < len(self.unsats)) else (len(self.unsats) * per_cut))
+        print(f'per_qty = {per_qty}')
         sats = self.sats
         unsats = self.unsats
         if len(sats) > per_qty:
             sats = sats[:per_qty]
         if len(unsats) > per_qty:
             unsats = unsats[:per_qty]
+        # print(f'len sats = {len(sats)}')
+        # print(f'len unsats = {len(unsats)}')
 
         chstr = str(sats[0])
         chstr = chstr.replace(' ', ',')
@@ -540,6 +546,7 @@ class GA(object):
             f.write('\n')
             f.write('@data\n')
             for chromosome in sats:
+                # print('writing sats')
                 ch_str = str(chromosome)
                 ch_str = ch_str.replace(' ', ',')
                 ch_str = ch_str.replace(',t,In,(', ',')
@@ -547,12 +554,13 @@ class GA(object):
                 f.write(ch_str[:-1])
                 f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
             for chromosome in unsats:
+                # print('writing unsats')
                 ch_str = str(chromosome)
                 ch_str = ch_str.replace(' ', ',')
                 ch_str = ch_str.replace(',t,In,(', ',')
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
+                f.write(f",{'TRUE' if chromosome.madeit == True else 'FALSE'}\n")
         return filename_str
 
     def store_dataset_threshold(self):
@@ -597,7 +605,7 @@ class GA(object):
                 ch_str = ch_str.replace(',s,In,(', ',')
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
+                f.write(f",{'TRUE' if chromosome.madeit == True else 'FALSE'}\n")
 
     def dist2VF(self, generation):
         res = []
@@ -659,7 +667,7 @@ class GA(object):
         return deepcopy(np.random.choice(self.population, p=chromosome_probabilities))
 
     def check_evolution(self):
-        evolved = True if len(self.sats) >= self.target_sats else False
+        evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
         # max_allowed = self.generation_counter < MAX_ALLOWABLE_GENERATIONS
         # print(f"{self.count_distinct_edges(self.population[0])} < {len(self.graph.edges())} = {evolved}")
         return (evolved)
@@ -796,7 +804,7 @@ class GA(object):
                                              stderr=subprocess.PIPE,
                                              stdout=subprocess.PIPE,
                                              universal_newlines=True,
-                                             timeout=10)
+                                             timeout=100)
                 # print(f'Not({chromosome.format()})')
                 # print(f'Chromosome {chromosome.format()}')
                 # print(run_process.stdout)
@@ -818,14 +826,27 @@ class GA(object):
                     self.execution_report[err] = 1
 
                 if run_process.stdout.find('SATISFIED') > 0:
-                    chromosome.madeit = True
-                    self.check_highest_sat(chromosome)
+                    chromosome.madeit = 'True'
+                    # self.check_highest_sat(chromosome)
                 elif run_process.stdout.find('VIOLATED') > 0:
-                    chromosome.madeit = False
+                    chromosome.madeit = 'False'
                 else:
-                    chromosome.madeit = False
+                    print(run_process.stdout)
+                    print(run_process.stderr)
+                    chromosome.madeit = 'Problem'
             except:
-                chromosome.madeit = False
+                print("An exception occurred")
+                print(f'Chromosome {chromosome.format()}')
+                print(run_process.stdout)
+                print(run_process.stderr)
+                chromosome.madeit = 'Problem'
+
+            if chromosome.madeit == 'Problem':
+                # When we cannot evaluate the chromosome set fitness to zero and evaluate next chromosome
+                chromosome.sw_score = 0
+                chromosome.fitness = 0
+                continue
+
             # print(self.execution_report)
             self.execution_report['TOTAL'] += 1
             
@@ -833,9 +854,9 @@ class GA(object):
             new_result = 0
             if self.highest_sat is not None:
                 new_result = self.SW.compare(self.replace_token(list(self.highest_sat)), self.replace_token(list(chromosome)), 0,0).traceback_score
-            new_result_seed = self.SW.compare(self.replace_token(list(self.seed)), self.replace_token(list(chromosome)), 0,0).traceback_score
+            result_seed = self.SW.compare(self.replace_token(list(self.seed)), self.replace_token(list(chromosome)), 0,0).traceback_score
             # print(f'diff = {treenode.compare_tree(self.seed, chromosome.root)}\n')
-            chromosome.sw_score = new_result_seed #+ (treenode.compare_tree(self.seed, chromosome.root) * SCALE)
+            chromosome.sw_score = result_seed #+ (treenode.compare_tree(self.seed, chromosome.root) * SCALE)
 
             # print(f'\n')
             # print(f'{list(self.seed)}')
@@ -847,7 +868,7 @@ class GA(object):
             # print(f'SW score = {self.SW.compare(self.replace_token(list(self.seed)), self.replace_token(list(chromosome)), 0,0).traceback_score}')
             # print(f'\n')
 
-            chromosome.fitness = int(100 * (new_result + new_result_seed) / self.max_score)# + (treenode.compare_tree(self.seed, chromosome.root) * SCALE)
+            chromosome.fitness = int(100 * (result_seed) / self.max_score)# + (treenode.compare_tree(self.seed, chromosome.root) * SCALE)
                 # chromosome.madeit = '\n'+run_process.stderr
                 # print(run_process.stdout)
 
