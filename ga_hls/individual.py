@@ -155,20 +155,20 @@ class Individual():
         return len(self.root)
 
     # @check_call
-    # def mutate(self, rate: float, nmutations=MUTATION_NODES):
-    #     for _ in range(0, nmutations):
-    #         if (random.random() < rate):
-    #             mut_idx = random.randrange(len(self.root))
-    #             subtree, parent = self.root.get_subtree(mut_idx)
-    #             if subtree.left is None:
-    #                 subtree.value = self.get_new_term(subtree.value)
-    #             else:
-    #                 new_operator = self.get_new_op(subtree.value)
-    #                 if parent:
-    #                     if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
-    #                         # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
-    #                         continue
-    #                 subtree.value = new_operator
+    def mutate(self, rate: float, nmutations=MUTATION_NODES):
+        for _ in range(0, nmutations):
+            if (random.random() < rate):
+                mut_idx = random.randrange(len(self.root))
+                subtree, parent = self.root.get_subtree(mut_idx)
+                if subtree.left is None:
+                    subtree.value = self.get_new_term(subtree.value)
+                else:
+                    new_operator = self.get_new_op(subtree.value)
+                    if parent:
+                        if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
+                            # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
+                            continue
+                    subtree.value = new_operator
 
     # @check_call
     def force_mutate(self, mut_idxs=[], nmutations=MUTATION_NODES):
@@ -247,34 +247,34 @@ class Individual():
             raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
 
     # @show_arg_ret_decorator
-    # def get_new_term(self, t):
-    #     # print(f'For terminator t = {t}: {self.print_genes()}')
-    #     if t.__class__ in self.term.keys():
-    #         if isinstance(t, int):
-    #             if t == 0:
-    #                 if random.random() > 0.5:
-    #                     return +1
-    #                 else:
-    #                     return -1
-    #             if random.random() > 0.5:
-    #                 ## Change the terminator inside the same maginitude order from the input
-    #                 return t + random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
-    #             else:
-    #                 return t - random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
-    #         elif isinstance(t, float):
-    #             if abs(t) >= 1.0:
-    #                 diff = random.uniform(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1))
-    #             else:
-    #                 diff = random.uniform(0, 10 ** int(math.log(abs(t),10)))
-    #             if random.random() > 0.5:
-    #                 return t + diff
-    #             else:
-    #                 return t - diff
-    #         else:
-    #             # return random.choice(self.term[t.__class__])
-    #             return t
-    #     else:
-    #         raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
+    def get_new_term(self, t):
+        # print(f'For terminator t = {t}: {self.print_genes()}')
+        if t.__class__ in self.term.keys():
+            if isinstance(t, int):
+                if t == 0:
+                    if random.random() > 0.5:
+                        return +1
+                    else:
+                        return -1
+                if random.random() > 0.5:
+                    ## Change the terminator inside the same maginitude order from the input
+                    return t + random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
+                else:
+                    return t - random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
+            elif isinstance(t, float):
+                if abs(t) >= 1.0:
+                    diff = random.uniform(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1))
+                else:
+                    diff = random.uniform(0, 10 ** int(math.log(abs(t),10)))
+                if random.random() > 0.5:
+                    return t + diff
+                else:
+                    return t - diff
+            else:
+                # return random.choice(self.term[t.__class__])
+                return t
+        else:
+            raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
 
     def check_terminators(self, term_list):
         term_dict = {}
