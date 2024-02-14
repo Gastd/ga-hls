@@ -18,7 +18,7 @@ def check_if_sat(filepath):
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE,
                                      universal_newlines=True,
-                                     timeout=10)
+                                     timeout=50)
 
         if run_process.stdout.find('SATISFIED') > 0:
             ret = True
@@ -41,7 +41,7 @@ form2 = json.loads('["ForAll",[["s"],["Implies",[["Or",[[">",["s",0]],["<",["s",
 form3 = json.loads('[">",[["+",["x",2]],2]]')
 form4 = json.loads('["Or",[["+",["x",10]],["<",["x",20]]]]')
 form1 = json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",50]],[">=",["signal_2(s)",-15.27]]]]]]]]')
-form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t",1.593E7]]]],["And",[[">", ["d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.5]], ["<", [["-", ["des_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]","cur_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]"]], 0.2]]]]]]]]')
+form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t",15930000]]]],["And",[[">", ["d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.5]], ["<", [["-", ["des_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]","cur_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]"]], 0.2]]]]]]]]')
 
 
 
@@ -85,7 +85,8 @@ req2form = {
     "AT6B": at6b,
     "AT6C": at6c,
     "CC1" : cc1 ,
-    "CC2" : cc2
+    "CC2" : cc2 ,
+    "form5":form5
 }
 
 if True:
@@ -188,6 +189,6 @@ ranges = {
 print(ranges)
 # run 2
 ga = GA(form, ranges, sys.argv[3])
-# ga.set_mutation_ranges(ranges)
-# ga.set_force_mutations(True)
+ga.set_mutation_ranges(ranges)
+ga.set_force_mutations(True)
 ga.evolve()

@@ -678,11 +678,10 @@ class GA(object):
                 f.write(f'\t{hypot[1]}\n')
         # loop
         self.generation_counter = 0
+        self.evaluate()
         while not self.check_evolution():
         # for i in range(MAX_ALLOWABLE_GENERATIONS):
         # for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
-            ## score population
-            self.evaluate()
 
             ## retain elite
             self.population.sort(key=lambda x: x.fitness, reverse=True)
@@ -704,7 +703,7 @@ class GA(object):
                 if self.force_mutation:
                     offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
                 else:
-                    offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
+                    offspring1.mutate(MUTATION_RATE)
 
                 while not offspring1.is_viable():
                     offspring1 = deepcopy(individual.Individual(self.seed, terminators))
@@ -712,17 +711,20 @@ class GA(object):
                     if self.force_mutation:
                         offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
                     else:
-                        offspring1.mutate(MUTATION_RATE, random.randrange(len(offspring1)))
+                        offspring1.mutate(MUTATION_RATE)
                     # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
 
-                offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
+                if self.force_mutation:
+                    offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
+                else:
+                    offspring2.mutate(MUTATION_RATE)
                 while not offspring2.is_viable():
                     offspring2 = deepcopy(individual.Individual(self.seed, terminators))
                     offspring2.ranges = self.ranges
                     if self.force_mutation:
                         offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
                     else:
-                        offspring2.mutate(MUTATION_RATE, random.randrange(len(offspring2)))
+                        offspring2.mutate(MUTATION_RATE)
                     # print(f"offspring2 is {'viable' if offspring2.is_viable() else 'not viable'}")
                 new_population.append(offspring1)
                 new_population.append(offspring2)
@@ -735,11 +737,14 @@ class GA(object):
             self.generation_counter += 1
             self.population = new_population
             self.diagnosis()
-        s100 = self.store_dataset_qty(1.0)
-        s025 = self.store_dataset_qty(.25)
-        s020 = self.store_dataset_qty(.20)
-        s015 = self.store_dataset_qty(.15)
-        s010 = self.store_dataset_qty(.10)
+            ## score population
+            self.evaluate()
+
+            s100 = self.store_dataset_qty(1.0)
+            s025 = self.store_dataset_qty(.25)
+            s020 = self.store_dataset_qty(.20)
+            s015 = self.store_dataset_qty(.15)
+            s010 = self.store_dataset_qty(.10)
         self.j48(s100, 1.0)
         self.j48(s025, .25)
         self.j48(s020, .20)
@@ -909,7 +914,7 @@ class GA(object):
                                          stderr=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
                                          universal_newlines=True,
-                                         timeout=10)
+                                         timeout=100)
             print(run_process.stdout)
             print(run_process.stderr)
             filename_str = f'{self.path}/J48-data-{int(qty*100)}.out'
