@@ -66,7 +66,18 @@ class Individual():
     #     else:
     #         return max(t_list), min(t_list)
 
-    def is_viable(self):
+    def copy_temp_file(self, folder_path):
+        lines = []
+        with open(defs.FILEPATH2,'r') as file:
+            for l in file:
+                lines.append(l)
+
+        with open(f'{folder_path}/z3check.py','w') as file:
+            for l in lines:
+                file.write(l)
+        return f'{folder_path}/z3check.py'
+
+    def is_viable(self, temp_path):
         def get_file_w_traces(file_path = defs.FILEPATH2):
             s = e = -1
             lines = []
@@ -102,13 +113,19 @@ class Individual():
                 for l in after:
                     z3check_file.write(l)
 
-        start, end, lines = get_file_w_traces()
-        save_check_wo_traces(start, end, lines, f'Not({self.format()})')
-        f = open(defs.FILEPATH2, 'r')
-        f.seek(0, 0)
-        f.close()
+        def reset_file(path):
+            f = open(path, 'r')
+            f.seek(0, 0)
+            f.close()
 
-        folder_name = 'ga_hls'
+        new_file = self.copy_temp_file(temp_path)
+        start, end, lines = get_file_w_traces(new_file)
+        save_check_wo_traces(start, end, lines, f'Not({self.format()})', new_file)
+        reset_file(defs.FILEPATH2)
+        reset_file(new_file)
+
+        # folder_name = 'ga_hls'
+        folder_name = temp_path
         run_str = f'python3 {folder_name}/z3check.py'
         run_tk = shlex.split(run_str)
         try:
