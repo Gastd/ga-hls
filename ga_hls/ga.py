@@ -87,8 +87,8 @@ class GA(object):
             self.set_mutation_ranges(ranges)
             self.set_force_mutations(True)
 
-        self.init_population()
         self.init_log(curr_path)
+        self.init_population()
         self.s, self.e = self.get_line('ga_hls')
         self.execution_report = {'TOTAL': 0}
 
@@ -102,7 +102,11 @@ class GA(object):
         # self.diag = diagnosis.Diagnosis()
         # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
         self.target_sats = int(target_sats)
+        name = self.copy_temp_file(self.path)
+        defs.FILEPATH = name
+        defs.FILEPATH2= name
         print(f'Runnnig script {defs.FILEPATH} and {defs.FILEPATH2}')
+        # print(f'Runnnig script {name}')
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             f.write(f'\t{defs.FILEPATH}\n')
 
@@ -154,15 +158,15 @@ class GA(object):
                 chromosome.force_mutate(MTX_IDX, n)
             else:
                 chromosome.mutate(1, n)
-            # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
-            while not chromosome.is_viable():
+            # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
+            while not chromosome.is_viable(self.path):
                 chromosome = deepcopy(individual.Individual(root, terminators))
                 chromosome.ranges = deepcopy(self.ranges)
                 if self.force_mutation:
                     chromosome.force_mutate(MTX_IDX, random.randrange(len(chromosome)))
                 else:
                     chromosome.mutate(1, random.randrange(len(chromosome)))
-                # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable() else 'not viable'}")
+                # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
             self.population.append(deepcopy(chromosome))
         # raise Exception('')
         print("Population initialized. Size = {}".format(self.size))
@@ -193,6 +197,7 @@ class GA(object):
     def get_line(self, file):
         # print(f'Running on {os.getcwd()} folder')
         file_path = defs.FILEPATH
+        # file_path = f'{self.path}/z3check.py'
         newf_str = ''
         print(f'Running on {file_path} folder')
         with open(file_path) as f:
@@ -211,7 +216,8 @@ class GA(object):
 
     def save_file(self, s, e, nline):
         src = defs.FILEPATH
-        dst = 'ga_hls/temp.py'
+        # src =  f'{self.path}/z3check.py'
+        dst = f'{self.path}/temp.py'
         # print(f'Running on {defs.FILEPATH} folder')
         with open(src) as firstfile, open(dst,'w') as secondfile:
             firstfile.seek(e)
@@ -220,6 +226,19 @@ class GA(object):
             secondfile.write(f'\tz3solver.add({nline})\n')
             for l in firstfile:
                 secondfile.write(l)
+
+    def copy_temp_file(self, folder_path):
+        lines = []
+        with open(defs.FILEPATH2,'r') as file:
+            for l in file:
+                lines.append(l)
+
+        filename = defs.FILEPATH2.split('/')[-1]
+
+        with open(f'{folder_path}/{filename}','w') as file:
+            for l in lines:
+                file.write(l)
+        return f'{folder_path}/{filename}'
 
     def test_chromosome(self, chromosome):
         # print(f'writing test for: {str(chromosome)}')
@@ -248,7 +267,7 @@ class GA(object):
                 return newf_str1.rfind('\n'), d2
         def save_z3check(s, e, nline):
             src = defs.FILEPATH2
-            file = 'ga_hls/z3check.py'
+            file = f'{self.path}/z3check.py'
             print(f'Running on {file} folder')
             form_line = ''
             newf_str2 = ''
@@ -320,16 +339,23 @@ class GA(object):
                 for l in after:
                     z3check_file.write(l)
 
+        def reset_file(path):
+            f = open(path, 'r')
+            f.seek(0, 0)
+            f.close()
+
         # s, e = find_traces_in_file()
         # save_z3check(s, e, f'Not({chromosome.format()})')
 
-        start, end, lines = get_file_w_traces()
-        save_check_wo_traces(start, end, lines, f'Not({chromosome.format()})')
-        f = open(defs.FILEPATH2, 'r')
-        f.seek(0, 0)
-        f.close()
+        new_file = self.copy_temp_file(self.path)
+        raise("")
+        start, end, lines = get_file_w_traces(new_file)
+        save_check_wo_traces(start, end, lines, f'Not({chromosome.format()})', new_file)
+        reset_file(defs.FILEPATH2)
+        reset_file(new_file)
 
-        folder_name = 'ga_hls'
+        # folder_name = 'ga_hls'
+        folder_name = self.path
         run_str = f'python3 {folder_name}/z3check.py'
         run_tk = shlex.split(run_str)
         run_process = subprocess.run(run_tk,
@@ -510,7 +536,7 @@ class GA(object):
         self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
 
         per_qty = math.ceil((len(self.sats) * per_cut) if (len(self.sats) < len(self.unsats)) else (len(self.unsats) * per_cut))
-        print(f'per_qty = {per_qty}')
+        # print(f'per_qty = {per_qty}')
         sats = self.sats
         unsats = self.unsats
         if len(sats) > per_qty:
@@ -705,27 +731,27 @@ class GA(object):
                 else:
                     offspring1.mutate(MUTATION_RATE)
 
-                while not offspring1.is_viable():
+                while not offspring1.is_viable(self.path):
                     offspring1 = deepcopy(individual.Individual(self.seed, terminators))
                     offspring1.ranges = self.ranges
                     if self.force_mutation:
                         offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
                     else:
                         offspring1.mutate(MUTATION_RATE)
-                    # print(f"offspring1 is {'viable' if offspring1.is_viable() else 'not viable'}")
+                    # print(f"offspring1 is {'viable' if offspring1.is_viable(self.path) else 'not viable'}")
 
                 if self.force_mutation:
                     offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
                 else:
                     offspring2.mutate(MUTATION_RATE)
-                while not offspring2.is_viable():
+                while not offspring2.is_viable(self.path):
                     offspring2 = deepcopy(individual.Individual(self.seed, terminators))
                     offspring2.ranges = self.ranges
                     if self.force_mutation:
                         offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
                     else:
                         offspring2.mutate(MUTATION_RATE)
-                    # print(f"offspring2 is {'viable' if offspring2.is_viable() else 'not viable'}")
+                    # print(f"offspring2 is {'viable' if offspring2.is_viable(self.path) else 'not viable'}")
                 new_population.append(offspring1)
                 new_population.append(offspring2)
 
@@ -801,7 +827,8 @@ class GA(object):
             # print(f'self.s={self.s}, self.e={self.e}')
             self.save_file(self.s, self.e, f'Not({chromosome.format()})')
 
-            folder_name = 'ga_hls'
+            # folder_name = 'ga_hls'
+            folder_name = self.path
             run_str = f'python3 {folder_name}/temp.py'
             run_tk = shlex.split(run_str)
             try:
