@@ -13,10 +13,10 @@ def property_distance_obs():
 	t=Real('t') 
 
 	#Trace: property_distance_obs
-	timestamps=Array('timestamps', RealSort(), IntSort())
-	cur_x=Array('cur_x', RealSort(), IntSort())
-	des_x=Array('des_x', RealSort(), IntSort())
-	d2obs=Array('d2obs', RealSort(), IntSort())
+	timestamps=Array('timestamps', IntSort(), RealSort())
+	cur_x=Array('cur_x', IntSort(), RealSort())
+	des_x=Array('des_x', IntSort(), RealSort())
+	d2obs=Array('d2obs', IntSort(), RealSort())
 	z3solver.add(timestamps[ 0]==0)
 	z3solver.add(cur_x[0]==-0.1542131509516591)
 	z3solver.add(des_x[0]==-0.1542131509516591)
