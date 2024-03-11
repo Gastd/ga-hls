@@ -38,7 +38,7 @@ def check_call(function):
 
 def choose_mutation(function):
     def wrapper(self, *args, **kwargs):
-        print(f'{self.ranges}')
+        print(f'{self.mutations}')
         ret = function(self, *args, **kwargs)
         return ret
     return wrapper
@@ -55,7 +55,7 @@ class Individual():
         self.madeit = False
         self.sw_score = -1
         self.self_test = None
-        self.ranges = None
+        self.mutations = None
         # self.maxint, self.minint = self.get_minmax(terminators, int)
         # self.maxfloat, self.minfloat = self.get_minmax(terminators, float)
 
@@ -192,12 +192,12 @@ class Individual():
         if len(mut_idxs) == 0:
             print('MUT_IDX is empty')
             return
-        # print(self.ranges)
-        if self.ranges is not None:
+        # print(self.mutations)
+        if self.mutations is not None:
             self.force_mutate_with_ranges(mut_idxs)
             return
         else:
-            raise ValueError(f'{__class__}.ranges is {self.ranges}')
+            raise ValueError(f'{__class__}.mutations is {self.mutations}')
             rate = 1.0
             for mut_idx in mut_idxs:
                 if (random.random() < rate):
@@ -225,43 +225,45 @@ class Individual():
         rate = 1.0
         for idx in mut_idxs:
             if (random.random() < rate):
-                subtree, parent = self.root.get_subtree(idx)
+                subtree, parent = self.root.get_subtree(int(idx))
                 # print(f"{self}")
-                # print(f"Mutating {idx} from {subtree.value} with {self.ranges[str(idx)]}")
+                # print(f"Mutating {idx} from {subtree.value} with {self.mutations[str(idx)]}")
                 if subtree.left is None:
-                    subtree.value = self.get_new_forced_term(subtree.value, self.ranges[str(idx)])
-                # else:
-                #     new_operator = self.get_new_op(subtree.value)
-                #     if parent:
-                #         if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
-                #             # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
-                #             continue
-                #     subtree.value = new_operator
+                    subtree.value = self.get_new_forced_term(subtree.value, self.mutations[str(idx)])
+                else:
+                    new_operator = random.choice(self.mutations[str(idx)][1])
+                    # if parent:
+                    #     if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
+                    #         # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
+                    #         continue
+                    subtree.value = new_operator
                 # print(f"To {subtree.value}")
 
-    def get_new_forced_term(self, t, interval):
-        if interval[0] == 'int':
-            lower = int(interval[1])
-            upper = int(interval[2])
-        if interval[0] == 'float':
-            lower = float(interval[1])
-            upper = float(interval[2])
+    def get_new_forced_term(self, t, mutation):
+        interval = mutation[1]
+        if mutation[0] == 'int':
+            lower = int(interval[0])
+            upper = int(interval[1])
+        if mutation[0] == 'float':
+            lower = float(interval[0])
+            upper = float(interval[1])
         # print(f'For term {t} we have interval {lower}, {upper}')
-        if t.__class__ in self.term.keys():
-            if isinstance(t, int):
-                ## Change the terminator inside the same maginitude order from the input
-                ret = random.randint(lower, upper)
-                # print(ret)
-                return ret
-            elif isinstance(t, float):
-                ret = random.uniform(lower, upper)
-                # print(ret)
-                return ret
-            else:
-                # return random.choice(self.term[t.__class__])
-                return t
+        # if t.__class__ in self.term.keys():
+        if isinstance(t, int):
+            ## Change the terminator inside the same maginitude order from the input
+            ret = random.randint(lower, upper)
+            # print(ret)
+            return ret
+        elif isinstance(t, float):
+            ret = random.uniform(lower, upper)
+            # print(ret)
+            return ret
         else:
-            raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
+            ret = random.choice(interval)
+            # print(ret)
+            return ret
+        # else:
+        #     raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
 
     # @show_arg_ret_decorator
     def get_new_term(self, t):
