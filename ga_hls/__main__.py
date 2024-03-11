@@ -181,14 +181,23 @@ defs.FILEPATH2= sys.argv[2]
 #     '7': ['int', 10000000, 20000000],
 #     '11': ['int', 0, 20000000]
 # }
-ranges = {
-    '3': ['int',100, 140],
-    '7': ['int', 10000000, 30000000],
-    '11': ['int', 0, 10000000]
+# mutations = {
+#     '3': ['int', [100, 140]],
+#     '7': ['int', [10000000, 30000000]],
+#     '11': ['int', [0, 10000000]]
+# }
+mutations = {
+    "3": ["op", [">", "<"]],
+    "4": ["float", [0., 1.0]],
+    "8": ["op", [">", "<"]],
+    "9": ["float", [0., 2.0]]
 }
-print(ranges)
+# print(mutations)
+f = open(sys.argv[4],)
+mutations = json.load(f)
+# print(mutations)
 # run 2
-ga = GA(form, ranges, sys.argv[3])
-ga.set_mutation_ranges(ranges)
-ga.set_force_mutations(True)
+ga = GA(form, mutations, sys.argv[3])
+# ga.set_mutation_ranges(mutations)
+# ga.set_force_mutations(True)
 ga.evolve()
