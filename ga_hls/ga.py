@@ -69,7 +69,7 @@ def isfloat(num):
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self, init_form, ranges = None, target_sats = 2):
+    def __init__(self, init_form, mutations = None, target_sats = 2):
         super(GA, self).__init__()
 
 
@@ -79,12 +79,12 @@ class GA(object):
         self.now = datetime.datetime.now()
         curr_path = os.getcwd()
         self.force_mutation = False
-        self.ranges = None
+        self.mutations = None
         self.init_form = init_form
 
-        print(ranges)
-        if ranges is not None:
-            self.set_mutation_ranges(ranges)
+        print(mutations)
+        if mutations is not None:
+            self.set_mutation_ranges(mutations)
             self.set_force_mutations(True)
 
         self.init_log(curr_path)
@@ -135,8 +135,8 @@ class GA(object):
     def set_force_mutations(self, forced: bool):
         self.force_mutation = forced
 
-    def set_mutation_ranges(self, ranges: dict):
-        self.ranges = ranges
+    def set_mutation_ranges(self, mutations: dict):
+        self.mutations = mutations
 
     def init_population(self):
         self.population = []
@@ -151,19 +151,19 @@ class GA(object):
         for i in range(0, self.size):
             print(i)
             chromosome = deepcopy(individual.Individual(root, terminators))
-            chromosome.ranges = deepcopy(self.ranges)
-            # print(f'chromosome.ranges = {chromosome.ranges}')
+            chromosome.mutations = deepcopy(self.mutations)
+            # print(f'chromosome.mutations = {chromosome.mutations}')
             n = random.randrange(len(root))
             if self.force_mutation:
-                chromosome.force_mutate(MTX_IDX, n)
+                chromosome.force_mutate(list(self.mutations.keys()), n)
             else:
                 chromosome.mutate(1, n)
             # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
             while not chromosome.is_viable(self.path):
                 chromosome = deepcopy(individual.Individual(root, terminators))
-                chromosome.ranges = deepcopy(self.ranges)
+                chromosome.mutations = deepcopy(self.mutations)
                 if self.force_mutation:
-                    chromosome.force_mutate(MTX_IDX, random.randrange(len(chromosome)))
+                    chromosome.force_mutate(list(self.mutations.keys()), random.randrange(len(chromosome)))
                 else:
                     chromosome.mutate(1, random.randrange(len(chromosome)))
                 # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
@@ -546,7 +546,11 @@ class GA(object):
         # print(f'len sats = {len(sats)}')
         # print(f'len unsats = {len(unsats)}')
 
-        chstr = str(sats[0])
+        try:
+            chstr = str(sats[0])
+        except Exception as e:
+            chstr = str(self.seed_ch)
+
         chstr = chstr.replace(' ', ',')
         chstr = chstr.replace(',t,In,(', ',')
         chstr = chstr.replace('),Implies,(', ',Implies,')
@@ -727,28 +731,28 @@ class GA(object):
                 self.crossover(offspring1, offspring2)
                 
                 if self.force_mutation:
-                    offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
+                    offspring1.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring1)))
                 else:
                     offspring1.mutate(MUTATION_RATE)
 
                 while not offspring1.is_viable(self.path):
                     offspring1 = deepcopy(individual.Individual(self.seed, terminators))
-                    offspring1.ranges = self.ranges
+                    offspring1.mutations = self.mutations
                     if self.force_mutation:
-                        offspring1.force_mutate(MTX_IDX, random.randrange(len(offspring1)))
+                        offspring1.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring1)))
                     else:
                         offspring1.mutate(MUTATION_RATE)
                     # print(f"offspring1 is {'viable' if offspring1.is_viable(self.path) else 'not viable'}")
 
                 if self.force_mutation:
-                    offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
+                    offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
                 else:
                     offspring2.mutate(MUTATION_RATE)
                 while not offspring2.is_viable(self.path):
                     offspring2 = deepcopy(individual.Individual(self.seed, terminators))
-                    offspring2.ranges = self.ranges
+                    offspring2.mutations = self.mutations
                     if self.force_mutation:
-                        offspring2.force_mutate(MTX_IDX, random.randrange(len(offspring2)))
+                        offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
                     else:
                         offspring2.mutate(MUTATION_RATE)
                     # print(f"offspring2 is {'viable' if offspring2.is_viable(self.path) else 'not viable'}")
