@@ -41,7 +41,7 @@ form2 = json.loads('["ForAll",[["s"],["Implies",[["Or",[[">",["s",0]],["<",["s",
 form3 = json.loads('[">",[["+",["x",2]],2]]')
 form4 = json.loads('["Or",[["+",["x",10]],["<",["x",20]]]]')
 form1 = json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",50]],[">=",["signal_2(s)",-15.27]]]]]]]]')
-form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t",15930000]]]],["And",[[">", ["d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.5]], ["<", [["-", ["des_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]","cur_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]"]], 0.2]]]]]]]]')
+form5 = json.loads('["ForAll",[["t"],["Implies",[["And",[[">",["t",0]],["<",["t",15930000]]]],["And",[[">", ["d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.05]], ["<", [["-", ["des_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]","cur_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]"]], 0.02]]]]]]]]')
 
 
 
@@ -52,17 +52,26 @@ experiment1=json.loads('["ForAll", ["t", ["Implies", [["And", [[">", ["t",11]], 
 
 
 
-# ForAll([t], Implies(And(0<=t, t<=(50*1000000)), (v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<120))
+# ForAll([t], Implies(And(0<=t, t<=(20*1000000)), (v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<120))
 at1  = json.loads('["ForAll", ["t",  ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",20000000]] ]], ["<",["v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",120]]]]]]')
-# ForAll([t], Implies(And(0<=t, t<=(50*1000000)), (e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<4750))
+# ForAll([t], Implies(And(0<=t, t<=(10*1000000)), (e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<4750))
 at2  = json.loads('["ForAll", ["t",  ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",10000000]] ]], ["<",["e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)]",4750]]]]]]')
-at51 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]] ] ], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+(30-0.0)/10000.0)"]] ] ], ["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2.5]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 1]]] ]]] ]]]]]]]] ] ]')
+
+# z3solver.add(Not(ForAll([t1], Implies(And(1<=t1, t1<=(30000000)),                                          ForAll([i], Implies(And(i>=0, i<ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)),                               Implies(And(gear[(i-1)]!=1, gear[i]==1), ForAll([t2],                                             Implies(And(t1<=t2, t2<=t1+(2500000)), gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==1)))))))))
+at51 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]] ] ], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)"]] ] ], ["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2500000]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 1]]] ]]] ]]]]]]]] ] ]')
+# z3solver.add(Not(ForAll([t1],           Implies(And(1<=t1, t1<=(30000000)),                              ForAll([i], Implies(And(i>=1, i<ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)),                                         Implies(And(gear[(i-1)]!=2, gear[i]==2),                                     ForAll([t2], Implies(And(t1<=t2, t2<=t1+((2500000))),                                                       gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==2)))))))))
 at52 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]] ] ], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)"]]] ], ["Implies", [["And",[["!=", ["gear[(i-1)]", 2]], ["==", ["gear[i]", 2]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["t1","t2"]], ["<=", ["t2", ["+",["t1",2500000]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 2]]]]]] ]]]]]]]]]]')
-at53 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30]]]],         ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+(30-0.0)/10000.0)"]]]],   ["Implies", [["And",[["!=", ["gear[(i-1)]", 3]], ["==", ["gear[i]",3]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2.5]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 3]]]]]] ]]]]]]]]]]')
-at54 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<",["i","ToInt(RealVal(0)+(30-0.0)/10000.0)"]]]], ["Implies", [["And",[["!=", ["gear[(i-1)]", 4]], ["==", ["gear[i]", 4]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2.5]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 4]]]]]] ]]]]]]]]]]')
-at6a = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",4]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]]]]]]]]]]]')
-at6b = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",8]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 50]]]]]]]]]]]]')
-at6c = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1",30]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",20]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 65]]]]]]]]]]]]')
+#  z3solver.add(Not(ForAll([t1],       Implies(And(0<=t1,                      t1<=(30000000)),                 ForAll([i],        Implies(And(i>=0, i<ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)),                           Implies(And(gear[(i-1)]!=3, gear[i]==3),                                         ForAll([t2], Implies(And(t1<=t2, t2<=t1+(2500000)),                                                       gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==3)))))))))
+at53 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]],   ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)"]]]],   ["Implies", [["And",[["!=", ["gear[(i-1)]", 3]], ["==", ["gear[i]",3]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2500000]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 3]]]]]] ]]]]]]]]]]')
+#        z3solver.add(Not(ForAll([t1], Implies(And(0<=t1, t1<=(30000000)),                                 ForAll([i], Implies(And(i>=0, i<ToInt(RealVal(0)+(30-0.0)/10000.0)), Implies(And(gear[(i-1)]!=4, gear[i]==4),                                                                         ForAll([t2], Implies(And(t1<=t2, t2<=t1+(2.5*1000000)),                                                     gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==4)))))))))
+at54 = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]],   ["ForAll", ["i", ["Implies", [["And", [[">=", ["i",0]], ["<", ["i","ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0)"]]]], ["Implies", [["And",[["!=", ["gear[(i-1)]", 4]], ["==", ["gear[i]", 4]]]], ["ForAll", ["t2", ["Implies", [["And",[["<=", ["t1","t2"]], ["<=", ["t2",["+", ["t1",2500000]]]]]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 4]]]]]] ]]]]]]]]]]')
+
+# z3solver.add(Not(ForAll([t1], Implies(And(0<=t1, t1<=(30000000)),                                         Implies(e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]<3000, ForAll([t2], Implies(And(0<=t2, t2<=(4000000)), v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]<35)))))))
+at6a = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",4000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]]]]]]]]]]]')
+# z3solver.add(Not(ForAll([t1], Implies(And(0<=t1, t1<=(30000000)),                                        Implies(e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]<3000,                ForAll([t2],                                            Implies(And(0<=t2, t2<=(8000000)), v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]<50))))))) 
+at6b = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",8000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 50]]]]]]]]]]]]')
+# z3solver.add(Not(ForAll([t1],          Implies(And(0<=t1, t1<=(30000000)),                              Implies(e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]<3000,               ForAll([t2],          Implies(And(0<=t2, t2<=(20000000)), v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]<65)))))))
+at6c = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",20000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 65]]]]]]]]]]]]')
 
 # ForAll([t], Implies(And(0<=t, t<=(100*1000000)), ((y5[ToInt(RealVal(0)+(t-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t-0.0)/10000.0)]))<=40))
 cc1  = json.loads('["ForAll", ["t", ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",100000000]] ]], ["<=", [ ["-", ["y5[ToInt(RealVal(0)+(t-0.0)/10000.0)]","y4[ToInt(RealVal(0)+(t-0.0)/10000.0)]"]] , 40]] ]] ]]')
@@ -113,7 +122,7 @@ if True:
 # print(len(form1[1][1][1][1][1]))
 # print(    form1[1][1][1][1][1][1][0][1])
 
-root1 = treenode.parse(at1)
+root1 = treenode.parse(req2form[sys.argv[1]])
 # root2 = treenode.parse(form2)
 
 # print(root1)
@@ -198,6 +207,7 @@ mutations = json.load(f)
 # print(mutations)
 # run 2
 ga = GA(form, mutations, sys.argv[3])
+# ga = GA(form, None, sys.argv[3])
 # ga.set_mutation_ranges(mutations)
 # ga.set_force_mutations(True)
 ga.evolve()
