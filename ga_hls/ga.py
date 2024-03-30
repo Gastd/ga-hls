@@ -442,7 +442,7 @@ class GA(object):
         count_op = {
             'QUANTIFIERS': 0,
             'RELATIONALS': 0,
-            'EQUALSS': 0,
+            'EQUALS': 0,
             'ARITHMETICS': 0,
             'MULDIV': 0,
             'EXP': 0,
