@@ -15,10 +15,10 @@ MUT_IDXS =[4, 7]
 QUANTIFIERS = ['ForAll', 'Exists']
 RELATIONALS = ['<', '>', '<=', '>=']
 EQUALS = ['==', '!=']
-ARITHMETICS = ['+', '-']
+ARITHMETICS = ['+', '-', '*', '/']
 MULDIV = ['*', '/']
 EXP = ['^']
-LOGICALS = ['And', 'Or']
+LOGICALS = ['And', 'Or', 'Implies']
 NEG = ['Not']   # PROBLEM
 IMP = ['Implies']
 
@@ -211,8 +211,12 @@ class Individual():
                         subtree.value = self.get_new_term(subtree.value)
                     else:
                         new_operator = self.get_new_op(subtree.value)
+                        if subtree.value in QUANTIFIERS:
+                            subtree.right.value = 'Implies' if new_operator == 'ForAll' else 'And'
                         if parent:
-                            if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
+                            if subtree.value == 'And'     and (parent.value == 'Exists'):
+                                continue
+                            if subtree.value == 'Implies' and (parent.value == 'ForAll'):
                                 # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
                                 continue
                         subtree.value = new_operator
@@ -235,7 +239,8 @@ class Individual():
                     subtree.value = self.get_new_forced_term(subtree.value, self.mutations[str(idx)])
                 else:
                     new_operator = random.choice(self.mutations[str(idx)][1])
-                    # if parent:
+                    if subtree.value in QUANTIFIERS:
+                        subtree.right.value = 'Implies' if new_operator == 'ForAll' else 'And'
                     #     if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
                     #         # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
                     #         continue
@@ -251,13 +256,12 @@ class Individual():
             lower = float(interval[0])
             upper = float(interval[1])
         # print(f'For term {t} we have interval {lower}, {upper}')
-        # if t.__class__ in self.term.keys():
-        if isinstance(t, int):
+        if mutation[0] == 'int':
             ## Change the terminator inside the same maginitude order from the input
             ret = random.randint(lower, upper)
             # print(ret)
             return ret
-        elif isinstance(t, float):
+        elif mutation[0] == 'float':
             ret = random.uniform(lower, upper)
             # print(ret)
             return ret
@@ -265,8 +269,6 @@ class Individual():
             ret = random.choice(interval)
             # print(ret)
             return ret
-        # else:
-        #     raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
 
     # @show_arg_ret_decorator
     def get_new_term(self, t):
@@ -338,7 +340,8 @@ def readable(root):
             return f'{root.value}'
 
     if root.value in QUANTIFIERS:
-        return f'{root.value} {readable(root.left)} In ({readable(root.right.left)}) Implies ({readable(root.right.right)})'
+
+        return f'{root.value} {readable(root.left)} In ({readable(root.right.left)}) {root.right.value} ({readable(root.right.right)})'
     elif root.value in LOGICALS+IMP+NEG:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in RELATIONALS+EQUALS:
