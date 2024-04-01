@@ -50,7 +50,6 @@ FOLDS = 10
 
 SCALE = 0.5
 
-MTX_IDX = [3, 7, 11]
 
 # defs.FILEPATH = 'ga_hls/prop_ctrl.py'
 # defs.FILEPATH2 = 'ga_hls/prop_ctrl1.py'
