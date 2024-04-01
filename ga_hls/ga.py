@@ -547,14 +547,17 @@ class GA(object):
         # print(f'len unsats = {len(unsats)}')
 
         try:
-            chstr = str(sats[0])
+            chstr = sats[0].arrf_str()
         except Exception as e:
             chstr = str(self.seed_ch)
 
-        chstr = chstr.replace(' ', ',')
-        chstr = chstr.replace(',t,In,(', ',')
-        chstr = chstr.replace('),Implies,(', ',Implies,')
-        chstr = chstr[:-1]
+        # print(chstr)
+        # chstr = chstr.replace(' ', ',')
+        # chstr = chstr.replace(',In,(', ',')
+        # chstr = chstr.replace('),Implies,(', ',Implies,')
+        # chstr = chstr[:-1]
+        # print(chstr)
+        # print(sats[0].arrf_str())
         # print(chstr.split(','))
         attrs = self.build_attributes(chstr.split(','))
         # for att in attrs:
@@ -562,7 +565,7 @@ class GA(object):
 
         nowstr = f'{self.now}'.replace(' ', '_')
         nowstr = nowstr.replace(':', '_')
-        filename_str = '{}/dataset_qty_{}_per{}.arff'.format(self.path, nowstr, int(per_cut*100))
+        filename_str = '{}/dataset_qty_{}_per{:0>3d}.arff'.format(self.path, nowstr, int(per_cut*100))
         with open(filename_str, 'w') as f:
             nowstr = f'{nowstr}\n'
             nowstr = nowstr.replace(' ', '_')
@@ -577,19 +580,19 @@ class GA(object):
             f.write('@data\n')
             for chromosome in sats:
                 # print('writing sats')
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',t,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
+                ch_str = chromosome.arrf_str()
+                # ch_str = ch_str.replace(' ', ',')
+                # ch_str = ch_str.replace(',t,In,(', ',')
+                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
+                f.write(ch_str)
                 f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
             for chromosome in unsats:
                 # print('writing unsats')
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',t,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
+                ch_str = chromosome.arrf_str()
+                # ch_str = ch_str.replace(' ', ',')
+                # ch_str = ch_str.replace(',t,In,(', ',')
+                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
+                f.write(ch_str)
                 f.write(f",{'TRUE' if chromosome.madeit == True else 'FALSE'}\n")
         return filename_str
 

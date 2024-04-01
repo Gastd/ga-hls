@@ -171,6 +171,9 @@ class Individual():
     def __len__(self):
         return len(self.root)
 
+    def arrf_str(self):
+        return arrf(self.root)
+
     # @check_call
     def mutate(self, rate: float, nmutations=MUTATION_NODES):
         for _ in range(0, nmutations):
@@ -342,6 +345,25 @@ def readable(root):
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in ARITHMETICS+MULDIV+EXP:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
+
+def arrf(root):
+    s = ''
+    if root is None:
+        return ''
+    if root.left is None:
+        if isinstance(root.value, float):
+            return f'{root.value:.6f}'
+        else:
+            return f'{root.value}'
+
+    if root.value in QUANTIFIERS:
+        return f'{root.value},{arrf(root.right.left)},{arrf(root.right.right)}'
+    elif root.value in LOGICALS+IMP+NEG:
+        return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
+    elif root.value in RELATIONALS+EQUALS:
+        return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
+    elif root.value in ARITHMETICS+MULDIV+EXP:
+        return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
 
 def build_str(root):
     s = ''
