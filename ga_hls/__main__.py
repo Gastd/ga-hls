@@ -73,6 +73,11 @@ at6b = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<
 # z3solver.add(Not(ForAll([t1],          Implies(And(0<=t1, t1<=(30000000)),                              Implies(e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]<3000,               ForAll([t2],          Implies(And(0<=t2, t2<=(20000000)), v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]<65)))))))
 at6c = json.loads('["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",20000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 65]]]]]]]]]]]]')
 
+["And", ["AT6B", "AT6C"]]
+["And", ["AT6A", ["And", ["AT6B", "AT6C"]]]]
+# at6abc = json.loads('["And", ["AT6A", ["And", ["AT6B", "AT6C"]]]]')
+at6abc = json.loads('["And", [["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",4000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]]]]]]]]]]], ["And", [["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",8000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 50]]]]]]]]]]]], ["ForAll", ["t1", ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["Implies", [["<",["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]",3000]], ["ForAll", ["t2", ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2",20000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 65]]]]]]]]]]]]]]]]')
+
 # ForAll([t], Implies(And(0<=t, t<=(100*1000000)), ((y5[ToInt(RealVal(0)+(t-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t-0.0)/10000.0)]))<=40))
 cc1  = json.loads('["ForAll", ["t", ["Implies", [["And", [["<=",[0,"t"]], ["<=",["t",100000000]] ]], ["<=", [ ["-", ["y5[ToInt(RealVal(0)+(t-0.0)/50000.0)]","y4[ToInt(RealVal(0)+(t-0.0)/50000.0)]"]] , 40]] ]] ]]')
 # ForAll([t1], Implies(And(0<=t1, t1<=(70*1000000)), conditions_t1))
@@ -102,6 +107,7 @@ req2form = {
     "AT6A": at6a,
     "AT6B": at6b,
     "AT6C": at6c,
+    "AT6ABC": at6abc,
     "CC1" : cc1 ,
     "CC2" : cc2 ,
     "CC3" : cc3 ,
