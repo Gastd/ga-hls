@@ -11,8 +11,8 @@ def AT51():
 	i=Int('i') 
 
 	#Trace: AT51
-	timestamps=Array('timestamps', RealSort(), IntSort())
-	gear=Array('gear', RealSort(), IntSort())
+	timestamps=Array('timestamps', IntSort(), RealSort())
+	gear=Array('gear', IntSort(), RealSort())
 	z3solver.add(timestamps[ 0]==0)
 	z3solver.add(gear[0]==1.0)
 	z3solver.add(timestamps[ 1]==10000)
