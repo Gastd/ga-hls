@@ -18,7 +18,7 @@ EQUALS = ['==', '!=']
 ARITHMETICS = ['+', '-', '*', '/']
 MULDIV = ['*', '/']
 EXP = ['^']
-LOGICALS = ['And', 'Or', 'Implies']
+LOGICALS = ['And', 'Or']
 NEG = ['Not']   # PROBLEM
 IMP = ['Implies']
 
