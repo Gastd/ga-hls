@@ -11,8 +11,8 @@ def AT51():
 	i=Int('i') 
 
 	#Trace: AT51
-	timestamps=Array('timestamps', IntSort(), RealSort())
-	gear=Array('gear', IntSort(), RealSort())
+	timestamps=Array('timestamps', RealSort(), IntSort())
+	gear=Array('gear', RealSort(), IntSort())
 	z3solver.add(timestamps[ 0]==0)
 	z3solver.add(gear[0]==1.0)
 	z3solver.add(timestamps[ 1]==10000)
@@ -10029,11 +10029,11 @@ def AT51():
 
 
 
-	interval_t1=And(1<=t1, t1<=(30*1000000))
+	interval_t1=And(0<=t1, t1<=(30*1000000))
 
 	interval_i=And(i>=0, i<ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0))
 
-	interval_t2=And(t1<=t2, t2<=t1+(2.5*1000000))
+	interval_t2=And(timestamps[i]<=t2, t2<=timestamps[i]+(2.5*1000000))
 	conditions_t2=gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==1
 	conditions_i=Implies(And(gear[(i-1)]!=1, gear[i]==1), ForAll([t2], Implies(interval_t2, conditions_t2)))
 	conditions_t1=ForAll([i], Implies(interval_i, conditions_i))

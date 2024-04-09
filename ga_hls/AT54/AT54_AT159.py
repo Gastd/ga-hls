@@ -10033,7 +10033,7 @@ def AT54():
 
 	interval_i=And(i>=0, i<ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0))
 
-	interval_t2=And(t1<=t2, t2<=t1+(2.5*1000000))
+	interval_t2=And(timestamps[i]<=t2, t2<=timestamps[i]+(2.5*1000000))
 	conditions_t2=gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==4
 	conditions_i=Implies(And(gear[(i-1)]!=4, gear[i]==4), ForAll([t2], Implies(interval_t2, conditions_t2)))
 	conditions_t1=ForAll([i], Implies(interval_i, conditions_i))
