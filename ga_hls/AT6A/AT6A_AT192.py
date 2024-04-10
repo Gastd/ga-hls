@@ -15032,26 +15032,26 @@ def AT6A():
 
 
 
-	["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]]
+	#["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]]
 	interval_t1=And(0<=t1, t1<=(30000000))
 	
-	["<", ["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]", 3000]]
+	#["<", ["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]", 3000]]
 	conditions_t1=e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]<3000
 
-	["And", [["<=", [0,"t2"]], ["<=", ["t2", 4000000]]]]
+	#["And", [["<=", [0,"t2"]], ["<=", ["t2", 4000000]]]]
 	interval_t2=And(0<=t2, t2<=(4000000))
 	
-	["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]
+	#["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]
 	conditions_t2=v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]<35
 	
 
-	["Implies", [interval_t1, conditions_t1]]
-	["ForAll", [["t1"], ["Implies", [interval_t1, conditions_t1]]]]
+	#["Implies", [interval_t1, conditions_t1]]
+	#["ForAll", [["t1"], ["Implies", [interval_t1, conditions_t1]]]]
 	
-	["Implies", [interval_t2, conditions_t2]]
-	["ForAll", [["t2"], ["Implies", [interval_t2, conditions_t2]]]]
-	["Implies", [, ]]
-	["Implies", [["ForAll", [["t1"], ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["<", ["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]", 3000]]]]]], ["ForAll", [["t2"], ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2", 4000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]]]]]]]
+	#["Implies", [interval_t2, conditions_t2]]
+	#["ForAll", [["t2"], ["Implies", [interval_t2, conditions_t2]]]]
+	#["Implies", [, ]]
+	#["Implies", [["ForAll", [["t1"], ["Implies", [["And", [["<=", [0,"t1"]], ["<=", ["t1", 30000000]]]], ["<", ["e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]", 3000]]]]]], ["ForAll", [["t2"], ["Implies", [["And", [["<=", [0,"t2"]], ["<=", ["t2", 4000000]]]], ["<", ["v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 35]]]]]]]]
 	z3solver.add(Not(Implies(ForAll([t1], Implies(interval_t1, conditions_t1)), ForAll([t2], Implies(interval_t2, conditions_t2)))))
 	status=z3solver.check()
 	print(status)
