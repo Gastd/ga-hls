@@ -361,7 +361,7 @@ class GA(object):
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE,
                                      universal_newlines=True,
-                                     timeout=10)
+                                     timeout=100)
         # print(run_process.stdout)
         if run_process.stdout.find('SATISFIED') > 0:
             # print('Chromosome not viable')
@@ -842,7 +842,7 @@ class GA(object):
                                              stderr=subprocess.PIPE,
                                              stdout=subprocess.PIPE,
                                              universal_newlines=True,
-                                             timeout=100)
+                                             timeout=60*60)
                 # print(f'Not({chromosome.format()})')
                 # print(f'Chromosome {chromosome.format()}')
                 # print(run_process.stdout)

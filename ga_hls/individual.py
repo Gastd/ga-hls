@@ -133,7 +133,7 @@ class Individual():
                                          stderr=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
                                          universal_newlines=True,
-                                         timeout=25)
+                                         timeout=100)
         except:
             return False
         # print(run_process.stdout)
