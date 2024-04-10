@@ -416,7 +416,7 @@ class GA(object):
         Z = create_dendrogram('{}/sw_ga_{:0>2}'.format(self.path, generation), score_matrix, labels, inverse_score=True)
         if Z is not None:
             for idx, el in enumerate(self.population):
-                if el.madeit is 'True': #and Z[idx-1][2] < 0.0333:
+                if el.madeit == 'True': #and Z[idx-1][2] < 0.0333:
                     print(f'{idx}: {Z[idx-1][2]}: {el}')
                     self.hypots.append([Z[idx-1][2], el])
                     # if hypot[0] > Z[idx-1][2]:
