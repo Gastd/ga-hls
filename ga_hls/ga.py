@@ -72,6 +72,13 @@ class GA(object):
         super(GA, self).__init__()
 
 
+        # Log the timespaneach one of the tree steps in the approach
+        self.timespan_log = {
+            'mutation_timestamp': 0.0,
+            'tracheck_timestamp': 0.0,
+            'diagnosi_timestamp': 0.0
+        }
+
         random.seed()
         self.size = POPULATION_SIZE
         self.population = []
@@ -704,6 +711,17 @@ class GA(object):
         # print(f"{self.count_distinct_edges(self.population[0])} < {len(self.graph.edges())} = {evolved}")
         return (evolved)
 
+    def checkin(self, logtype: str):
+        self.timespan_log[logtype] = time.time()
+
+    def checkin(self, logtype: str):
+        self.timespan_log[logtype] = time.time() - self.timespan_log[logtype]
+
+    def write_timespan_log(self):
+        json_object = json.dumps(self.timespan_log, indent=4)
+        with open(f"{self.path}/timespan.json", "w") as outfile:
+            outfile.write(json_object)
+
     def evolve(self):
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             for hypot in self.hypots:
@@ -712,6 +730,7 @@ class GA(object):
         self.generation_counter = 0
         self.evaluate()
         while not self.check_evolution():
+            self.checkin('mutation_timestamp')
         # for i in range(MAX_ALLOWABLE_GENERATIONS):
         # for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
 
@@ -761,15 +780,19 @@ class GA(object):
                 new_population.append(offspring1)
                 new_population.append(offspring2)
 
-                # Reset fitness
+                # Reset fitness 
                 offspring1.reset()
                 offspring2.reset()
 
                 population_counter += 2
             self.generation_counter += 1
             self.population = new_population
+            self.checkout('mutation_timestamp')
+
             self.diagnosis()
+
             ## score population
+            self.checkin('tracheck_timestamp')
             self.evaluate()
 
             s100 = self.store_dataset_qty(1.0)
@@ -777,11 +800,17 @@ class GA(object):
             s020 = self.store_dataset_qty(.20)
             s015 = self.store_dataset_qty(.15)
             s010 = self.store_dataset_qty(.10)
+            self.checkout('tracheck_timestamp')
+
+            self.write_timespan_log()
+
+        self.checkin('diagnosi_timestamp')
         self.j48(s100, 1.0)
         self.j48(s025, .25)
         self.j48(s020, .20)
         self.j48(s015, .15)
         self.j48(s010, .10)
+        self.checkout('diagnosi_timestamp')
 
 
     def replace_token(self, tk_list):
