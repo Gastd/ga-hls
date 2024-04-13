@@ -21,6 +21,7 @@ EXP = ['^']
 LOGICALS = ['And', 'Or']
 NEG = ['Not']   # PROBLEM
 IMP = ['Implies']
+FUNC = ['ToInt']
 
 def show_arg_ret_decorator(function):
     def wrapper(self, *args, **kwargs):
@@ -348,6 +349,8 @@ def readable(root):
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in ARITHMETICS+MULDIV+EXP:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
+    elif root.value in FUNC:
+        return f'{readable(root.left)}({root.value}/{readable(root.right)})'
 
 def arrf(root):
     s = ''
@@ -366,6 +369,8 @@ def arrf(root):
     elif root.value in RELATIONALS+EQUALS:
         return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
     elif root.value in ARITHMETICS+MULDIV+EXP:
+        return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
+    elif root.value in FUNC:
         return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
 
 def build_str(root):
@@ -389,5 +394,8 @@ def build_str(root):
         return f'{root.value}({build_str(root.left)}, {build_str(root.right)})'
     elif root.value in RELATIONALS+EQUALS:
         return f'({build_str(root.left)} {root.value} {build_str(root.right)})'
-    elif root.value in ARITHMETICS:
+    elif root.value in ARITHMETICS+MULDIV+EXP:
         return f'({build_str(root.left)} {root.value} {build_str(root.right)})'
+    elif root.value in FUNC:
+        if root.value == "ToInt":
+            return f'({root.value}(RealVal(0)+{build_str(root.left)}/{build_str(root.right)}))'
