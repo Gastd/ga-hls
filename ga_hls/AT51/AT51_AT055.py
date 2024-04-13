@@ -10028,16 +10028,35 @@ def AT51():
 	# the total number of samples is 5000
 
 
+	["ToInt", [0, 10000.0]]
+	[">=", ["i", ["ToInt", [0, 10000.0]] ]]
+	["ToInt", [30000000, 10000.0]]
+	["<", ["i", ["ToInt", [30000000, 10000.0]] ]]
+	["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]]
+	interval_i=And(i>=ToInt(RealVal(0)+((0*1000000)-0.0)/10000.0), i<ToInt(RealVal(0)+((30000000)-0.0)/10000.0))
 
-	interval_t1=And(0<=t1, t1<=(30*1000000))
+	# [, [,  ]]
+	["<=", ["timestamps[i]", "t2"]]
+	["<=", ["timestamps[i]", 2500000]]
+	["And", [["<=", ["timestamps[i]", "t2"]], ["<=", ["timestamps[i]", 2500000]] ]]
+	interval_t2=And(timestamps[i]<=t2, t2<=timestamps[i]+(2500000))
 
-	interval_i=And(i>=0, i<ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0))
-
-	interval_t2=And(timestamps[i]<=t2, t2<=timestamps[i]+(2.5*1000000))
+	["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 1]]
 	conditions_t2=gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==1
+	
+	["Implies", [interval_t2, conditions_t2 ]]
+	["ForAll", ["t2", ["Implies", [interval_t2, conditions_t2 ]] ]]
+	["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]]
+	["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [interval_t2, conditions_t2 ]] ]] ]]
 	conditions_i=Implies(And(gear[(i-1)]!=1, gear[i]==1), ForAll([t2], Implies(interval_t2, conditions_t2)))
-	conditions_t1=ForAll([i], Implies(interval_i, conditions_i))
-	z3solver.add(Not(ForAll([t1], Implies(interval_t1, conditions_t1))))
+
+	["Implies", [interval_i, conditions_i ]]
+	["ForAll", ["i", ["Implies", [interval_i, conditions_i ]] ]]
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], conditions_i ]] ]]
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], ["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [interval_t2, conditions_t2 ]] ]] ]] ]] ]]
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], ["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["timestamps[i]", "t2"]], ["<=", ["timestamps[i]", 2500000]] ]], conditions_t2 ]] ]] ]] ]] ]]
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], ["Implies", [["And", [["!=", ["gear[(i-1)]",1]], ["==", ["gear[i]",1]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["timestamps[i]", "t2"]], ["<=", ["timestamps[i]", 2500000]] ]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 1]] ]] ]] ]] ]] ]]
+	z3solver.add(Not(ForAll([i], Implies(interval_i, conditions_i))))
 	status=z3solver.check()
 	print(status)
 
@@ -10052,6 +10071,10 @@ def AT51():
 		print("UNDECIDED")
 		return 2
 
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], ["Implies", [["And", [["!=", ["gear[(i-1)]", 1]], ["==", ["gear[i]", 1]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["timestamps[i]", "t2"]], ["<=", ["timestamps[i]", 2500000]] ]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 1]] ]] ]] ]] ]] ]]
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], ["Implies", [["And", [["!=", ["gear[(i-1)]", 2]], ["==", ["gear[i]", 2]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["timestamps[i]", "t2"]], ["<=", ["timestamps[i]", 2500000]] ]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 2]] ]] ]] ]] ]] ]]
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], ["Implies", [["And", [["!=", ["gear[(i-1)]", 3]], ["==", ["gear[i]", 3]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["timestamps[i]", "t2"]], ["<=", ["timestamps[i]", 2500000]] ]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 3]] ]] ]] ]] ]] ]]
+	["ForAll", ["i", ["Implies", [["And", [[">=", ["i", ["ToInt", [0, 10000.0]] ]], ["<", ["i", ["ToInt", [30000000, 10000.0]] ]] ]], ["Implies", [["And", [["!=", ["gear[(i-1)]", 4]], ["==", ["gear[i]", 4]]]], ["ForAll", ["t2", ["Implies", [["And", [["<=", ["timestamps[i]", "t2"]], ["<=", ["timestamps[i]", 2500000]] ]], ["==", ["gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", 4]] ]] ]] ]] ]] ]]
 
 
 
