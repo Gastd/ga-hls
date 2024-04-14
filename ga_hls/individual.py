@@ -167,7 +167,7 @@ class Individual():
         return repr(self.root)
 
     def __str__(self):
-        return readable(self.root)
+        return arrf(self.root)
 
     def __len__(self):
         return len(self.root)
@@ -313,7 +313,9 @@ class Individual():
 
     def get_new_op(self, op):
         # return random.choice(OPS)
-        if op in RELATIONALS:
+        if op in FUNC:
+            return random.choice(FUNC)
+        elif op in RELATIONALS:
             return random.choice(RELATIONALS)
         elif op in ARITHMETICS:
             return random.choice(ARITHMETICS)
@@ -331,6 +333,11 @@ class Individual():
         return build_str(self.root)
 
 def readable(root):
+    # print('\n')
+    # print(root.__class__)
+    # print(f'{root}')
+    # print(f'{root.value}')
+    # print(f'{root.left},{root.value},{root.right}')
     s = ''
     if root is None:
         return ''
@@ -341,7 +348,6 @@ def readable(root):
             return f'{root.value}'
 
     if root.value in QUANTIFIERS:
-
         return f'{root.value} {readable(root.left)} In ({readable(root.right.left)}) {root.right.value} ({readable(root.right.right)})'
     elif root.value in LOGICALS+IMP+NEG:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
@@ -350,9 +356,14 @@ def readable(root):
     elif root.value in ARITHMETICS+MULDIV+EXP:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in FUNC:
-        return f'{readable(root.left)}({root.value}/{readable(root.right)})'
+        return f'{readable(root.value)}({root.left}/{readable(root.right)})'
 
 def arrf(root):
+    # print('\n')
+    # print(root.__class__)
+    # print(f'{root}')
+    # print(f'{root.value}')
+    # print(f'{root.left},{root.value},{root.right}')
     s = ''
     if root is None:
         return ''
