@@ -17,7 +17,7 @@ from copy import deepcopy
 import treenode
 import individual
 
-from individual import QUANTIFIERS, RELATIONALS, EQUALS, ARITHMETICS, MULDIV, EXP, LOGICALS, NEG, IMP
+from individual import QUANTIFIERS, RELATIONALS, EQUALS, ARITHMETICS, MULDIV, EXP, LOGICALS, NEG, IMP, FUNC
 
 # from anytree import Node
 from matplotlib import pyplot as plt
@@ -73,25 +73,34 @@ class GA(object):
 
 
         # Log the timespaneach one of the tree steps in the approach
+        self.checkin_start = {
+            'mutation_timestamp': 0.0,
+            'tracheck_timestamp': 0.0,
+            'diagnosi_timestamp': 0.0
+        }
         self.timespan_log = {
             'mutation_timestamp': 0.0,
             'tracheck_timestamp': 0.0,
             'diagnosi_timestamp': 0.0
         }
 
+        self.mutations = None
+        self.force_mutation = False
+        print(mutations)
+        if mutations is not None:
+            self.set_mutation_ranges(mutations)
+            self.set_force_mutations(True)
+
         random.seed()
         self.size = POPULATION_SIZE
         self.population = []
         self.now = datetime.datetime.now()
         curr_path = os.getcwd()
-        self.force_mutation = False
-        self.mutations = None
         self.init_form = init_form
 
-        print(mutations)
-        if mutations is not None:
-            self.set_mutation_ranges(mutations)
-            self.set_force_mutations(True)
+        self.target_sats = int(target_sats)
+        self.target_mutation = False
+        self.check_if_target_is_reachable()
 
         self.init_log(curr_path)
         self.init_population()
@@ -107,7 +116,7 @@ class GA(object):
 
         # self.diag = diagnosis.Diagnosis()
         # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
-        self.target_sats = int(target_sats)
+
         name = self.copy_temp_file(self.path)
         defs.FILEPATH = name
         defs.FILEPATH2= name
@@ -115,6 +124,31 @@ class GA(object):
         # print(f'Runnnig script {name}')
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             f.write(f'\t{defs.FILEPATH}\n')
+
+    def check_if_target_is_reachable(self):
+        total_combination = 1
+        combination_set = {}
+        f = math.factorial
+        if self.mutations is None:
+            return
+        else:
+            for i in self.mutations:
+                if self.mutations[i][0] == 'float':
+                    return
+                elif self.mutations[i][0] == 'int':
+                    combination_set[i] = self.mutations[i][1][1] - self.mutations[i][1][0] + 1
+                else:
+                    combination_set[i] = len(self.mutations[i][1])
+        # Check if the combinations are greater or equal than the requested satisfied requirements
+        for mutation_comb in combination_set:
+            print(mutation_comb)
+            total_combination = total_combination * combination_set[mutation_comb]
+        if self.target_sats > total_combination:
+            print('Requested Satisfied requirements unreachable. Changing to all possible combinations')
+            print(f'From {self.target_sats} to {total_combination}')
+            self.target_sats = total_combination
+            self.target_mutation = True
+        return
 
     def check_highest_sat(self, chromosome):
         self.max_score += self.SW.compare(list(self.seed), list(self.seed), 0,0).traceback_score
@@ -154,6 +188,7 @@ class GA(object):
         print(f'terminators = {terminators}')
         # print(f'Initial formula: {root}')
         # for i in tqdm(range(0, self.size)):
+        self.checkin('mutation_timestamp')
         for i in range(0, self.size):
             print(i)
             chromosome = deepcopy(individual.Individual(root, terminators))
@@ -173,8 +208,11 @@ class GA(object):
                 else:
                     chromosome.mutate(1, random.randrange(len(chromosome)))
                 # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
+            # print((chromosome.arrf_str()))
+            # print(str(chromosome))
             self.population.append(deepcopy(chromosome))
-        # raise Exception('')
+        self.checkout('mutation_timestamp')
+        # raise Excevzption('')
         print("Population initialized. Size = {}".format(self.size))
 
     def init_log(self, parent_dir):
@@ -395,6 +433,7 @@ class GA(object):
                 f.write('\n')
             for i, chromosome in enumerate(self.population):
                 f.write('{:0>2}'.format(i)+': ')
+                # print(chromosome.format())
                 f.write(str(chromosome))
                 f.write(f'\t{chromosome.fitness}')
                 f.write(f'\t{chromosome.madeit}')
@@ -453,6 +492,7 @@ class GA(object):
             'MULDIV': 0,
             'EXP': 0,
             'LOGICALS': 0,
+            'FUNC': 0,
             'NEG': 0,
             'IMP': 0,
             'NUM': 0,
@@ -470,71 +510,78 @@ class GA(object):
                 qstring = qstring.replace('[', '{')
                 ret.append(f'QUANTIFIERS{count_op["QUANTIFIERS"]} {qstring}')
                 count_op['QUANTIFIERS'] = count_op['QUANTIFIERS'] + 1
-            if term in RELATIONALS:
+            elif term in RELATIONALS:
                 qstring = str(RELATIONALS)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'RELATIONALS{count_op["RELATIONALS"]} {qstring}')
                 count_op['RELATIONALS'] = count_op['RELATIONALS'] + 1
-            if term in EQUALS:
+            elif term in EQUALS:
                 qstring = str(EQUALS)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'EQUALS{count_op["EQUALS"]} {qstring}')
                 count_op['EQUALS'] = count_op['EQUALS'] + 1
-            if term in ARITHMETICS:
+            elif term in ARITHMETICS:
                 qstring = str(ARITHMETICS)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'ARITHMETICS{count_op["ARITHMETICS"]} {qstring}')
                 count_op['ARITHMETICS'] = count_op['ARITHMETICS'] + 1
-            if term in MULDIV:
+            elif term in MULDIV:
                 qstring = str(MULDIV)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'MULDIV{count_op["MULDIV"]} {qstring}')
                 count_op['MULDIV'] = count_op['MULDIV'] + 1
-            if term in EXP:
+            elif term in EXP:
                 qstring = str(EXP)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'EXP{count_op["EXP"]} {qstring}')
                 count_op['EXP'] = count_op['EXP'] + 1
-            if term in LOGICALS:
+            elif term in LOGICALS:
                 qstring = str(LOGICALS)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'LOGICALS{count_op["LOGICALS"]} {qstring}')
                 count_op['LOGICALS'] = count_op['LOGICALS'] + 1
-            if term in NEG:
+            elif term in NEG:
                 qstring = str(NEG)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'NEG{count_op["NEG"]} {qstring}')
                 count_op['NEG'] = count_op['NEG'] + 1
-            if term in IMP:
+            elif term in IMP:
                 qstring = str(IMP)
                 qstring = qstring.replace('\'', '')
                 qstring = qstring.replace(']', '}')
                 qstring = qstring.replace('[', '{')
                 ret.append(f'IMP{count_op["IMP"]} {qstring}')
                 count_op['IMP'] = count_op['IMP'] + 1
-            if term in terminators:
+            elif term in terminators:
                 qstring = str(terminators)
                 qstring = qstring.replace('\'', '')
                 qstring = '{'+qstring[1:-1]+'}'
                 ret.append(f'TERM{count_op["TERM"]} {qstring}')
                 count_op['TERM'] = count_op['TERM'] + 1
-            if term.isnumeric() or isfloat(term):
+            elif term.isnumeric() or isfloat(term):
                 ret.append(f'NUM{count_op["NUM"]} NUMERIC')
                 count_op['NUM'] = count_op['NUM'] + 1
+            elif term in FUNC:
+                qstring = str(FUNC)
+                qstring = qstring.replace('\'', '')
+                qstring = qstring.replace(']', '}')
+                qstring = qstring.replace('[', '{')
+                ret.append(f'FUNC{count_op["FUNC"]} {qstring}')
+                count_op['FUNC'] = count_op['FUNC'] + 1
         return ret
 
     def store_dataset_qty(self, per_cut: float):
@@ -706,16 +753,23 @@ class GA(object):
         return deepcopy(np.random.choice(self.population, p=chromosome_probabilities))
 
     def check_evolution(self):
-        evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
+        if self.target_mutation == True:
+            evolved = (len(self.sats)+len(self.unsats)) >= self.target_sats
+        else:
+            evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
         # max_allowed = self.generation_counter < MAX_ALLOWABLE_GENERATIONS
         # print(f"{self.count_distinct_edges(self.population[0])} < {len(self.graph.edges())} = {evolved}")
         return (evolved)
 
     def checkin(self, logtype: str):
-        self.timespan_log[logtype] = time.time()
+        self.checkin_start[logtype] = time.time()
+        print(f'Check in: {logtype} {self.checkin_start[logtype]} seconds')
 
-    def checkin(self, logtype: str):
-        self.timespan_log[logtype] = time.time() - self.timespan_log[logtype]
+    def checkout(self, logtype: str):
+        self.checkin_start[logtype] = time.time() - self.checkin_start[logtype]
+        print(f'Check out: {logtype} {self.checkin_start[logtype]} seconds')
+        self.timespan_log[logtype] = self.timespan_log[logtype] + self.checkin_start[logtype]
+        print(f'Timespan: {logtype} {self.timespan_log[logtype]} seconds')
 
     def write_timespan_log(self):
         json_object = json.dumps(self.timespan_log, indent=4)
@@ -728,7 +782,11 @@ class GA(object):
                 f.write(f'\t{hypot[1]}\n')
         # loop
         self.generation_counter = 0
+       
+        self.checkin('tracheck_timestamp')
         self.evaluate()
+        self.checkout('tracheck_timestamp')
+        
         while not self.check_evolution():
             self.checkin('mutation_timestamp')
         # for i in range(MAX_ALLOWABLE_GENERATIONS):
@@ -805,12 +863,18 @@ class GA(object):
             self.write_timespan_log()
 
         self.checkin('diagnosi_timestamp')
+        s100 = self.store_dataset_qty(1.0)
+        s025 = self.store_dataset_qty(.25)
+        s020 = self.store_dataset_qty(.20)
+        s015 = self.store_dataset_qty(.15)
+        s010 = self.store_dataset_qty(.10)
         self.j48(s100, 1.0)
         self.j48(s025, .25)
         self.j48(s020, .20)
         self.j48(s015, .15)
         self.j48(s010, .10)
         self.checkout('diagnosi_timestamp')
+        self.write_timespan_log()
 
 
     def replace_token(self, tk_list):
