@@ -147,7 +147,7 @@ class Individual():
         else:
             # print('Chromosome not viable')
             return False
-        return False
+        return True
 
     def reset(self):
         self.fitness = -1
