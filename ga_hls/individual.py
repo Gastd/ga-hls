@@ -53,7 +53,7 @@ class Individual():
         self.root = formula_root
         self.fitness = -1
         self.term = self.check_terminators(terminators)
-        self.madeit = False
+        self.madeit = 'Unknown'
         self.sw_score = -1
         self.self_test = None
         self.mutations = None
@@ -151,6 +151,7 @@ class Individual():
 
     def reset(self):
         self.fitness = -1
+        self.madeit = 'Unknown'
 
     def print_genes(self):
         if self.root is not None:

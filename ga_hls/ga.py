@@ -113,6 +113,7 @@ class GA(object):
         self.hypots = []
         self.sats = []
         self.unsats = []
+        self.unknown = []
 
         # self.diag = diagnosis.Diagnosis()
         # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
@@ -200,14 +201,14 @@ class GA(object):
             else:
                 chromosome.mutate(1, n)
             # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
-            while not chromosome.is_viable(self.path):
-                chromosome = deepcopy(individual.Individual(root, terminators))
-                chromosome.mutations = deepcopy(self.mutations)
-                if self.force_mutation:
-                    chromosome.force_mutate(list(self.mutations.keys()), random.randrange(len(chromosome)))
-                else:
-                    chromosome.mutate(1, random.randrange(len(chromosome)))
-                # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
+            # while not chromosome.is_viable(self.path):
+            #     chromosome = deepcopy(individual.Individual(root, terminators))
+            #     chromosome.mutations = deepcopy(self.mutations)
+            #     if self.force_mutation:
+            #         chromosome.force_mutate(list(self.mutations.keys()), random.randrange(len(chromosome)))
+            #     else:
+            #         chromosome.mutate(1, random.randrange(len(chromosome)))
+            #     # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
             # print((chromosome.arrf_str()))
             # print(str(chromosome))
             self.population.append(deepcopy(chromosome))
@@ -472,16 +473,19 @@ class GA(object):
     def generate_dataset_qty(self):
         res = []
         [res.append(x) for x in self.population if x not in res]
+        [self.unknown.append(x) for x in self.population if (x not in self.unknown) and (x.madeit == 'Unknown')]
         [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
         [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.madeit == 'True')]
+        print(f'\nWe have so far {len(self.sats)} satisfied')
+        print(f'and {len(self.unsats)} unsatisfied')
+        print(f'and {len(self.unknown)} unknown')
 
     def generate_dataset_threshold(self):
         res = []
         [res.append(x) for x in self.population if x not in res]
+        [self.unknown.append(x) for x in self.population if (x not in self.unknown) and (x.madeit == 'Unknown')]
         [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
         [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.sw_score > SW_THRESHOLD) and (x.madeit == 'True')]
-        # print(f'\nWe have so far {len(self.sats)} satisfied')
-        # print(f'and {len(self.unsats)} unsatisfied')
 
     def build_attributes(self, formulae: list):
         count_op = {
@@ -584,20 +588,64 @@ class GA(object):
                 count_op['FUNC'] = count_op['FUNC'] + 1
         return ret
 
+    def store_dataset_all(self):
+        entire_dataset = self.sats + self.unsats + self.unknown
+        per_cut = 1.0
+
+        try:
+            chstr = self.population[0].arrf_str()
+        except Exception as e:
+            chstr = str(self.seed_ch)
+
+        attrs = self.build_attributes(chstr.split(','))
+        # for att in attrs:
+        #     print(att)
+
+        nowstr = f'{self.now}'.replace(' ', '_')
+        nowstr = nowstr.replace(':', '_')
+        filename_str = '{}/dataset_qty_{}_all.arff'.format(self.path, nowstr)
+        with open(filename_str, 'w') as f:
+            nowstr = f'{nowstr}\n'
+            nowstr = nowstr.replace(' ', '_')
+            s = f'@relation all.{nowstr}\n'
+            f.write(s)
+            f.write('\n')
+            for att in attrs:
+                f.write(f'@attribute {att}\n')
+
+            f.write('@attribute VEREDICT {TRUE, FALSE, UNKNOWN}\n')
+            f.write('\n')
+            f.write('@data\n')
+            for chromosome in entire_dataset:
+                # print('writing sats')
+                ch_str = chromosome.arrf_str()
+                # ch_str = ch_str.replace(' ', ',')
+                # ch_str = ch_str.replace(',t,In,(', ',')
+                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
+                f.write(ch_str)
+                f.write(f",{chromosome.madeit.upper()}\n")
+        return filename_str
+
     def store_dataset_qty(self, per_cut: float):
         self.sats.sort(key=lambda x : x.sw_score, reverse=True)
         self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
+        self.unknown.sort(key=lambda x : x.sw_score, reverse=True)
 
-        per_qty = math.ceil((len(self.sats) * per_cut) if (len(self.sats) < len(self.unsats)) else (len(self.unsats) * per_cut))
+        min_len = min([len(self.sats), len(self.unsats), len(self.unknown)])
+        per_qty = math.ceil(min_len * per_cut)
         # print(f'per_qty = {per_qty}')
         sats = self.sats
         unsats = self.unsats
+        unknown = self.unknown
         if len(sats) > per_qty:
             sats = sats[:per_qty]
         if len(unsats) > per_qty:
             unsats = unsats[:per_qty]
+        if len(unknown) > per_qty:
+            unknown = unknown[:per_qty]
         # print(f'len sats = {len(sats)}')
         # print(f'len unsats = {len(unsats)}')
+        # print(f'len unknown = {len(unknown)}')
 
         try:
             chstr = sats[0].arrf_str()
@@ -628,7 +676,7 @@ class GA(object):
             for att in attrs:
                 f.write(f'@attribute {att}\n')
 
-            f.write('@attribute VEREDICT {TRUE, FALSE}\n')
+            f.write('@attribute VEREDICT {TRUE, FALSE, UNKNOWN}\n')
             f.write('\n')
             f.write('@data\n')
             for chromosome in sats:
@@ -638,7 +686,7 @@ class GA(object):
                 # ch_str = ch_str.replace(',t,In,(', ',')
                 # ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str)
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
+                f.write(f",{chromosome.madeit.upper()}\n")
             for chromosome in unsats:
                 # print('writing unsats')
                 ch_str = chromosome.arrf_str()
@@ -646,7 +694,15 @@ class GA(object):
                 # ch_str = ch_str.replace(',t,In,(', ',')
                 # ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str)
-                f.write(f",{'TRUE' if chromosome.madeit == True else 'FALSE'}\n")
+                f.write(f",{chromosome.madeit.upper()}\n")
+            for chromosome in unknown:
+                # print('writing unsats')
+                ch_str = chromosome.arrf_str()
+                # ch_str = ch_str.replace(' ', ',')
+                # ch_str = ch_str.replace(',t,In,(', ',')
+                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
+                f.write(ch_str)
+                f.write(f",{chromosome.madeit.upper()}\n")
         return filename_str
 
     def store_dataset_threshold(self):
@@ -675,7 +731,7 @@ class GA(object):
             f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
             f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
             f.write('@attribute NUMBER3 NUMERIC\n')
-            f.write('@attribute VEREDICT {TRUE, FALSE}\n')
+            f.write('@attribute VEREDICT {TRUE, FALSE, UNKNOWN}\n')
             f.write('\n')
             f.write('@data\n')
             for chromosome in self.sats:
@@ -684,71 +740,74 @@ class GA(object):
                 ch_str = ch_str.replace(',s,In,(', ',')
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit else 'FALSE'}\n")
+                f.write(f",{chromosome.madeit.upper()}\n")
             for chromosome in self.unsats:
                 ch_str = str(chromosome)
                 ch_str = ch_str.replace(' ', ',')
                 ch_str = ch_str.replace(',s,In,(', ',')
                 ch_str = ch_str.replace('),Implies,(', ',Implies,')
                 f.write(ch_str[:-1])
-                f.write(f",{'TRUE' if chromosome.madeit == True else 'FALSE'}\n")
+                f.write(f",{chromosome.madeit.upper()}\n")
 
-    def dist2VF(self, generation):
-        res = []
-        [res.append(x) for x in self.population if x not in res]
-        # print(res)
+    # def dist2VF(self, generation):
+    #     res = []
+    #     [res.append(x) for x in self.population if x not in res]
+    #     # print(res)
         
-        sats = []
-        unsats = []
-        for chromosome in res:
-            if chromosome.madeit == False:
-                unsats.append(chromosome)
-            else:
-                sats.append(chromosome)
+    #     sats = []
+    #     unsats = []
+    #     for chromosome in res:
+    #         if chromosome.madeit == False:
+    #             unsats.append(chromosome)
+    #         else:
+    #             sats.append(chromosome)
 
-        # print(sats)
-        # print(unsats)
+    #     # print(sats)
+    #     # print(unsats)
 
-        sats.sort(key=lambda x : x.sw_score, reverse=True)
-        unsats.sort(key=lambda x : x.sw_score, reverse=True)
+    #     sats.sort(key=lambda x : x.sw_score, reverse=True)
+    #     unsats.sort(key=lambda x : x.sw_score, reverse=True)
 
-        per20 = int(POPULATION_SIZE * .20)
-        if len(sats) > per20:
-            sats = sats[:per20]
-        if len(unsats) > per20:
-            unsats = unsats[:per20]
+    #     per20 = int(POPULATION_SIZE * .20)
+    #     if len(sats) > per20:
+    #         sats = sats[:per20]
+    #     if len(unsats) > per20:
+    #         unsats = unsats[:per20]
 
-        with open('{}/{:0>2}_pareto.txt'.format(self.path, generation), 'w') as f:
-            f.write('Formula\tSW_Score\tSatisfied\n')
-            f.write('SEED: ')
-            f.write(str(self.seed_ch))
-            f.write(f'\t-')
-            f.write(f'\t-')
-            f.write('\n')
-            for i, chromosome in enumerate(sats):
-                f.write('{:0>2}'.format(i)+': ')
-                f.write(str(chromosome))
-                f.write(f'\t{chromosome.sw_score}')
-                f.write(f'\t{chromosome.madeit}')
-                f.write('\n')
-            f.write('\n')
-            f.write('\n')
-            for i, chromosome in enumerate(unsats):
-                f.write('{:0>2}'.format(i)+': ')
-                f.write(str(chromosome))
-                f.write(f'\t{chromosome.sw_score}')
-                f.write(f'\t{chromosome.madeit}')
-                f.write('\n')
-        json_object = json.dumps(self.execution_report, indent=4)
-        with open(f"{self.path}/report.json", "w") as outfile:
-            outfile.write(json_object)
+    #     with open('{}/{:0>2}_pareto.txt'.format(self.path, generation), 'w') as f:
+    #         f.write('Formula\tSW_Score\tSatisfied\n')
+    #         f.write('SEED: ')
+    #         f.write(str(self.seed_ch))
+    #         f.write(f'\t-')
+    #         f.write(f'\t-')
+    #         f.write('\n')
+    #         for i, chromosome in enumerate(sats):
+    #             f.write('{:0>2}'.format(i)+': ')
+    #             f.write(str(chromosome))
+    #             f.write(f'\t{chromosome.sw_score}')
+    #             f.write(f'\t{chromosome.madeit}')
+    #             f.write('\n')
+    #         f.write('\n')
+    #         f.write('\n')
+    #         for i, chromosome in enumerate(unsats):
+    #             f.write('{:0>2}'.format(i)+': ')
+    #             f.write(str(chromosome))
+    #             f.write(f'\t{chromosome.sw_score}')
+    #             f.write(f'\t{chromosome.madeit}')
+    #             f.write('\n')
+    #     json_object = json.dumps(self.execution_report, indent=4)
+    #     with open(f"{self.path}/report.json", "w") as outfile:
+    #         outfile.write(json_object)
 
     def pool(self):
         return deepcopy(self.population[random.randint(0, 32767) % PARENTS_TO_BE_CHOSEN])
 
     def roulette_wheel_selection(self):
         population_fitness = sum([chromosome.fitness for chromosome in self.population])
-        chromosome_probabilities = [chromosome.fitness/population_fitness for chromosome in self.population]
+        if population_fitness == 0:
+            chromosome_probabilities = [1/len(self.population) for chromosome in self.population]
+        else:
+            chromosome_probabilities = [chromosome.fitness/population_fitness for chromosome in self.population]
         
         return deepcopy(np.random.choice(self.population, p=chromosome_probabilities))
 
@@ -783,6 +842,9 @@ class GA(object):
         # loop
         self.generation_counter = 0
        
+        self.generate_dataset_qty()
+        s100 = self.store_dataset_all()
+        
         self.checkin('tracheck_timestamp')
         self.evaluate()
         self.checkout('tracheck_timestamp')
@@ -792,12 +854,12 @@ class GA(object):
         # for i in range(MAX_ALLOWABLE_GENERATIONS):
         # for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
 
-            ## retain elite
             self.population.sort(key=lambda x: x.fitness, reverse=True)
             self.write_population(self.generation_counter)
-            self.dist2VF(self.generation_counter)
+            # self.dist2VF(self.generation_counter)
             self.generate_dataset_qty()
-            # self.clusterize(self.generation_counter)
+            s100 = self.store_dataset_all()
+
             new_population = self.population[:CHROMOSOME_TO_PRESERVE]
 
             terminators = list(set(treenode.get_terminators(self.seed)))
@@ -808,33 +870,33 @@ class GA(object):
                 offspring2 = self.roulette_wheel_selection()
 
                 self.crossover(offspring1, offspring2)
-                
+
                 if self.force_mutation:
                     offspring1.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring1)))
                 else:
                     offspring1.mutate(MUTATION_RATE)
 
-                while not offspring1.is_viable(self.path):
-                    offspring1 = deepcopy(individual.Individual(self.seed, terminators))
-                    offspring1.mutations = self.mutations
-                    if self.force_mutation:
-                        offspring1.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring1)))
-                    else:
-                        offspring1.mutate(MUTATION_RATE)
-                    # print(f"offspring1 is {'viable' if offspring1.is_viable(self.path) else 'not viable'}")
+                # while not offspring1.is_viable(self.path):
+                #     offspring1 = deepcopy(individual.Individual(self.seed, terminators))
+                #     offspring1.mutations = self.mutations
+                #     if self.force_mutation:
+                #         offspring1.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring1)))
+                #     else:
+                #         offspring1.mutate(MUTATION_RATE)
+                #     # print(f"offspring1 is {'viable' if offspring1.is_viable(self.path) else 'not viable'}")
 
                 if self.force_mutation:
                     offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
                 else:
                     offspring2.mutate(MUTATION_RATE)
-                while not offspring2.is_viable(self.path):
-                    offspring2 = deepcopy(individual.Individual(self.seed, terminators))
-                    offspring2.mutations = self.mutations
-                    if self.force_mutation:
-                        offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
-                    else:
-                        offspring2.mutate(MUTATION_RATE)
-                    # print(f"offspring2 is {'viable' if offspring2.is_viable(self.path) else 'not viable'}")
+                # while not offspring2.is_viable(self.path):
+                #     offspring2 = deepcopy(individual.Individual(self.seed, terminators))
+                #     offspring2.mutations = self.mutations
+                #     if self.force_mutation:
+                #         offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
+                #     else:
+                #         offspring2.mutate(MUTATION_RATE)
+                #     # print(f"offspring2 is {'viable' if offspring2.is_viable(self.path) else 'not viable'}")
                 new_population.append(offspring1)
                 new_population.append(offspring2)
 
@@ -847,7 +909,11 @@ class GA(object):
             self.population = new_population
             self.checkout('mutation_timestamp')
 
-            self.diagnosis()
+            # self.diagnosis()
+
+            # write population before trace checker
+            self.generate_dataset_qty()
+            s100 = self.store_dataset_all()
 
             ## score population
             self.checkin('tracheck_timestamp')
@@ -914,8 +980,11 @@ class GA(object):
         print(diag)
 
     def evaluate(self):
+        idx = 0
         for chromosome in self.population:
         # for chromosome in tqdm(self.population):
+            print('evaluating ', idx)
+            idx = 1+idx
             if chromosome.fitness != -1:
                 continue
 
@@ -930,6 +999,7 @@ class GA(object):
             folder_name = self.path
             run_str = f'python3 {folder_name}/temp.py'
             run_tk = shlex.split(run_str)
+            err = ''
             try:
                 run_process = subprocess.run(run_tk,
                                              stderr=subprocess.PIPE,
@@ -940,7 +1010,6 @@ class GA(object):
                 # print(f'Chromosome {chromosome.format()}')
                 # print(run_process.stdout)
                 # print(run_process.stderr)
-                err = ''
                 if len(run_process.stderr) > 0:
                     errorn = run_process.stderr.find('Error:')
                     if errorn == -1:
@@ -951,26 +1020,29 @@ class GA(object):
                     errorn = run_process.stdout.find('REQUIREMENT')
                     err = run_process.stdout[errorn:-1]
 
-                if err in self.execution_report.keys():
-                    self.execution_report[err] += 1
-                else:
-                    self.execution_report[err] = 1
 
                 if run_process.stdout.find('SATISFIED') > 0:
                     chromosome.madeit = 'True'
                     # self.check_highest_sat(chromosome)
                 elif run_process.stdout.find('VIOLATED') > 0:
                     chromosome.madeit = 'False'
+                elif run_process.stdout.find('UNDECIDED') > 0:
+                    chromosome.madeit = 'Unknown'
                 else:
                     print(run_process.stdout)
                     print(run_process.stderr)
                     chromosome.madeit = 'Problem'
-            except:
+            except subprocess.CalledProcessError as e:
                 print("An exception occurred")
+                print(e.output)
+            except subprocess.TimeoutExpired as e:
+                print("Trace checker timed out. Unedcided requirement")
                 print(f'Chromosome {chromosome.format()}')
-                print(run_process.stdout)
-                print(run_process.stderr)
-                chromosome.madeit = 'Problem'
+                print(e.output)
+                # print(run_process.stdout)
+                # print(run_process.stderr)
+                chromosome.madeit = 'Unknown'
+                err = 'REQUIREMENT UNDECIDED'
 
             if chromosome.madeit == 'Problem':
                 # When we cannot evaluate the chromosome set fitness to zero and evaluate next chromosome
@@ -978,7 +1050,10 @@ class GA(object):
                 chromosome.fitness = 0
                 continue
 
-            # print(self.execution_report)
+            if err in self.execution_report.keys():
+                self.execution_report[err] += 1
+            else:
+                self.execution_report[err] = 1
             self.execution_report['TOTAL'] += 1
             
             ## running sw
