@@ -6031,12 +6031,29 @@ def CC2():
 	# the total number of samples is 2000
 
 
+	["<=", [0, "t1"]]
+	["<=", ["t1", 70000000]]
+	["And", [["<=", [0, "t1"]], ["<=", ["t1", 70000000]] ]]
+	interval_t1=And((0*1000000)<=t1, t1<=(70000000))
 
-	interval_t1=And((466990)<=t1, t1<=(70*1000000))
-
+	["+", ["t1", 0]]
+	["<=", [["+", ["t1", 0]], "t2"]]
+	["+", ["t1", 30000000]]
+	["<=", ["t2", ["+", ["t1", 30000000]] ]]
+	["And", [["<=", [["+", ["t1", 0]], "t2"]], ["<=", ["t2", ["+", ["t1", 30000000]] ]] ]]
 	interval_t2=And(t1<=t2, t2<=t1+(30*1000000))
+
+	[">", [["-", ["y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", "y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]"]], 15]]
 	conditions_t2=((y5[ToInt(RealVal(0)+(t2-0.0)/50000.0)])-(y4[ToInt(RealVal(0)+(t2-0.0)/50000.0)]))>15
-	conditions_t1=Exists([t2], And(interval_t2, conditions_t2))
+
+	["And", [interval_t2, conditions_t2]]
+	["Exists", ["t2", ["And", [interval_t2, conditions_t2]] ]]
+	["Exists", ["t2", ["And", [["And", [["<=", [["+", ["t1", 0]], "t2"]], ["<=", ["t2", ["+", ["t1", 30000000]] ]] ]], [">", [["-", ["y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", "y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]"]], 15]]]] ]]
+	conditions_t1=Exists([t2], And(interval_t2, [">", [["-", ["y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", "y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]"]], 15]]))
+
+	["Implies", [interval_t1, conditions_t1]]
+	["ForAll", ["t1", ["Implies", [interval_t1, conditions_t1 ]] ]]
+	["ForAll", ["t1", ["Implies", [["And", [["<=", [0, "t1"]], ["<=", ["t1", 70000000]] ]], ["Exists", ["t2", ["And", [["And", [["<=", [["+", ["t1", 0]], "t2"]], ["<=", ["t2", ["+", ["t1", 30000000]] ]] ]], [">", [["-", ["y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)]", "y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]"]], 15]] ]] ]] ]] ]]
 	z3solver.add(Not(ForAll([t1], Implies(interval_t1, conditions_t1))))
 	status=z3solver.check()
 	print(status)
