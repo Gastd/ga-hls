@@ -1,0 +1,127 @@
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+NUM2 <= 126.218286
+|   NUM1 <= 18890540
+|   |   NUM2 <= 114.562083
+|   |   |   NUM1 <= 13980307
+|   |   |   |   NUM2 <= 101.794117
+|   |   |   |   |   NUM1 <= 11987560: TRUE (3.0)
+|   |   |   |   |   NUM1 > 11987560: FALSE (3.0)
+|   |   |   |   NUM2 > 101.794117: TRUE (34.0)
+|   |   |   NUM1 > 13980307
+|   |   |   |   NUM2 <= 107.456271: FALSE (31.0)
+|   |   |   |   NUM2 > 107.456271
+|   |   |   |   |   NUM1 <= 16960631
+|   |   |   |   |   |   NUM0 <= 1962554: FALSE (2.0)
+|   |   |   |   |   |   NUM0 > 1962554: TRUE (11.0/1.0)
+|   |   |   |   |   NUM1 > 16960631: FALSE (14.0)
+|   |   NUM2 > 114.562083: TRUE (55.0/2.0)
+|   NUM1 > 18890540
+|   |   NUM2 <= 122.389936: FALSE (171.0)
+|   |   NUM2 > 122.389936
+|   |   |   NUM1 <= 21228596: TRUE (5.0)
+|   |   |   NUM1 > 21228596: FALSE (19.0)
+NUM2 > 126.218286
+|   NUM1 <= 26873572: TRUE (140.0)
+|   NUM1 > 26873572
+|   |   NUM2 <= 132.338942: FALSE (10.0)
+|   |   NUM2 > 132.338942: TRUE (8.0)
+
+Number of Leaves  : 	14
+
+Size of the tree : 	27
+
+
+Time taken to build model: 0.28 seconds
+
+Time taken to test model on training data: 0.04 seconds
+
+=== Error on training data ===
+
+Correctly Classified Instances         503               99.4071 %
+Incorrectly Classified Instances         3                0.5929 %
+Kappa statistic                          0.9881
+K&B Relative Info Score                 98.031  %
+K&B Information Score                  496.0371 bits      0.9803 bits/instance
+Class complexity | order 0             506      bits      1      bits/instance
+Class complexity | scheme               17.2295 bits      0.0341 bits/instance
+Complexity improvement     (Sf)        488.7705 bits      0.9659 bits/instance
+Mean absolute error                      0.0112
+Root mean squared error                  0.0749
+Relative absolute error                  2.2422 %
+Root relative squared error             14.9739 %
+Total Number of Instances              506     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.012    0.988      1.000    0.994      0.988    0.999     0.998     TRUE
+                 0.988    0.000    1.000      0.988    0.994      0.988    0.999     0.998     FALSE
+Weighted Avg.    0.994    0.006    0.994      0.994    0.994      0.988    0.999     0.998     
+
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 253   0 |   a = TRUE
+   3 250 |   b = FALSE
+
+Time taken to perform cross-validation: 0.21 seconds
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances         490               96.8379 %
+Incorrectly Classified Instances        16                3.1621 %
+Kappa statistic                          0.9368
+K&B Relative Info Score                 92.9163 %
+K&B Information Score                  470.1751 bits      0.9292 bits/instance
+Class complexity | order 0             506.02   bits      1      bits/instance
+Class complexity | scheme            13982.7979 bits     27.634  bits/instance
+Complexity improvement     (Sf)     -13476.7779 bits    -26.6339 bits/instance
+Mean absolute error                      0.0367
+Root mean squared error                  0.1779
+Relative absolute error                  7.3491 %
+Root relative squared error             35.5813 %
+Total Number of Instances              506     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.972    0.036    0.965      0.972    0.969      0.937    0.969     0.955     TRUE
+                 0.964    0.028    0.972      0.964    0.968      0.937    0.969     0.958     FALSE
+Weighted Avg.    0.968    0.032    0.968      0.968    0.968      0.937    0.969     0.956     
+
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 246   7 |   a = TRUE
+   9 244 |   b = FALSE
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx2g
+java.lang.reflect.InaccessibleObjectException: Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain) throws java.lang.ClassFormatError accessible: module java.base does not "opens java.lang" to unnamed module @4b6995df
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:199)
+	at java.base/java.lang.reflect.Method.setAccessible(Method.java:193)
+	at weka.core.WekaPackageClassLoaderManager.injectClasses(WekaPackageClassLoaderManager.java:792)
+	at weka.core.WekaPackageClassLoaderManager.injectAllClassesInFromStream(WekaPackageClassLoaderManager.java:690)
+	at weka.core.WekaPackageClassLoaderManager.injectMTJCoreClasses(WekaPackageClassLoaderManager.java:118)
+	at weka.core.WekaPackageManager.<clinit>(WekaPackageManager.java:255)
+	at weka.core.ResourceUtils.readProperties(ResourceUtils.java:241)
+	at weka.core.ResourceUtils.readProperties(ResourceUtils.java:184)
+	at weka.core.Utils.readProperties(Utils.java:183)
+	at weka.core.Capabilities.<clinit>(Capabilities.java:104)
+	at weka.classifiers.trees.J48.getCapabilities(J48.java:250)
+	at weka.classifiers.trees.J48.buildClassifier(J48.java:300)
+	at weka.classifiers.evaluation.Evaluation.evaluateModel(Evaluation.java:1632)
+	at weka.classifiers.Evaluation.evaluateModel(Evaluation.java:668)
+	at weka.classifiers.AbstractClassifier.runClassifier(AbstractClassifier.java:141)
+	at weka.classifiers.trees.J48.main(J48.java:1221)

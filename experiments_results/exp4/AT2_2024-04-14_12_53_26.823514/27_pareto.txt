@@ -1,0 +1,14 @@
+Formula	SW_Score	Satisfied
+SEED: ForAll,0,<=,t,And,t,<=,10000000,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4750	-	-
+00: ForAll,2441007,<=,t,And,t,<=,9336050,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4777.067392	30.0	True
+01: ForAll,1132593,<=,t,And,t,<=,13456000,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4709.814350	30.0	False
+02: ForAll,3008569,<=,t,And,t,<=,6920895,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4736.853256	30.0	True
+03: ForAll,4447813,<=,t,And,t,<=,6432058,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4706.436066	30.0	True
+04: ForAll,780980,<=,t,And,t,<=,5725324,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4752.808400	30.0	True
+05: ForAll,2458944,<=,t,And,t,<=,9433781,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4761.174525	30.0	True
+06: ForAll,1021030,<=,t,And,t,<=,10111071,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4723.120139	30.0	False
+07: ForAll,451579,<=,t,And,t,<=,8926015,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4722.669326	30.0	False
+08: ForAll,1027343,<=,t,And,t,<=,9313862,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4760.828030	30.0	True
+09: ForAll,4434359,<=,t,And,t,<=,5726800,e_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)],<,4744.801331	30.0	True
+
+
