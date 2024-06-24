@@ -1,0 +1,14 @@
+Formula	SW_Score	Satisfied
+SEED: ForAll,i,>=,0,ToInt,10000.000000,And,i,<,30000000,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,2500000,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	-	-
+00: ForAll,i,>=,11433183,ToInt,10000.000000,And,i,<,35511033,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,685630,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	True
+01: ForAll,i,>=,11282049,ToInt,10000.000000,And,i,<,25136842,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,3817243,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	True
+02: ForAll,i,>=,4121469,ToInt,10000.000000,And,i,<,26265096,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,689712,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	True
+03: ForAll,i,>=,11534731,ToInt,10000.000000,And,i,<,38899798,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,2667995,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	True
+04: ForAll,i,>=,4265150,ToInt,10000.000000,And,i,<,43958833,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,3259715,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	False
+05: ForAll,i,>=,9427812,ToInt,10000.000000,And,i,<,18647865,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,262830,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	True
+06: ForAll,i,>=,3388277,ToInt,10000.000000,And,i,<,27905930,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,4629980,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	False
+07: ForAll,i,>=,3545064,ToInt,10000.000000,And,i,<,37415136,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,4966835,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	False
+08: ForAll,i,>=,4153126,ToInt,10000.000000,And,i,<,23590125,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,2660275,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	False
+09: ForAll,i,>=,5149367,ToInt,10000.000000,And,i,<,37225483,ToInt,10000.000000,gear[(i-1)],!=,1,And,gear[i],==,1,Implies,ForAll,timestamps[i],<=,t2,And,t2,<=,timestamps[i],+,3049803,gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)],==,1	102.0	False
+
+
