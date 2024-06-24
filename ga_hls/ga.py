@@ -589,7 +589,11 @@ class GA(object):
         return ret
 
     def store_dataset_all(self):
-        entire_dataset = self.sats + self.unsats + self.unknown
+        # entire_dataset = self.sats + self.unsats + self.unknown
+        entire_dataset = list()
+        [self.entire_dataset.append(x) for x in self.unknown if (x not in self.entire_dataset)]
+        [self.entire_dataset.append(x) for x in self.unsats if (x not in self.entire_dataset)]
+        [self.entire_dataset.append(x) for x in self.sats if (x not in self.entire_dataset)]
         per_cut = 1.0
 
         try:
@@ -924,6 +928,7 @@ class GA(object):
             s020 = self.store_dataset_qty(.20)
             s015 = self.store_dataset_qty(.15)
             s010 = self.store_dataset_qty(.10)
+            self.store_dataset_all()
             self.checkout('tracheck_timestamp')
 
             self.write_timespan_log()
