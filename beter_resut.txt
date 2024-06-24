@@ -1,4 +1,0 @@
-ForAll s In (s > 0 And s < 10) Implies (signal_4(s) < 50 And signal_2(s) >= -15.27)	54.0	False
-ForAll s In (s > 0 And s < 10) Implies (signal_4(s) <= 112 And signal_2(s) >= -15.27)	46.0	True
-ForAll s In (s > 0 And s < 10) Implies (signal_4(s) > -48 And signal_2(s) >= -15.27)	42.0	True
-ForAll s In (s > 0 And s < 10) Implies (signal_4(s) < 50 Or signal_2(s) >= -15.27)	48.0	True
