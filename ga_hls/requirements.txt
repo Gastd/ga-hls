@@ -1,0 +1,5 @@
+numpy
+tqdm
+matplotlib
+scipy
+z3-solver

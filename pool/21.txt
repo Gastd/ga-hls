@@ -1,0 +1,32 @@
+Formula	Fitness	Satisfied
+ s  ForAll  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27 	282.0	False
+ s  ForAll  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27 	282.0	False
+ s  ForAll  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27 	282.0	False
+ s  ForAll  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27 	282.0	False
+ s  ForAll  s  >  -1  Or  s  <  5  Implies  signal_4(s)  >  50  And  signal_2(s)  >=  -15.27 	240.0	False
+ s  Exists  s  >=  0  And  s  <  0  Implies  signal_4(s)  >  50  And  signal_2(s)  >=  -15.27 	239.0	True
+ s  Exists  s  >  0  And  s  <  10  Implies  signal_4(s)  <  40  And  signal_2(s)  >  -15.829481434152058 	233.0	True
+ s  ForAll  s  <  5  Or  s  >=  11  Implies  signal_4(s)  <  50  And  signal_2(s)  <=  -15.27 	233.0	False
+ s  ForAll  s  >=  1  And  s  <=  2  Implies  signal_4(s)  >=  50  And  signal_2(s)  <=  -22.125877854664168 	229.0	False
+ s  ForAll  s  <  0  Or  s  >  10  Implies  signal_4(s)  <  40  And  signal_2(s)  >  -665.6523992438564 	225.0	False
+ s  ForAll  s  >=  0  Or  s  >=  -1  Implies  signal_4(s)  >=  60  And  signal_2(s)  >  -15.829481434152058 	221.0	False
+ s  ForAll  s  >  0  And  s  <=  0  Implies  signal_4(s)  <  39  Or  signal_2(s)  >  35.31098827578687 	221.0	True
+ s  ForAll  s  >  -3  And  s  <  1  Implies  signal_4(s)  <=  49  Or  signal_2(s)  >  41.875470562154334 	213.0	False
+ s  ForAll  s  >  0  Or  s  <  -3  Implies  signal_4(s)  <=  40  Or  signal_2(s)  >  -125.30084314584082 	212.0	False
+ s  ForAll  s  <  0  Or  s  <  7  Implies  signal_4(s)  <=  50  Or  signal_2(s)  <=  -102.15406441177389 	208.0	False
+ s  ForAll  s  <  1  Or  s  <=  -1  Implies  signal_4(s)  <  61  Or  signal_2(s)  <  -15.27 	204.0	False
+ s  ForAll  s  >  0  Or  s  >=  7  Implies  signal_4(s)  >  81  And  signal_2(s)  <=  576.7178085937604 	201.0	False
+ s  ForAll  s  >  -1  Or  s  >  -3  Implies  signal_4(s)  >=  40  Or  signal_2(s)  >=  -125.30084314584082 	197.0	False
+ s  Exists  s  <  0  And  s  <  9  Implies  signal_4(s)  >  60  Or  signal_2(s)  >=  -102.15406441177389 	191.0	True
+ s  Exists  s  <  5  Or  s  >=  11  Implies  signal_4(s)  <  40  And  signal_2(s)  >  -102.15406441177389 	183.0	True
+ s  ForAll  s  <=  7  Or  s  >  5  Implies  signal_4(s)  <  19  Or  signal_2(s)  >  -665.6523992438564 	183.0	False
+ s  Exists  s  <  1  Or  s  <  7  Implies  signal_4(s)  <  30  And  signal_2(s)  <  -1087.1719121438932 	180.0	True
+ s  Exists  s  <=  1  Or  s  >=  -1  Implies  signal_4(s)  <=  61  And  signal_2(s)  >=  -102.15406441177389 	177.0	
+
+ s  Exists  s  <  -1  Or  s  >  1  Implies  signal_4(s)  >  50  And  signal_2(s)  <  -4.477270052042854 	175.0	True
+ s  Exists  s  <  -1  Or  s  >  4  Implies  signal_4(s)  <  40  And  signal_2(s)  >  -309.88912292665 	175.0	True
+ s  Exists  s  >  -1  And  s  <  -1  Implies  signal_4(s)  >=  62  Or  signal_2(s)  <  43.65514109536961 	168.0	True
+ s  Exists  s  >  0  Or  s  <  9  Implies  signal_4(s)  >=  52  Or  signal_2(s)  >  97.8964946825476 	167.0	True
+ s  Exists  s  <  0  Or  s  >  6  Implies  signal_4(s)  >=  50  Or  signal_2(s)  >  0.6171128304966089 	161.0	True
+ s  Exists  s  <=  1  Or  s  >=  21  Implies  signal_4(s)  <  40  Or  signal_2(s)  <  576.7178085937604 	151.0	True
+ s  Exists  s  >  1  Or  s  <=  2  Implies  signal_4(s)  >=  29  Or  signal_2(s)  <  -928.7104210887087 	150.0	True

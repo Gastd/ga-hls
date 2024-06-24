@@ -13,10 +13,10 @@ def property_distance_obs():
 	t=Real('t') 
 
 	#Trace: property_distance_obs
-	timestamps=Array('timestamps', RealSort(), IntSort())
-	cur_x=Array('cur_x', RealSort(), IntSort())
-	des_x=Array('des_x', RealSort(), IntSort())
-	d2obs=Array('d2obs', RealSort(), IntSort())
+	timestamps=Array('timestamps', IntSort(), RealSort())
+	cur_x=Array('cur_x', IntSort(), RealSort())
+	des_x=Array('des_x', IntSort(), RealSort())
+	d2obs=Array('d2obs', IntSort(), RealSort())
 	z3solver.add(timestamps[ 0]==0)
 	z3solver.add(cur_x[0]==-0.1542131509516591)
 	z3solver.add(des_x[0]==-0.1542131509516591)
@@ -6408,7 +6408,7 @@ def property_distance_obs():
 
 
 	interval_t=And(0<=t, t<=1.593E7)
-	conditions_t=And(d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]>0.5, (des_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]-cur_x[ToInt(RealVal(0)+(t-0.0)/10000.0)])<0.2)
+	conditions_t=And(d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]>0.2, (des_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]-cur_x[ToInt(RealVal(0)+(t-0.0)/10000.0)])<0.5)
 	# x = ["Not",["ForAll",[["s"],["Implies",["And",[[">",["s",0]],["<",["s",10]]],["And",[["<",["signal_4(s)",1000]],[[">=",["signal_2(s)",-15.27]]]]]]]]]]
 	# x = ["Not",["ForAll",[["t"],["Implies",["And",[[">=",["t",0]],["<=",["t",1.593E7]]],["And"],[">",[["d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.5], ["<",[["-",["des_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]","cur_x[ToInt(RealVal(0)+(t-0.0)/10000.0)]"]],0.2]]]]]]]]]
 	# [">", ["d2obs[ToInt(RealVal(0)+(t-0.0)/10000.0)]",0.5]]

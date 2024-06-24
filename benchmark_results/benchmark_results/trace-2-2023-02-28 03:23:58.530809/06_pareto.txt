@@ -1,0 +1,16 @@
+Formula	SW_Score	Satisfied
+SEED: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.01)	-	-
+00: ForAll t In (t > 11 And t < 107) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.01)	45.0	True
+01: ForAll t In (t > 33 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= 0.24)	42.0	True
+02: ForAll t In (t > 11 And t < 92) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.49)	42.0	True
+03: ForAll t In (t >= 11 And t <= 396) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] > 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.01)	36.0	True
+04: ForAll t In (t > 11 And t <= 245) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= 0.84 Or err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.01)	31.0	True
+05: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] > 0.01 Or err[ToInt(RealVal(0)+(t-0.0)/10000.0)] < 0.79)	30.0	True
+
+
+00: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.01)	57.0	False
+01: ForAll t In (t >= 11 And t < 111) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.01)	49.0	False
+02: ForAll t In (t >= 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] > -0.65)	47.0	False
+03: ForAll t In (t > 11 Or t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] > -0.01)	46.0	False
+04: ForAll t In (t > 11 And t < 113) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] > -0.01)	46.0	False
+05: ForAll t In (t > 11 And t < 100) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] < 0.01 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.01)	46.0	False

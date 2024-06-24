@@ -1,0 +1,15 @@
+Formula	SW_Score	Satisfied
+SEED: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 0.007000 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -0.007000)	-	-
+00: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 975.724319 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -1084.985647)	48.0	True
+01: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 1069.395255 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -634.571306)	48.0	True
+02: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 984.827571 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -196.359469)	48.0	True
+03: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 1067.764539 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -892.878383)	48.0	True
+04: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 1013.671458 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -599.993766)	48.0	True
+
+
+00: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 246.680325 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -358.374170)	48.0	False
+01: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 365.726775 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -691.492689)	48.0	False
+02: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 772.506513 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -993.436791)	48.0	False
+03: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 187.742996 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -490.333459)	48.0	False
+04: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 698.434729 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -902.665830)	48.0	False
+05: ForAll t In (t > 11 And t < 50) Implies (err[ToInt(RealVal(0)+(t-0.0)/10000.0)] <= 943.672953 And err[ToInt(RealVal(0)+(t-0.0)/10000.0)] >= -1068.710541)	48.0	False

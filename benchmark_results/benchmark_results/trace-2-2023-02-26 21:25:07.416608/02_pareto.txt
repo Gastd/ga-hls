@@ -1,0 +1,12 @@
+Formula	SW_Score	Satisfied
+SEED: ForAll t In (t > 11 And t < 50) Implies (err[t] <= 0.70 And err[t] >= -0.70)	-	-
+00: ForAll t In (t > 11 And t < 50) Implies (err[t] >= 0.70 And err[t] >= -0.81)	48.0	True
+01: Exists t In (t > -72 Or t < 112) Implies (err[t] >= 2.75 Or err[t] < -0.59)	12.0	True
+
+
+00: ForAll t In (t > 11 And t < 50) Implies (err[t] <= 0.70 And err[t] >= -0.70)	57.0	False
+01: ForAll t In (t > 11 And t > 50) Implies (err[t] <= 0.70 And err[t] >= -0.70)	51.0	False
+02: ForAll t In (t < 11 And t <= 50) Implies (err[t] <= 0.70 And err[t] >= -0.70)	49.0	False
+03: ForAll t In (t <= 11 And t < 50) Implies (err[t] <= 0.70 And err[t] >= -0.33)	46.0	False
+04: ForAll t In (t >= 65 Or t < 50) Implies (err[t] <= 0.70 And err[t] >= -0.70)	43.0	False
+05: ForAll t In (t <= 11 And t < 164) Implies (err[t] <= 0.70 And err[t] >= -0.70)	43.0	False

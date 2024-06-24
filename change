@@ -1,0 +1,5 @@
+- not mutate on interval
+- prioritaze deep changes on the tree
+- check if the formulas are sat or not without trace
+- check the distance (metric)
+- crossover and mutation keeps the length

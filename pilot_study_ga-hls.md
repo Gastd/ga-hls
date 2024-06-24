@@ -46,7 +46,7 @@
  5. (4min) Fix the .arff features (@attribute)
  6. (9min) Prune the dataset to pareto
       1. save five datasets with different sized samples (10%, 15%, 20%, 25%, all)
- 5. (3min) Run WEKA
+ 7. (3min) Run WEKA
       1. copy-paste datasets to weka 
       2. load the dataset 
       3. run J48

@@ -1,0 +1,15 @@
+ s  ForAll  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27   Original
+
+
+
+ s  Exists  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27   252.0   True
+ s  ForAll  s  >  1  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27   276.0   False
+ s  ForAll  s  >=  0  And  s  <  11  Implies  signal_4(s)  >  50  And  signal_2(s)  >=  -15.27  268.0   False
+ s  ForAll  s  >  0  And  s  <  9  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.17    265.0   False
+ s  Exists  s  >  0  And  s  <  10  Implies  signal_4(s)  >=  50  And  signal_2(s)  >=  -15.17  244.0   True
+ s  ForAll  s  <=  0  And  s  <=  10  Implies  signal_4(s)  <  48  Or  signal_2(s)  >=  -15.27  243.0   False
+ s  Exists  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.37   240.0   True
+ s  ForAll  s  <  -1  Or  s  <  10  Implies  signal_4(s)  <=  49  And  signal_2(s)  >=  -15.17  231.0   False
+ s  Exists  s  >  -1  And  s  <  110  Implies  signal_4(s)  <  8647  Or  signal_2(s)  >=  124.90108941250729    189.0   True
+
+ s  Exists  s  >  0  And  s  <  10  Implies  signal_4(s)  <  50  And  signal_2(s)  >=  -15.27   257.0   False

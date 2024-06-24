@@ -1,0 +1,35 @@
+@relation all.generationall
+
+@attribute QUANTIFIERS0 {ForAll, Exists}
+@attribute TERM0 {err[t], t}
+@attribute RELATIONALS0 {<, >, <=, >=}
+@attribute NUM0 NUMERIC
+@attribute LOGICALS0 {And, Or}
+@attribute TERM1 {err[t], t}
+@attribute RELATIONALS1 {<, >, <=, >=}
+@attribute NUM1 NUMERIC
+@attribute IMP0 {Implies}
+@attribute TERM2 {err[t], t}
+@attribute RELATIONALS2 {<, >, <=, >=}
+@attribute NUM2 NUMERIC
+@attribute LOGICALS1 {And, Or}
+@attribute TERM3 {err[t], t}
+@attribute RELATIONALS3 {<, >, <=, >=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE}
+
+@data
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>=,0.70,And,err[t],>=,-0.81,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>,0.70,And,err[t],>=,-0.70,TRUE
+ForAll,t,>=,11,And,t,<,50,Implies,err[t],>,0.70,And,err[t],>=,-0.70,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>,0.70,And,err[t],>=,0.11,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>,0.70,And,err[t],>=,-0.03,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>,0.70,And,err[t],>=,-0.07,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],>,0.70,And,err[t],>=,-0.97,TRUE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.70,FALSE
+ForAll,t,>,11,And,t,<=,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.70,FALSE
+ForAll,t,>=,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.70,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.48,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-1.57,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,-0.53,FALSE
+ForAll,t,>,11,And,t,<,50,Implies,err[t],<=,0.70,And,err[t],>=,0.11,FALSE
