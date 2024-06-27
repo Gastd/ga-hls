@@ -41,8 +41,8 @@ time = np.array([[11.6,         # AT1
                   120.0,
                   120.0,        # CCx
                   120.0,
-                  10.8,         # RR
-                  10.8]])
+                  6.4,         # RR
+                  4.6]])
 
 #%% Print statistical analysis of computational time
 
@@ -51,7 +51,7 @@ print("To replicate all the experiments and run them in series, it would take ap
 
 # Remove experiments that took 120 hours
 time = time[time < 120]
-print("The average computational time is: %.1f" % np.mean(time))
-print("The minimum computational time is: %.1f" % np.min(time))
-print("The maximum computational time is: %.1f" % np.max(time))
-print("The Standanrd Deviation of computational time is: %.1f\n" % np.std(time))
+print("The average computational time is: %.1f hours." % np.mean(time))
+print("The minimum computational time is: %.1f hours." % np.min(time))
+print("The maximum computational time is: %.1f hours." % np.max(time))
+print("The Standanrd Deviation of computational time is: %.1f hours.\n" % np.std(time))
