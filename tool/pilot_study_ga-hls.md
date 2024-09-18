@@ -20,7 +20,6 @@
     1. (1min) Copy-paste the generated property_X.py into ga-hls.
     2. (2min) Set filepath (ga-hls/defs.py) for the properties_X.py containing the formula.
     3. (~30min) Tranform formula from property_X.py into list of list. Example:
-
         Input: 
         ```
         Not(ForAll([s], Implies(And(s>0, s<18), And(Implies(signal_5[s]==0, signal_6[s]==1), Implies(signal_5[s]==1, signal_6[s]==0)))))

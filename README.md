@@ -9,10 +9,3 @@ The content of this repository is divided as follows:
 - `tool`: Tool implementation as used in the paper. The inside readme shows how to run each experiment. Also, it includes the HLS specification for each requirement shown in the paper.
 - `Appendix.pdf`: Paper Appendix with the result comparison between _Tool_ and _Prediction_. Also available in [here](https://zenodo.org/records/12520835).
 
-### License
-
-The source code is released under a [MIT license](LICENSE).
-
-**Authors: Gabriel F P Araujo and Ricardo Diniz and Federico Formica<br />
-Affiliation: [LES-UNB](https://les.unb.br/ladecic/)<br />
-Maintainers: [Gabriel F P Araujo](mailto:gabriel.fp.araujo@gmail.com)**
