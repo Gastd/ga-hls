@@ -7,3 +7,4 @@ ga_hls/z3check.py
 # Hidden file to sort folders on MacOS systems.
 .DS_Store
 */.DS_Store
+ga_hls.egg-info/
