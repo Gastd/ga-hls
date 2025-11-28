@@ -1,7 +1,8 @@
 import json
-import treenode
-from individual import Individual
-from ga import GA
+
+from . import treenode, defs
+from .individual import Individual
+from .ga import GA
 
 ## interval_s=And(s>0, s<10)
 ## conditions_s=And(signal_4[s]<1000, signal_2[s]>=-(15.27))

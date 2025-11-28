@@ -1,0 +1,48 @@
+Metadata-Version: 2.4
+Name: ga-hls
+Version: 0.1.0
+Summary: Genetic algorithm-based HLS requirement mutation and diagnostics
+Author: ga-hls contributors
+License: MIT License
+        
+        Copyright (c) 2024
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Homepage, https://github.com/Gastd/ga-hls
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: scipy
+Requires-Dist: z3-solver
+Dynamic: license-file
+
+# Diagnosis
+
+## Overview
+This repository complements the paper _Search-based Trace Diagnostic_.
+The content of this repository is divided as follows:
+
+- `experiments_results`: Results of the experiments presented on the paper. Includes the output files, decision tree models and a png picture of the tool result. Experiments are separated by folder.
+- `results_analysis`: Python scripts used to measure precision and recall for each experiment. Scripts for plotting the boxplot also included.
+- `tool`: Tool implementation as used in the paper. The inside readme shows how to run each experiment. Also, it includes the HLS specification for each requirement shown in the paper.
+- `Appendix.pdf`: Paper Appendix with the result comparison between _Tool_ and _Prediction_. Also available in [here](https://zenodo.org/records/12520835).
+

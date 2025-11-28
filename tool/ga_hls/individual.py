@@ -4,9 +4,7 @@ import shlex
 import random
 import subprocess
 
-# from .treenode import 
-import treenode
-import defs
+from . import treenode, defs
 
 MUTATION_NODES = 5
 MUT_IDXS =[4, 7]

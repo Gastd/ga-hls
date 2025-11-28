@@ -5,34 +5,35 @@ import json
 import shlex
 import random
 import datetime
-# import statistics
 import subprocess
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 from copy import deepcopy
-# from tqdm import tqdm
 
-import treenode
-import individual
-
-from individual import QUANTIFIERS, RELATIONALS, EQUALS, ARITHMETICS, MULDIV, EXP, LOGICALS, NEG, IMP, FUNC
-
-# from anytree import Node
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from scipy.cluster.hierarchy import dendrogram, linkage
-# from timeit import default_timer as timer
 
 import matplotlib
-# import numpy
-# import sys
 
-# import analyse
-# from analyse import Smith_Waterman
+from . import treenode, defs
+from .individual import (
+    Individual,
+    QUANTIFIERS,
+    RELATIONALS,
+    EQUALS,
+    ARITHMETICS,
+    MULDIV,
+    EXP,
+    LOGICALS,
+    NEG,
+    IMP,
+    FUNC,
+)
+from .diagnosis import Diagnosis
 
-import defs
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia

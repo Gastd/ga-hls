@@ -1,11 +1,11 @@
 import json
-import treenode
-from individual import Individual
-from ga import GA
-import defs
 import shlex
 import sys
 import subprocess
+
+from . import treenode, defs
+from .individual import Individual
+from .ga import GA
 
 def check_if_sat(filepath):
     ret = False

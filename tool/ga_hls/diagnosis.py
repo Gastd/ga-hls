@@ -1,4 +1,4 @@
-
+from . import treenode, defs, individual
 
 class Diagnosis():
     """docstring for Diagnosis"""
