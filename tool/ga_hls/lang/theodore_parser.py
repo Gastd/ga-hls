@@ -189,13 +189,47 @@ def _expr_to_formula(node: ast.expr) -> Formula:
             return rels[0]
         return And(rels)
 
-    # Calls: ForAll([...], body), Exists([...], body), etc.
+        # Calls: ForAll([...], body), Exists([...], body), Not(...), And(...),
+    # Or(...), Implies(...), etc.
     if isinstance(node, ast.Call):
         if isinstance(node.func, ast.Name):
             fname = node.func.id
+
+            # Quantifiers
             if fname in ("ForAll", "Exists"):
                 return _handle_quantifier_call(fname, node)
-            # Any other function-style call we treat as a Var for now
+
+            # Logical Not as a function: Not(phi)
+            if fname == "Not":
+                if len(node.args) != 1:
+                    raise TheodoreParseError(
+                        f"Not(...) expects a single argument, got: {ast.dump(node)}"
+                    )
+                return Not(_expr_to_formula(node.args[0]))
+
+            # Logical And / Or as functions: And(phi1, phi2, ...), Or(...)
+            if fname in ("And", "Or"):
+                if not node.args:
+                    raise TheodoreParseError(
+                        f"{fname}(...) expects at least one argument, got: {ast.dump(node)}"
+                    )
+                args = [_expr_to_formula(a) for a in node.args]
+                if fname == "And":
+                    return And(args)
+                else:
+                    return Or(args)
+
+            # Implies(phi, psi)
+            if fname == "Implies":
+                if len(node.args) != 2:
+                    raise TheodoreParseError(
+                        f"Implies(...) expects 2 arguments, got: {ast.dump(node)}"
+                    )
+                left = _expr_to_formula(node.args[0])
+                right = _expr_to_formula(node.args[1])
+                return Implies(left=left, right=right)
+
+            # Any other function-style call we treat as an opaque variable for now
             return Var(_call_to_str(node))
 
         # Something like f.g(...) – treat as opaque for now
