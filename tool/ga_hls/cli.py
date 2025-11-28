@@ -10,6 +10,7 @@ from .lang.analysis import collect_vars, formula_depth, formula_size
 from .lang.internal_parser import InternalFormatError, parse_internal_json
 from .lang.internal_encoder import InternalEncodeError, formula_to_internal_obj
 from .lang.theodore_parser import TheodoreParseError, load_formula_from_property
+from .pipeline import run_diagnostics
 
 from .ga import GA
 
@@ -185,8 +186,15 @@ def main(argv=None) -> int:
         return 0
 
     if args.command == "run":
-        return _cmd_run(args)
+        try:
+            cfg = load_config(args.config)
+        except ConfigError as e:
+            print(f"[ga-hls] Error loading config: {e}")
+            return 1
 
+        run_diagnostics(cfg)
+        return 0
+        
     if args.command == "inspect-internal":
         return _cmd_inspect_internal(args)
 

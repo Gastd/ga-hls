@@ -1,6 +1,0 @@
-@relation all.2025-11-28_16_25_38.000172
-
-
-@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
-
-@data

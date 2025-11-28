@@ -1,6 +1,6 @@
 {
   "input": {
-    "requirement_file": "tool/requirements.hls",
+    "requirement_file": "tool/ga_hls/benchmark/property_01_err_twenty.py",
     "traces_file": "tool/example_traces.txt",
     "output_dir": "outputs"
   },
