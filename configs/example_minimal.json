@@ -1,7 +1,7 @@
 {
   "input": {
-    "requirement_file": "tool/requirements.hls",
-    "traces_file": "tool/example_traces.txt",
+    "requirement_file": "tool/ga_hls/requirements.hls",
+    "traces_file": "tool/ga_hls/tracesAT.csv",
     "output_dir": "outputs"
   }
 }

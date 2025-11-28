@@ -8,6 +8,7 @@ from pathlib import Path
 from .config import ConfigError, load_config
 from .lang.analysis import collect_vars, formula_depth, formula_size
 from .lang.internal_parser import InternalFormatError, parse_internal_json
+from .lang.hls_parser import HLSParseError, load_formula_from_hls 
 
 
 def _get_version() -> str:
@@ -86,6 +87,36 @@ def _cmd_inspect_internal(args: argparse.Namespace) -> int:
 
     return 0
 
+def _cmd_inspect_theodore(args) -> int:
+    """
+    Inspect an HLS/.hls requirements file specified in the config.
+
+    This uses ga_hls.lang.hls_parser to translate the Specification into
+    the internal Formula AST and prints a human-readable representation.
+    """
+    try:
+        cfg = load_config(args.config)
+    except ConfigError as e:
+        print(f"Error loading config: {e}")
+        return 1
+
+    prop_path = cfg.input.requirement_file
+    print(f"Inspecting ThEodorE HLS requirement file: {prop_path}")
+
+    try:
+        formula = load_formula_from_hls(prop_path, property_name=None)
+    except HLSParseError as e:
+        print(f"Failed to parse HLS requirement file:\n  {e}")
+        return 1
+
+    print("\nParsed formula (AST pretty-print):")
+    print(formula)
+    print("\nFormula stats:")
+    print(f"  size  = {formula_size(formula)}")
+    print(f"  depth = {formula_depth(formula)}")
+    print(f"  vars  = {sorted(collect_vars(formula))}")
+
+    return 0
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
@@ -122,6 +153,18 @@ def main(argv=None) -> int:
         help="Path to a file containing the internal JSON formula.",
     )
 
+    inspect_theodore_parser = subparsers.add_parser(
+        "inspect-theodore",
+        help="Inspect a ThEodorE/HLS Python property file defined in the config.",
+    )
+    inspect_theodore_parser.add_argument(
+        "--config",
+        required=True,
+        help="Path to JSON config file.",
+    )
+    inspect_theodore_parser.set_defaults(cmd="inspect_theodore")
+
+
     args = parser.parse_args(argv)
 
     # Global --version only (no subcommand)
@@ -134,6 +177,9 @@ def main(argv=None) -> int:
 
     if args.command == "inspect-internal":
         return _cmd_inspect_internal(args)
+
+    if args.command == "inspect-theodore":
+        return _cmd_inspect_theodore(args)
 
     # No subcommand: show help
     parser.print_help()
