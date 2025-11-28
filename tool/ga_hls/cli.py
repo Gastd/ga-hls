@@ -8,7 +8,10 @@ from pathlib import Path
 from .config import ConfigError, load_config
 from .lang.analysis import collect_vars, formula_depth, formula_size
 from .lang.internal_parser import InternalFormatError, parse_internal_json
-from .lang.hls_parser import HLSParseError, load_formula_from_hls 
+from .lang.internal_encoder import InternalEncodeError, formula_to_internal_obj
+from .lang.theodore_parser import TheodoreParseError, load_formula_from_property
+
+from .ga import GA
 
 
 def _get_version() -> str:
@@ -18,38 +21,48 @@ def _get_version() -> str:
         # Fallback when running from source without an installed dist
         return "0.1.0-dev"
 
-
-def _cmd_run(args: argparse.Namespace) -> int:
+def _cmd_run(args) -> int:
     """
-    Load and validate a configuration file.
+    Main GA/diagnostics entrypoint.
+
+    Canonical input: a ThEodorE-generated Python property file
+    (e.g., property_01_err_twenty.py) configured in Config.input.requirement_file.
+
+    Pipeline:
+      ThEodorE property Python -> Formula AST
+                              -> internal JSON -> GA
     """
     try:
         cfg = load_config(args.config)
-    except ConfigError as exc:
-        print(f"Error: {exc}", file=sys.stderr)
+    except ConfigError as e:
+        print(f"Error loading config: {e}")
         return 1
 
-    print("Loaded configuration:")
-    print(f"  Requirement file : {cfg.input.requirement_file}")
-    print(f"  Traces file      : {cfg.input.traces_file}")
-    print(f"  Output directory : {cfg.input.output_dir}")
-    print()
-    print("  GA configuration:")
-    print(f"    population_size: {cfg.ga.population_size}")
-    print(f"    generations    : {cfg.ga.generations}")
-    print(f"    crossover_rate : {cfg.ga.crossover_rate}")
-    print(f"    mutation_rate  : {cfg.ga.mutation_rate}")
-    print(f"    elitism        : {cfg.ga.elitism}")
-    print(f"    seed           : {cfg.ga.seed}")
-    print()
-    print("  Diagnostics configuration:")
-    print(f"    ARFF filename  : {cfg.diagnostics.arff_filename}")
-    print(f"    Weka JAR       : {cfg.diagnostics.weka_jar}")
-    print(f"    J48 options    : {cfg.diagnostics.j48_options}")
+    requirement_path = cfg.input.requirement_file
+    print(f"Loading ThEodorE Python requirement from: {requirement_path}")
 
-    # Later we will call the actual GA/diagnostics pipeline from here.
+    # 1) Parse requirement into Formula AST (ThEodorE Python is canonical)
+    try:
+        formula = load_formula_from_property(requirement_path)
+    except TheodoreParseError as e:
+        print(f"Failed to parse ThEodorE Python requirement file:\n  {e}")
+        return 1
+
+    print("\nParsed requirement as AST:")
+    print(formula)
+
+    # 2) Encode AST into legacy internal JSON format for GA
+    try:
+        internal_obj = formula_to_internal_obj(formula)
+    except InternalEncodeError as e:
+        print(f"Failed to encode AST into internal GA format:\n  {e}")
+        return 1
+
+    print("\nStarting GA with encoded initial formula...")
+    ga = GA(init_form=internal_obj)
+    ga.evolve()
+
     return 0
-
 
 def _cmd_inspect_internal(args: argparse.Namespace) -> int:
     """
@@ -89,10 +102,9 @@ def _cmd_inspect_internal(args: argparse.Namespace) -> int:
 
 def _cmd_inspect_theodore(args) -> int:
     """
-    Inspect an HLS/.hls requirements file specified in the config.
+    Inspect a ThEodorE-generated Python property file specified in the config.
 
-    This uses ga_hls.lang.hls_parser to translate the Specification into
-    the internal Formula AST and prints a human-readable representation.
+    Canonical input: property_X.py generated in ThEodorE (src-gen/*.py).
     """
     try:
         cfg = load_config(args.config)
@@ -100,13 +112,13 @@ def _cmd_inspect_theodore(args) -> int:
         print(f"Error loading config: {e}")
         return 1
 
-    prop_path = cfg.input.requirement_file
-    print(f"Inspecting ThEodorE HLS requirement file: {prop_path}")
+    req_path = cfg.input.requirement_file
+    print(f"Inspecting ThEodorE Python requirement file: {req_path}")
 
     try:
-        formula = load_formula_from_hls(prop_path, property_name=None)
-    except HLSParseError as e:
-        print(f"Failed to parse HLS requirement file:\n  {e}")
+        formula = load_formula_from_property(req_path)
+    except TheodoreParseError as e:
+        print(f"Failed to parse ThEodorE Python requirement file:\n  {e}")
         return 1
 
     print("\nParsed formula (AST pretty-print):")
