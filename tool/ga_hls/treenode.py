@@ -248,15 +248,20 @@ def parse(l: list):
     return tree
 
 def get_terminators(node):
-    if node.left is None and node.right is None:
-        if isinstance(node.value, list):
-            return [i for i in node.value]
-        else:
-            return [node.value]
-    else:
-        left = get_terminators(node.left)
-        right = get_terminators(node.right)
-        return left + right
+    """
+    Recursively collect terminal node values from a treenode-based formula.
+    """
+    if node is None:
+        return []
+
+    # Leaf node
+    if getattr(node, "left", None) is None and getattr(node, "right", None) is None:
+        return [node.value]
+
+    left_terms = get_terminators(node.left) if getattr(node, "left", None) is not None else []
+    right_terms = get_terminators(node.right) if getattr(node, "right", None) is not None else []
+
+    return left_terms + right_terms
 
 # A function to do inorder tree traversal
 def printInorder(root):
