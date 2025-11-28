@@ -1,0 +1,7 @@
+{
+  "input": {
+    "requirement_file": "tool/requirements.hls",
+    "traces_file": "tool/example_traces.txt",
+    "output_dir": "outputs"
+  }
+}

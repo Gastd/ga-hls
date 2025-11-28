@@ -1,0 +1,20 @@
+{
+  "input": {
+    "requirement_file": "tool/requirements.hls",
+    "traces_file": "tool/example_traces.txt",
+    "output_dir": "outputs"
+  },
+  "ga": {
+    "population_size": 80,
+    "generations": 60,
+    "crossover_rate": 0.9,
+    "mutation_rate": 0.1,
+    "elitism": 2,
+    "seed": 42
+  },
+  "diagnostics": {
+    "arff_filename": "outputs/example.arff",
+    "weka_jar": null,
+    "j48_options": ["-C", "0.25", "-M", "2"]
+  }
+}
