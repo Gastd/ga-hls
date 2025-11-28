@@ -41,7 +41,13 @@ def build_ga_from_config(cfg: Config) -> GA:
     # 3) Build the GA instance. We keep `target_sats` at its default (2) for now
     #    to preserve existing semantics; if you later add a `target_sats` field
     #    to GAConfig, you can pass it through here.
-    ga = GA(init_form)
+    ga = GA(
+        init_form=init_form,
+        mutations=cfg.input.mutations if hasattr(cfg.input, "mutations") else None,
+        population_size=cfg.ga.population_size,
+        max_generations=cfg.ga.generations,
+        seed=cfg.ga.seed,
+    )
 
     return ga
 

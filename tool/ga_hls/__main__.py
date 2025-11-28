@@ -6,29 +6,16 @@ import subprocess
 from . import treenode, defs
 from .individual import Individual
 from .ga import GA
+from .harness import run_property_script, Verdict
 
-def check_if_sat(filepath):
-    ret = False
-    folder_name = 'ga_hls'
-    run_str = f'python3 {filepath}'
-    run_tk = shlex.split(run_str)
-    lines = []
-    try:
-        run_process = subprocess.run(run_tk,
-                                     stderr=subprocess.PIPE,
-                                     stdout=subprocess.PIPE,
-                                     universal_newlines=True,
-                                     timeout=50)
+def check_if_sat(filepath: str) -> bool:
+    """
+    Legacy helper preserved for playground use.
 
-        if run_process.stdout.find('SATISFIED') > 0:
-            ret = True
-        elif run_process.stdout.find('VIOLATED') > 0:
-            ret = False
-        else:
-            ret = False
-    except:
-        ret = False
-    return ret
+    Returns True for SAT, False for UNSAT or ERROR.
+    """
+    result = run_property_script(filepath)
+    return result.verdict == Verdict.SAT
 
 # from parsing import Parser
 

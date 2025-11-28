@@ -1,12 +1,12 @@
 {
   "input": {
     "requirement_file": "tool/ga_hls/benchmark/property_01_err_twenty.py",
-    "traces_file": "tool/example_traces.txt",
+    "traces_file": "tool/ga_hls/tracesAT.csv",
     "output_dir": "outputs"
   },
   "ga": {
-    "population_size": 80,
-    "generations": 60,
+    "population_size": 10,
+    "generations": 5,
     "crossover_rate": 0.9,
     "mutation_rate": 0.1,
     "elitism": 2,

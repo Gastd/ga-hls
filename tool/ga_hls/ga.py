@@ -6,6 +6,7 @@ import shlex
 import random
 import datetime
 import subprocess
+from tqdm import tqdm
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +17,7 @@ from typing import Optional
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from scipy.cluster.hierarchy import dendrogram, linkage
-
+from pathlib import Path
 import matplotlib
 
 from . import treenode, defs
@@ -36,6 +37,9 @@ from .individual import (
 from .diagnosis import Diagnosis
 from .lang.internal_parser import parse_internal_obj
 from .lang.ast import Formula
+from .harness_script import build_z3check_script
+from .harness import run_property_script, Verdict
+from .lang.python_printer import formula_to_python_expr
 
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
@@ -72,8 +76,9 @@ def isfloat(num):
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self, init_form, mutations = None, target_sats = 2):
-        super(GA, self).__init__()
+    def __init__(self,init_form,mutations=None,target_sats: int = 2,
+        population_size: int | None = None, max_generations: int | None = None, seed: int | None = None,
+    ):
 
 
         # Log the timespaneach one of the tree steps in the approach
@@ -95,8 +100,25 @@ class GA(object):
             self.set_mutation_ranges(mutations)
             self.set_force_mutations(True)
 
-        random.seed()
-        self.size = POPULATION_SIZE
+        # Seed the RNG (configurable)
+        if seed is not None:
+            random.seed(seed)
+        else:
+            random.seed()
+
+        # Population size from config, falling back to legacy constant
+        if population_size is not None:
+            self.size = int(population_size)
+        else:
+            self.size = POPULATION_SIZE
+
+        # Max generations from config, falling back to legacy constant
+        # (assuming MAX_ALLOWABLE_GENERATIONS is defined in defs)
+        if max_generations is not None:
+            self.max_generations = int(max_generations)
+        else:
+            self.max_generations = MAX_ALLOWABLE_GENERATIONS
+
         self.population = []
         self.now = datetime.datetime.now()
         curr_path = os.getcwd()
@@ -110,6 +132,19 @@ class GA(object):
             # Do not break GA if the AST view fails; just log and continue
             print(f"[ga-hls] Warning: failed to build seed AST: {exc}")
             self.seed_ast = None
+        
+        # DEBUG: print the seed AST for inspection
+        self.print_seed_ast()
+        print("seed_ast type:", type(self.seed_ast))
+        if self.seed_ast is not None:
+            try:
+                from ga_hls.lang.analysis import formula_size, formula_depth, collect_vars
+            except ImportError:
+                from .lang.analysis import formula_size, formula_depth, collect_vars
+
+            print("seed_ast size:", formula_size(self.seed_ast))
+            print("seed_ast depth:", formula_depth(self.seed_ast))
+            print("seed_ast vars:", sorted(collect_vars(self.seed_ast)))
 
         self.target_sats = int(target_sats)
         self.target_mutation = False
@@ -117,7 +152,6 @@ class GA(object):
 
         self.init_log(curr_path)
         self.init_population()
-        self.s, self.e = self.get_line('ga_hls')
         self.execution_report = {'TOTAL': 0}
 
         self.SW = Smith_Waterman()
@@ -129,9 +163,6 @@ class GA(object):
         self.unknown = []
         self.entire_dataset = []  # collects sats/unsats/unknown for diagnostics
 
-        # self.diag = diagnosis.Diagnosis()
-        # self.seed = treenode.parse(json.loads('["ForAll",[["s"],["Implies",[["And",[[">",["s",0]],["<",["s",10]]]],["And",[["<",["signal_4(s)",1000]],[">=",["signal_2(s)",-15.27]]]]]]]]'))
-
         name = self.copy_temp_file(self.path)
         defs.FILEPATH = name
         defs.FILEPATH2= name
@@ -139,6 +170,19 @@ class GA(object):
         # print(f'Runnnig script {name}')
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             f.write(f'\t{defs.FILEPATH}\n')
+
+
+    def _progress(self, iterable, desc: str = ""):
+        """
+        Wrap an iterable in a tqdm progress bar if available; otherwise return
+        the iterable unchanged. Used to avoid spamming 'evaluating  0' logs.
+        """
+        if tqdm is not None:
+            return tqdm(iterable, desc=desc, leave=False)
+        else:
+            if desc:
+                print(desc)
+            return iterable
 
     def print_seed_ast(self):
         """Print the AST representation of the seed formula, if available."""
@@ -212,8 +256,7 @@ class GA(object):
         print(f'terminators = {terminators}')
 
         self.checkin('mutation_timestamp')
-        for i in range(0, self.size):
-            print(i)
+        for i in self._progress(range(self.size), desc="Initializing population"):
             # Each chromosome starts from the same tree + AST seed
             chromosome = deepcopy(Individual(root, terminators, self.seed_ast))
             chromosome.mutations = deepcopy(self.mutations)
@@ -240,50 +283,6 @@ class GA(object):
         except OSError as error:
             print(error)
 
-    def show(self):
-        self.evaluate()
-        self.population.sort(key=lambda x: x.fitness)
-        print(f"Best solution so far have fitness = {self.population[0].fitness}")
-        print(f"Best solution has {self.count_distinct_edges(self.population[0])} against all {len(self.graph.edges())} edges")
-        print("Best solution = ", self.population[0])
-        print("Paths")
-        for i in range(self.ncars):
-            car = self.population[0].paths[i]
-            print('->'.join([str(x.name) for x in car.path]))
-
-    def get_line(self, file):
-        # print(f'Running on {os.getcwd()} folder')
-        file_path = defs.FILEPATH
-        # file_path = f'{self.path}/z3check.py'
-        newf_str = ''
-        print(f'Running on {file_path} folder')
-        with open(file_path) as f:
-            f.seek(0, 0)
-            for l in f:
-                if l.find('z3solver.check') > 0:
-                    break
-                else:
-                    newf_str += l
-            # print(f'py file seek at = {len(newf_str)}')
-            d1 = newf_str.rfind('\t')
-            d2 = newf_str[1:d1-1].rfind('\t')
-            # print(f'py file seek at = {d2}')
-            self.first = newf_str
-            return d2, newf_str.rfind('\n')
-
-    def save_file(self, s, e, nline):
-        src = defs.FILEPATH
-        # src =  f'{self.path}/z3check.py'
-        dst = f'{self.path}/temp.py'
-        # print(f'Running on {defs.FILEPATH} folder')
-        with open(src) as firstfile, open(dst,'w') as secondfile:
-            firstfile.seek(e)
-            secondfile.write(self.first[:s])
-            secondfile.write('\n\n')
-            secondfile.write(f'\tz3solver.add({nline})\n')
-            for l in firstfile:
-                secondfile.write(l)
-
     def copy_temp_file(self, folder_path):
         lines = []
         with open(defs.FILEPATH2,'r') as file:
@@ -296,144 +295,6 @@ class GA(object):
             for l in lines:
                 file.write(l)
         return f'{folder_path}/{filename}'
-
-    def test_chromosome(self, chromosome):
-        # print(f'writing test for: {str(chromosome)}')
-        def find_traces_in_file(file_path = defs.FILEPATH2):
-            print(f'Running on {os.getcwd()} folder')
-            print(f'Running on {file_path} folder')
-            newf_str1 = ''
-            newf_str2 = ''
-            with open(file_path) as f:
-                for l in f:
-                    if l.find('z3solver.check') > 0:
-                        break
-                    else:
-                        newf_str2 += l
-                f.seek(0, 0)
-                for l in f:
-                    if l.find('z3solver.add') > 0:
-                        break
-                    else:
-                        newf_str1 += l
-                print(f'py file seek at = {len(newf_str1)}')
-                d1 = newf_str2.rfind('\n')
-                d2 = newf_str2[1:d1-1].rfind('\t')
-                print(f'py file seek at = {d2}')
-                self.first = newf_str1
-                return newf_str1.rfind('\n'), d2
-        def save_z3check(s, e, nline):
-            src = defs.FILEPATH2
-            file = f'{self.path}/z3check.py'
-            print(f'Running on {file} folder')
-            form_line = ''
-            newf_str2 = ''
-            newf_str3 = ''
-            with open(file,'r+') as z3check_file:
-                for l in z3check_file:
-                    if l.find('z3solver.check') > 0:
-                        # form_line = l
-                        print('found: '+l)
-                        break
-                    else:
-                        newf_str2 += l
-                d1 = newf_str2.rfind('\n')
-                d2 = newf_str2[1:d1-1].rfind('\n')
-            with open(file,'r+') as z3check_file:
-                for l in z3check_file:
-                    if l.find('z3solver.check') > 0:
-                        # form_line = l
-                        print('found: '+l)
-                        break
-                    else:
-                        newf_str3 += l
-                newf_str2 = newf_str2[1:d2]
-                z3check_file.seek(0, 0)
-                print(newf_str2)
-                z3check_file.write('\n')
-                z3check_file.write(newf_str2)
-                form_line = (f'\tz3solver.add({nline})\n')
-                print(form_line)
-                z3check_file.write(form_line)
-                z3check_file.write('\n')
-                # for l in z3check_file:
-                #     z3check_file.write(l)
-                # z3check_file.seek(0, 0)
-                # firstfile.seek(0, 0)
-
-        def get_file_w_traces(file_path = defs.FILEPATH2):
-            s = e = -1
-            lines = []
-            with open(file_path) as f:
-                for l in f:
-                    lines.append(l)
-            # print('lines')
-            for idx, l in enumerate(lines):
-                if l.find('z3solver.add') >= 0:
-                    # print(idx, l)
-                    s = idx
-                    break
-            for idx, l in enumerate(lines):
-                # print(l, l.find('z3solver.check'))
-                if l.find('z3solver.check') >= 0:
-                    # print(idx, l)
-                    e = idx
-                    break
-            # print('lines')
-            return s, e, lines
-        
-        def save_check_wo_traces(start, end, lines, nline, file_path = 'ga_hls/z3check.py'):
-            before = lines[:start]
-            after = lines[end:]
-            with open(file_path,'w') as z3check_file:
-                for l in before:
-                    z3check_file.write(l)
-                form_line = (f'\tz3solver.add({nline})\n')
-                z3check_file.write('\n')
-                # print(form_line)
-                z3check_file.write(form_line)
-                z3check_file.write('\n')
-                for l in after:
-                    z3check_file.write(l)
-
-        def reset_file(path):
-            f = open(path, 'r')
-            f.seek(0, 0)
-            f.close()
-
-        # s, e = find_traces_in_file()
-        # save_z3check(s, e, f'Not({chromosome.format()})')
-
-        new_file = self.copy_temp_file(self.path)
-        raise("")
-        start, end, lines = get_file_w_traces(new_file)
-        save_check_wo_traces(start, end, lines, f'Not({chromosome.format()})', new_file)
-        reset_file(defs.FILEPATH2)
-        reset_file(new_file)
-
-        # folder_name = 'ga_hls'
-        folder_name = self.path
-        run_str = f'python3 {folder_name}/z3check.py'
-        run_tk = shlex.split(run_str)
-        run_process = subprocess.run(run_tk,
-                                     stderr=subprocess.PIPE,
-                                     stdout=subprocess.PIPE,
-                                     universal_newlines=True,
-                                     timeout=100)
-        # print(run_process.stdout)
-        if run_process.stdout.find('SATISFIED') > 0:
-            # print('Chromosome not viable')
-            return True
-        elif run_process.stdout.find('VIOLATED') > 0:
-            # print('Chromosome viable')
-            return True
-        else:
-            # print('Chromosome not viable')
-            return False
-        return
-
-    def get_best(self):
-        return self.population[0]
 
     def write_population(self, generation):
         with open('{}/{:0>2}.txt'.format(self.path, generation), 'w') as f:
@@ -455,33 +316,6 @@ class GA(object):
         with open(f"{self.path}/report.json", "w") as outfile:
             outfile.write(json_object)
 
-    def clusterize(self, generation):
-        # this method applies the SW algorithm to all formulas
-        results = []
-        score_matrix = [[0 for x in range(self.size)] for y in range(self.size)]
-        labels = []
-        SW = Smith_Waterman()
-        for idx, el in enumerate(self.population):
-            labels.append('{:0>2}{}'.format(idx,'T' if el.madeit == 'True' else 'F'))
-        for i, c1 in enumerate(self.population):
-            for j, c2 in zip(range(i+1, self.size), self.population[i+1:]):
-                new_result = SW.compare(list(c1), list(c2), i, j)
-                score_matrix[j][i] = score_matrix[i][j] = new_result.traceback_score
-                results.append(new_result)
-        # return list(sorted(results, reverse = True)), score_matrix
-
-        hypot = [float('inf'), '']
-        ## write dendrogram
-        Z = create_dendrogram('{}/sw_ga_{:0>2}'.format(self.path, generation), score_matrix, labels, inverse_score=True)
-        if Z is not None:
-            for idx, el in enumerate(self.population):
-                if el.madeit == 'True': #and Z[idx-1][2] < 0.0333:
-                    print(f'{idx}: {Z[idx-1][2]}: {el}')
-                    self.hypots.append([Z[idx-1][2], el])
-                    # if hypot[0] > Z[idx-1][2]:
-                    #     hypot = [Z[idx-1][2], el]
-            # self.hypots.append(hypot)
-
     def generate_dataset_qty(self):
         res = []
         [res.append(x) for x in self.population if x not in res]
@@ -491,13 +325,6 @@ class GA(object):
         print(f'\nWe have so far {len(self.sats)} satisfied')
         print(f'and {len(self.unsats)} unsatisfied')
         print(f'and {len(self.unknown)} unknown')
-
-    def generate_dataset_threshold(self):
-        res = []
-        [res.append(x) for x in self.population if x not in res]
-        [self.unknown.append(x) for x in self.population if (x not in self.unknown) and (x.madeit == 'Unknown')]
-        [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
-        [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.sw_score > SW_THRESHOLD) and (x.madeit == 'True')]
 
     def build_attributes(self, formulae: list):
         count_op = {
@@ -765,59 +592,6 @@ class GA(object):
                 f.write(ch_str[:-1])
                 f.write(f",{chromosome.madeit.upper()}\n")
 
-    # def dist2VF(self, generation):
-    #     res = []
-    #     [res.append(x) for x in self.population if x not in res]
-    #     # print(res)
-        
-    #     sats = []
-    #     unsats = []
-    #     for chromosome in res:
-    #         if chromosome.madeit == False:
-    #             unsats.append(chromosome)
-    #         else:
-    #             sats.append(chromosome)
-
-    #     # print(sats)
-    #     # print(unsats)
-
-    #     sats.sort(key=lambda x : x.sw_score, reverse=True)
-    #     unsats.sort(key=lambda x : x.sw_score, reverse=True)
-
-    #     per20 = int(POPULATION_SIZE * .20)
-    #     if len(sats) > per20:
-    #         sats = sats[:per20]
-    #     if len(unsats) > per20:
-    #         unsats = unsats[:per20]
-
-    #     with open('{}/{:0>2}_pareto.txt'.format(self.path, generation), 'w') as f:
-    #         f.write('Formula\tSW_Score\tSatisfied\n')
-    #         f.write('SEED: ')
-    #         f.write(str(self.seed_ch))
-    #         f.write(f'\t-')
-    #         f.write(f'\t-')
-    #         f.write('\n')
-    #         for i, chromosome in enumerate(sats):
-    #             f.write('{:0>2}'.format(i)+': ')
-    #             f.write(str(chromosome))
-    #             f.write(f'\t{chromosome.sw_score}')
-    #             f.write(f'\t{chromosome.madeit}')
-    #             f.write('\n')
-    #         f.write('\n')
-    #         f.write('\n')
-    #         for i, chromosome in enumerate(unsats):
-    #             f.write('{:0>2}'.format(i)+': ')
-    #             f.write(str(chromosome))
-    #             f.write(f'\t{chromosome.sw_score}')
-    #             f.write(f'\t{chromosome.madeit}')
-    #             f.write('\n')
-    #     json_object = json.dumps(self.execution_report, indent=4)
-    #     with open(f"{self.path}/report.json", "w") as outfile:
-    #         outfile.write(json_object)
-
-    def pool(self):
-        return deepcopy(self.population[random.randint(0, 32767) % PARENTS_TO_BE_CHOSEN])
-
     def roulette_wheel_selection(self):
         population_fitness = sum([chromosome.fitness for chromosome in self.population])
         if population_fitness == 0:
@@ -832,8 +606,6 @@ class GA(object):
             evolved = (len(self.sats)+len(self.unsats)) >= self.target_sats
         else:
             evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
-        # max_allowed = self.generation_counter < MAX_ALLOWABLE_GENERATIONS
-        # print(f"{self.count_distinct_edges(self.population[0])} < {len(self.graph.edges())} = {evolved}")
         return (evolved)
 
     def checkin(self, logtype: str):
@@ -865,7 +637,7 @@ class GA(object):
         self.evaluate()
         self.checkout('tracheck_timestamp')
         
-        while not self.check_evolution():
+        while (not self.check_evolution()) and (self.generation_counter < self.max_generations):
             self.checkin('mutation_timestamp')
         # for i in range(MAX_ALLOWABLE_GENERATIONS):
         # for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
@@ -881,7 +653,7 @@ class GA(object):
             terminators = list(set(treenode.get_terminators(self.seed)))
             
             population_counter = CHROMOSOME_TO_PRESERVE
-            while(population_counter < POPULATION_SIZE):
+            while(population_counter < self.size):
                 offspring1 = self.roulette_wheel_selection()
                 offspring2 = self.roulette_wheel_selection()
 
@@ -970,96 +742,82 @@ class GA(object):
                 l.append(tk)
         return l
 
-    def diagnosis(self):
-        return
-        hypots = []
-        for hypot in self.hypots:
-            hypots.append(list(hypot[1]))
+    def save_file(self, nline: str):
+        """
+        Create self.path/temp.py by copying the original property script
+        (defs.FILEPATH) and replacing the property z3solver.add(Not(ForAll(...)))
+        line with the given expression.
 
-        # if len(hypots) == 0:
-        length = len(hypots[0])
-        aux = np.array(hypots)
-        aux = aux.transpose()
-        d = {}
-        for i in range(len(aux)):
-            d[i] = {}
-            # print(list(aux[i]))
-            for j in range(len(list(aux[i]))):
-                # print(aux[i][j].value)
-                val = deepcopy(aux[i][j].value)
-                d[i][list(aux[i]).count(val)] = val
-        # print(json.dumps(d))
-        diag = []
-        for pos in d:
-            keys = list(d[pos].keys())
-            keys.sort(reverse=True)
-            diag.append(d[pos][keys[0]])
-        print(diag)
+        This preserves the order of interval_t / conditions_t definitions.
+        """
+        src = defs.FILEPATH
+        dst = f"{self.path}/temp.py"
+
+        with open(src, "r") as f:
+            lines = f.readlines()
+
+        # First, try to replace the specific property line:
+        #   z3solver.add(Not(ForAll([t], Implies(interval_t, conditions_t))))
+        new_lines = []
+        replaced = False
+        marker = "z3solver.add(Not(ForAll"
+
+        for line in lines:
+            if (marker in line) and not replaced:
+                # Preserve existing indentation
+                indent = line[: len(line) - len(line.lstrip())]
+                new_lines.append(f"{indent}z3solver.add({nline})\n")
+                replaced = True
+            else:
+                new_lines.append(line)
+
+        # If that exact marker wasn't found (different property shape),
+        # fall back to replacing the first z3solver.add(...) in the file.
+        if not replaced:
+            new_lines = []
+            replaced = False
+            for line in lines:
+                if ("z3solver.add" in line) and not replaced:
+                    indent = line[: len(line) - len(line.lstrip())]
+                    new_lines.append(f"{indent}z3solver.add({nline})\n")
+                    replaced = True
+                else:
+                    new_lines.append(line)
+
+        if not replaced:
+            raise RuntimeError(f"Could not find a z3solver.add(...) line in {src}")
+
+        with open(dst, "w") as f:
+            f.writelines(new_lines)
 
     def evaluate(self):
-        idx = 0
-        for chromosome in self.population:
-        # for chromosome in tqdm(self.population):
-            print('evaluating ', idx)
-            idx = 1+idx
+        for idx, chromosome in enumerate(self._progress(self.population, desc=f"Evaluating gen {getattr(self, 'generation_counter', 0)}")
+):
             if chromosome.fitness != -1:
                 continue
 
-            # self.test_chromosome(chromosome)
-            # print(f'Chromosome {chromosome.format()}')
-            # if self.test_chromosome(chromosome) == False:
-            #     continue
-            # print(f'self.s={self.s}, self.e={self.e}')
-            self.save_file(self.s, self.e, f'Not({chromosome.format()})')
+            self.save_file(f'Not({chromosome.format()})')
 
-            # folder_name = 'ga_hls'
-            folder_name = self.path
-            run_str = f'python3 {folder_name}/temp.py'
-            run_tk = shlex.split(run_str)
-            err = ''
-            try:
-                run_process = subprocess.run(run_tk,
-                                             stderr=subprocess.PIPE,
-                                             stdout=subprocess.PIPE,
-                                             universal_newlines=True,
-                                             timeout=60*60)
-                # print(f'Not({chromosome.format()})')
-                # print(f'Chromosome {chromosome.format()}')
-                # print(run_process.stdout)
-                # print(run_process.stderr)
-                if len(run_process.stderr) > 0:
-                    errorn = run_process.stderr.find('Error:')
-                    if errorn == -1:
-                        errorn = run_process.stderr.find('Exception:')
-                    newln = run_process.stderr[:errorn].rfind('\n')
-                    err = run_process.stderr[newln+1:-1]
+            script_path = Path(self.path) / "temp.py"
+            err = ""
+
+            result = run_property_script(script_path, timeout=60 * 60)
+
+            # Decide madeit based on harness verdict / output
+            if result.verdict == Verdict.SAT:
+                chromosome.madeit = "True"
+            elif result.verdict == Verdict.UNSAT:
+                chromosome.madeit = "False"
+            else:
+                # ERROR or unknown: try to classify as UNDECIDED if possible
+                out = (result.stdout or "") + (result.stderr or "")
+                if "UNDECIDED" in out:
+                    chromosome.madeit = "Unknown"
+                    err = "REQUIREMENT UNDECIDED"
                 else:
-                    errorn = run_process.stdout.find('REQUIREMENT')
-                    err = run_process.stdout[errorn:-1]
-
-
-                if run_process.stdout.find('SATISFIED') > 0:
-                    chromosome.madeit = 'True'
-                    # self.check_highest_sat(chromosome)
-                elif run_process.stdout.find('VIOLATED') > 0:
-                    chromosome.madeit = 'False'
-                elif run_process.stdout.find('UNDECIDED') > 0:
-                    chromosome.madeit = 'Unknown'
-                else:
-                    print(run_process.stdout)
-                    print(run_process.stderr)
-                    chromosome.madeit = 'Problem'
-            except subprocess.CalledProcessError as e:
-                print("An exception occurred")
-                print(e.output)
-            except subprocess.TimeoutExpired as e:
-                print("Trace checker timed out. Unedcided requirement")
-                print(f'Chromosome {chromosome.format()}')
-                print(e.output)
-                # print(run_process.stdout)
-                # print(run_process.stderr)
-                chromosome.madeit = 'Unknown'
-                err = 'REQUIREMENT UNDECIDED'
+                    print(result.stdout)
+                    print(result.stderr)
+                    chromosome.madeit = "Problem"
 
             if chromosome.madeit == 'Problem':
                 # When we cannot evaluate the chromosome set fitness to zero and evaluate next chromosome
@@ -1097,24 +855,28 @@ class GA(object):
 
     def crossover(self, parent1: Individual, parent2: Individual):
         offsprings = [parent1, parent2]
-        # print(f'{offsprings[0]}:\tParent 1 lenght: {len(offsprings[0])} \n{offsprings[1]}:\tParent 2 lenght: {len(offsprings[1])}')
-        # if False: # len(offsprings[0]) != len(offsprings[1]):
-        #     raise ValueError("Error in crossover: offsprings[0] and offsprings[1] lenght does not match: {} != {}.\n{}\n{}" \
-        #         .format(len(offsprings[0].root), len(offsprings[1].root), offsprings[0], offsprings[1]))
-        # else:
-        cut_idx = random.randint(1, len(offsprings[0])-2) if len(offsprings[0]) < len(offsprings[1]) else random.randint(1, len(offsprings[1])-2)
+
+        # Guard: if either offspring is too short, skip crossover.
+        min_len = min(len(offsprings[0]), len(offsprings[1]))
+        if min_len <= 2:
+            # Nothing sensible to cross; return parents as-is.
+            return offsprings
+
+        # Choose a cut index that is valid for both trees.
+        cut_idx = random.randint(1, min_len - 2)
 
         try:
             off0_tree, off0_sub, node0 = offsprings[0].root.cut_tree(cut_idx)
             off1_tree, off1_sub, node1 = offsprings[1].root.cut_tree(cut_idx)
-        except Exception as e:
-            # print(e)
+        except Exception:
+            # If cut_tree fails for any reason, fall back to unmodified parents.
             return offsprings
 
         node0 += off1_sub
         node1 += off0_sub
 
         return offsprings
+
 
     def j48(self, arff_file, qty):
         # filename_str = '{}/dataset_qty_{}_per{}.arff'.format(self.path, self.now, int(per_cut*100))
@@ -1288,67 +1050,3 @@ class SW_Result(object):
 
     def __eq__(self, result_2):
         return self.traceback_score == result_2.traceback_score
-
-# this method is used to create the dendrogram that shows which CBs are closer to each other
-def create_dendrogram (filename, distance_matrix, labels, inverse_score):
-    condensed_matrix = []
-    
-    matplotlib.rc('xtick', labelsize=20) 
-    matplotlib.rc('ytick', labelsize=20) 
-
-    # condenses the distance matrix into one dimension, according if the score needs to be inversed or not
-    # that is, if the higher the score the more similar the elements, the score needs to be inversed (i.e., 1/score)
-    # so that the most similar elements have a lower score among them
-    if inverse_score == True:
-        for i in range(len(distance_matrix)):
-            for j in range(i+1, len(distance_matrix)):
-                if distance_matrix[i][j] == 0:
-                    condensed_matrix.append(1.0)
-                else:
-                    condensed_matrix.append(1.0 / distance_matrix[i][j])
-
-    else:
-        for i in range(len(distance_matrix)):
-            for j in range(i+1, len(distance_matrix)):
-                condensed_matrix.append(distance_matrix[i][j])
-
-    figs = []
-    # linkage methods considered
-    # methods = ['ward', 'centroid', 'single', 'complete', 'average']
-    methods = ['complete']
-
-    # draws one dendrogram for each linkage method
-    # and the distance used is:
-    #                     |-> 0,                   if c1 = c2
-    #  dist (c1, c2) =    |-> 1,                   if SW(c1, c2) = 0
-    #                     |-> 1 / SW(c1, c2),      otherwise.
-    #
-    # if the score inverse_score == True. If inverse_score == False, the distance used is the Levenshtein distance.
-
-    for method in methods:
-        Z = linkage(condensed_matrix, method)
-        # print(method)
-        fig = plt.figure(figsize=(25, 10))
-        fig.suptitle(method, fontsize=20, fontweight='bold')
-        dn = dendrogram(Z, leaf_font_size=20, labels=labels)
-        # if method == 'complete':
-        #     # i = 0
-        #     for i, l in enumerate(Z):
-        #         print(f'{i+1}: {l}')
-
-        #     print(dn)
-        figs.append(fig)
-
-    try:
-        # exports each dendrogram drawn in a separate page in the pdf
-        # pdf = PdfPages(str("dendro_for_" + filename + ".pdf"))
-        pdf = PdfPages(str(filename + ".pdf"))
-        for fig in figs:
-            pdf.savefig(fig)
-        pdf.close()
-        return Z
-    except Exception as e:
-        print(e)
-        print("ERROR: unable to create output file with dendrogram.")
-        # quit()
-        return None
