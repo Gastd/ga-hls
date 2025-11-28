@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from copy import deepcopy
+from typing import Optional
 
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -33,6 +34,8 @@ from .individual import (
     FUNC,
 )
 from .diagnosis import Diagnosis
+from .lang.internal_parser import parse_internal_obj
+from .lang.ast import Formula
 
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
@@ -99,6 +102,15 @@ class GA(object):
         curr_path = os.getcwd()
         self.init_form = init_form
 
+        # AST view of the seed formula
+        self.seed_ast: Optional[Formula]
+        try:
+            self.seed_ast = parse_internal_obj(self.init_form)
+        except Exception as exc:
+            # Do not break GA if the AST view fails; just log and continue
+            print(f"[ga-hls] Warning: failed to build seed AST: {exc}")
+            self.seed_ast = None
+
         self.target_sats = int(target_sats)
         self.target_mutation = False
         self.check_if_target_is_reachable()
@@ -127,6 +139,13 @@ class GA(object):
         # print(f'Runnnig script {name}')
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
             f.write(f'\t{defs.FILEPATH}\n')
+
+    def print_seed_ast(self):
+        """Print the AST representation of the seed formula, if available."""
+        if self.seed_ast is None:
+            print("No seed AST available.")
+        else:
+            print(self.seed_ast)
 
     def check_if_target_is_reachable(self):
         total_combination = 1
@@ -186,36 +205,27 @@ class GA(object):
         root = treenode.parse(self.init_form)
         self.seed = root
         terminators = list(set(treenode.get_terminators(root)))
-        self.seed_ch = deepcopy(Individual(root, terminators))
+
+        # Seed individual has both tree and AST
+        self.seed_ch = deepcopy(Individual(root, terminators, self.seed_ast))
         self.seed_ch.show_idx()
         print(f'terminators = {terminators}')
-        # print(f'Initial formula: {root}')
-        # for i in tqdm(range(0, self.size)):
+
         self.checkin('mutation_timestamp')
         for i in range(0, self.size):
             print(i)
-            chromosome = deepcopy(Individual(root, terminators))
+            # Each chromosome starts from the same tree + AST seed
+            chromosome = deepcopy(Individual(root, terminators, self.seed_ast))
             chromosome.mutations = deepcopy(self.mutations)
-            # print(f'chromosome.mutations = {chromosome.mutations}')
+
             n = random.randrange(len(root))
             if self.force_mutation:
                 chromosome.force_mutate(list(self.mutations.keys()), n)
             else:
                 chromosome.mutate(1, n)
-            # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
-            # while not chromosome.is_viable(self.path):
-            #     chromosome = deepcopy(Individual(root, terminators))
-            #     chromosome.mutations = deepcopy(self.mutations)
-            #     if self.force_mutation:
-            #         chromosome.force_mutate(list(self.mutations.keys()), random.randrange(len(chromosome)))
-            #     else:
-            #         chromosome.mutate(1, random.randrange(len(chromosome)))
-            #     # print(f"{i}: chromosome {chromosome} is {'viable' if chromosome.is_viable(self.path) else 'not viable'}")
-            # print((chromosome.arrf_str()))
-            # print(str(chromosome))
+
             self.population.append(deepcopy(chromosome))
         self.checkout('mutation_timestamp')
-        # raise Excevzption('')
         print("Population initialized. Size = {}".format(self.size))
 
     def init_log(self, parent_dir):

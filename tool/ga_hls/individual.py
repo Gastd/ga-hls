@@ -5,6 +5,9 @@ import random
 import subprocess
 
 from . import treenode, defs
+from .lang.ast import Formula
+from .lang.internal_encoder import InternalEncodeError, formula_to_internal_obj
+from .mutation import MutationConfig, mutate_formula
 
 MUTATION_NODES = 5
 MUT_IDXS =[4, 7]
@@ -44,11 +47,12 @@ def choose_mutation(function):
 
 class Individual():
     """docstring for Individual"""
-    def __init__(self, formula_root: treenode.Node, terminators):
+    def __init__(self, formula_root: treenode.Node, terminators, formula_ast=None):
         if formula_root is None:
             raise Exception(f"{self.__class__.__name__} error: Input formula cannot be empty")
 
         self.root = formula_root
+        self.ast: Optional[Formula] = formula_ast
         self.fitness = -1
         self.term = self.check_terminators(terminators)
         self.madeit = 'Unknown'
@@ -64,6 +68,16 @@ class Individual():
     #         return None, None
     #     else:
     #         return max(t_list), min(t_list)
+    def _sync_root_from_ast(self):
+        """
+        Refresh the legacy treenode representation (`self.root`) from the AST.
+        """
+        if self.ast is None:
+            return
+
+        internal = formula_to_internal_obj(self.ast)
+        self.root = treenode.parse(internal)
+
 
     def copy_temp_file(self, folder_path):
         lines = []
@@ -176,6 +190,23 @@ class Individual():
 
     # @check_call
     def mutate(self, rate: float, nmutations=MUTATION_NODES):
+        """
+        Default mutation operator.
+        """
+        # AST-based mutation path
+        if self.ast is not None:
+            # Map the "number of mutations" to our AST config.
+            cfg = MutationConfig(max_mutations=max(1, int(nmutations)))
+
+            # We deliberately ignore `rate` here and treat `max_mutations`
+            # as the main knob, roughly analogous to the old loop count.
+            self.ast = mutate_formula(self.ast, cfg)
+
+            # Keep the legacy tree representation in sync
+            self._sync_root_from_ast()
+            return
+
+        # -- Legacy Mutation: used only if chosen explicitely --# 
         for _ in range(0, nmutations):
             if (random.random() < rate):
                 mut_idx = random.randrange(len(self.root))
