@@ -28,7 +28,7 @@ dependencies = [
 ga-hls = "ga_hls.cli:main"
 
 [tool.setuptools]
-packages = ["ga_hls"]
+packages = ["ga_hls", "ga_hls.lang"]
 
 [tool.setuptools.package-dir]
 ga_hls = "tool/ga_hls"

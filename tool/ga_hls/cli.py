@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from .config import ConfigError, load_config
+from .lang.analysis import collect_vars, formula_depth, formula_size
+from .lang.internal_parser import InternalFormatError, parse_internal_json
 
 
 def _get_version() -> str:
@@ -19,21 +22,18 @@ def _cmd_run(args: argparse.Namespace) -> int:
     """
     Load and validate a configuration file.
     """
-    config_path = args.config
-
     try:
-        cfg = load_config(config_path)
+        cfg = load_config(args.config)
     except ConfigError as exc:
-        print(f"Configuration error while loading {config_path!r}:")
-        print(f"  {exc}")
+        print(f"Error: {exc}", file=sys.stderr)
         return 1
 
     print("Loaded configuration:")
-    print(f"  requirement_file : {cfg.input.requirement_file}")
-    print(f"  traces_file      : {cfg.input.traces_file}")
-    print(f"  output_dir       : {cfg.input.output_dir}")
+    print(f"  Requirement file : {cfg.input.requirement_file}")
+    print(f"  Traces file      : {cfg.input.traces_file}")
+    print(f"  Output directory : {cfg.input.output_dir}")
     print()
-    print("  GA parameters:")
+    print("  GA configuration:")
     print(f"    population_size: {cfg.ga.population_size}")
     print(f"    generations    : {cfg.ga.generations}")
     print(f"    crossover_rate : {cfg.ga.crossover_rate}")
@@ -41,47 +41,53 @@ def _cmd_run(args: argparse.Namespace) -> int:
     print(f"    elitism        : {cfg.ga.elitism}")
     print(f"    seed           : {cfg.ga.seed}")
     print()
-    print("  Diagnostics:")
-    print(f"    arff_filename  : {cfg.diagnostics.arff_filename}")
-    print(f"    weka_jar       : {cfg.diagnostics.weka_jar}")
-    print(f"    j48_options    : {cfg.diagnostics.j48_options}")
+    print("  Diagnostics configuration:")
+    print(f"    ARFF filename  : {cfg.diagnostics.arff_filename}")
+    print(f"    Weka JAR       : {cfg.diagnostics.weka_jar}")
+    print(f"    J48 options    : {cfg.diagnostics.j48_options}")
 
-    # Basic path checks
-    problems = False
+    # Later we will call the actual GA/diagnostics pipeline from here.
+    return 0
 
-    req_path = Path(cfg.input.requirement_file)
-    traces_path = Path(cfg.input.traces_file)
 
-    if not req_path.is_file():
-        print(f"\nWARNING: requirement file does not exist: {req_path}")
-        problems = True
-    if not traces_path.is_file():
-        print(f"WARNING: traces file does not exist: {traces_path}")
-        problems = True
+def _cmd_inspect_internal(args: argparse.Namespace) -> int:
+    """
+    Inspect an internal JSON list-of-lists formula and print basic AST info.
 
-    out_dir = Path(cfg.input.output_dir)
+    Usage:
+        ga-hls inspect-internal --file path/to/formula.json
+    """
+    path = Path(args.file)
     try:
-        out_dir.mkdir(parents=True, exist_ok=True)
+        text = path.read_text(encoding="utf-8")
     except OSError as exc:
-        print(f"\nERROR: could not create output directory {out_dir}: {exc}")
+        print(f"Error reading {path!s}: {exc}", file=sys.stderr)
         return 1
 
-    if problems:
-        print(
-            "\nConfig loaded, but there were missing input files "
-            "(see warnings above)."
-        )
-        # Treat missing inputs as a non-successful validation for now.
+    try:
+        formula = parse_internal_json(text)
+    except InternalFormatError as exc:
+        print(f"Error parsing internal formula from {path!s}:", file=sys.stderr)
+        print(f"  {exc}", file=sys.stderr)
         return 1
 
-    print("\nConfig validation OK: inputs exist and output directory is ready.")
+    print("Parsed formula:")
+    print(f"  {formula}")
+    print()
+
+    size = formula_size(formula)
+    depth = formula_depth(formula)
+    vars_ = sorted(collect_vars(formula))
+
+    print("AST statistics:")
+    print(f"  Size (nodes): {size}")
+    print(f"  Depth      : {depth}")
+    print(f"  Variables  : {vars_ if vars_ else 'none'}")
+
     return 0
 
 
 def main(argv=None) -> int:
-    """
-    Entry point for the ga-hls command-line interface.
-    """
     parser = argparse.ArgumentParser(
         prog="ga-hls",
         description="ga-hls: GA-based mutation and diagnostics for HLS/ThEodorE requirements.",
@@ -94,26 +100,42 @@ def main(argv=None) -> int:
 
     subparsers = parser.add_subparsers(dest="command")
 
+    # `run` subcommand (config-based pipeline entrypoint, still stubbed)
     run_parser = subparsers.add_parser(
         "run",
-        help="Load and validate a configuration file.",
+        help="Run ga-hls using a JSON config file (currently: load & summarize).",
     )
     run_parser.add_argument(
-        "-c",
         "--config",
         required=True,
         help="Path to a JSON configuration file.",
     )
 
+    # `inspect-internal` subcommand
+    inspect_parser = subparsers.add_parser(
+        "inspect-internal",
+        help="Inspect an internal JSON list-of-lists formula.",
+    )
+    inspect_parser.add_argument(
+        "--file",
+        required=True,
+        help="Path to a file containing the internal JSON formula.",
+    )
+
     args = parser.parse_args(argv)
 
-    if args.version:
+    # Global --version only (no subcommand)
+    if args.version and args.command is None:
         print(_get_version())
         return 0
 
     if args.command == "run":
         return _cmd_run(args)
 
+    if args.command == "inspect-internal":
+        return _cmd_inspect_internal(args)
+
+    # No subcommand: show help
     parser.print_help()
     return 0
 

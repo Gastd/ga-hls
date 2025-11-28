@@ -8,3 +8,4 @@ ga_hls/z3check.py
 .DS_Store
 */.DS_Store
 ga_hls.egg-info/
+tmp/
