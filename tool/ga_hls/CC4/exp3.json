@@ -1,5 +1,0 @@
-{
-    "0": ["op", ["ForAll", "Exists"]],
-    "4": ["op", ["ForAll", "Exists"]],
-    "7": ["float", [6.0, 10.0]]
-}
