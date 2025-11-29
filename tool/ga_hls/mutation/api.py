@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, Iterable, List, Optional, Tuple
 
 from ga_hls.lang.ast import (
@@ -42,6 +42,13 @@ class MutationConfig:
     enable_logical_flip: bool = True
     enable_quantifier_flip: bool = True
 
+    # restrict *which* node indices are allowed to mutate
+    # (preorder indices from _walk(formula))
+    allowed_positions: Optional[Set[int]] = None
+
+    # numeric bounds per node index: idx -> (min, max)
+    numeric_bounds: Dict[int, Tuple[float, float]] = field(default_factory=dict)
+
     # How aggressively to perturb numeric constants. We reuse the idea of
     # "order of magnitude" steps from individual.get_new_term.
     int_magnitude_jitter: float = 1.0
@@ -73,12 +80,23 @@ def mutate_formula(formula: Formula, cfg: MutationConfig, rng: Optional[random.R
     if not nodes:
         return formula
 
+    # Build the candidate index set, respecting cfg.allowed_positions if set
+    all_indices = list(range(len(nodes)))
+    if cfg.allowed_positions is not None:
+        candidate_indices = [i for i in all_indices if i in cfg.allowed_positions]
+    else:
+        candidate_indices = all_indices
+
+    if not candidate_indices:
+        # Nothing is allowed to mutate
+        return formula
+
     # Choose positions to mutate (without replacement)
-    max_muts = min(cfg.max_mutations, len(nodes))
+    max_muts = min(cfg.max_mutations, len(candidate_indices))
     if max_muts <= 0:
         return formula
 
-    positions = rng.sample(range(len(nodes)), k=max_muts)
+    positions = rng.sample(candidate_indices, k=max_muts)
 
     # We implement mutation by a single pass rebuild where we keep a counter
     # of visited nodes and mutate at the chosen indices.
@@ -163,22 +181,40 @@ def _mutate_by_positions(
 
         # Maybe mutate at this position
         if here in target_positions:
-            new_node = _mutate_node(new_node, cfg, rng)
+            new_node = _mutate_node(new_node, cfg, rng, here)
 
         return new_node
 
     return rebuild(f)
 
 
-def _mutate_node(node: Formula, cfg: MutationConfig, rng: random.Random) -> Formula:
+def _mutate_node(node: Formula, cfg: MutationConfig, rng: random.Random, idx: int) -> Formula:
     """
     Mutate a single node, depending on its type and the config.
     """
     # Numeric perturbation for constants
     if cfg.enable_numeric_perturbation and isinstance(node, IntConst):
-        return _mutate_int_const(node, cfg, rng)
+        new_val = _mutate_int_const(node, cfg, rng).value
+        # If bounds exist for this position, clamp/enforce them
+        bounds = cfg.numeric_bounds.get(idx)
+        if bounds is not None:
+            lo, hi = bounds
+            if new_val < lo:
+                new_val = lo
+            elif new_val > hi:
+                new_val = hi
+        return RealConst(new_val)
     if cfg.enable_numeric_perturbation and isinstance(node, RealConst):
-        return _mutate_real_const(node, cfg, rng)
+        new_val = _mutate_real_const(node, cfg, rng).value
+        # If bounds exist for this position, clamp/enforce them
+        bounds = cfg.numeric_bounds.get(idx)
+        if bounds is not None:
+            lo, hi = bounds
+            if new_val < lo:
+                new_val = lo
+            elif new_val > hi:
+                new_val = hi
+        return RealConst(new_val)
 
     # Operator flips
     if cfg.enable_relop_flip and isinstance(node, RelOp):
