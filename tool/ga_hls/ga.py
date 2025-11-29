@@ -63,7 +63,7 @@ SCALE = 0.5
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self,init_form,mutations=None,target_sats: int = 2, population_size: int | None = None, max_generations: int | None = None, seed: int | None = None, fitness: Fitness | None = None
+    def __init__(self,init_form,mutations=None,target_sats: int = 2, population_size: int | None = None, max_generations: int | None = None, seed: int | None = None, fitness: Fitness | None = None, output_root: str
     ):
         super(GA, self).__init__()
 
@@ -114,7 +114,9 @@ class GA(object):
         self.highest_sat = None
         self.population = []
         self.now = datetime.datetime.now()
-        curr_path = os.getcwd()
+        self.output_root = Path(output_root)
+        self.init_log(self.output_root)
+
         self.init_form = init_form
 
         # AST view of the seed formula
@@ -143,7 +145,6 @@ class GA(object):
         self.target_mutation = False
         self.check_if_target_is_reachable()
 
-        self.init_log(curr_path)
         self.init_population()
         self.execution_report = {'TOTAL': 0}
 

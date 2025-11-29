@@ -34,9 +34,14 @@ def build_ga_from_config(cfg: Config) -> GA:
     """
     # 1) Load the formula as a typed AST from the ThEodorE property file.
     formula_ast = load_formula_from_property(cfg.input.requirement_file)
+ 
+    # 1.1) Load output directory
+    output_root = Path(cfg.input.output_dir)
+    output_root.mkdir(parents=True, exist_ok=True)
 
     # 2) Encode the AST into the legacy internal format GA expects (list-of-lists).
     init_form = formula_to_internal_obj(formula_ast)
+
 
     # 3) Build the GA instance. We keep `target_sats` at its default (2) for now
     #    to preserve existing semantics; if you later add a `target_sats` field
@@ -47,6 +52,7 @@ def build_ga_from_config(cfg: Config) -> GA:
         population_size=cfg.ga.population_size,
         max_generations=cfg.ga.generations,
         seed=cfg.ga.seed,
+        output_root=output_root
     )
 
     return ga
