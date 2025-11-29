@@ -9,7 +9,6 @@
     "generations": 5,
     "crossover_rate": 0.9,
     "mutation_rate": 0.1,
-    "elitism": 2,
     "seed": 42
   },
   "diagnostics": {

@@ -45,25 +45,20 @@ from .harness import run_property_script, Verdict
 from .fitness_smithwaterman import Fitness, SmithWatermanFitness
 from .fitness_smithwaterman import Smith_Waterman as SW
 
-CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
-MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia
-POPULATION_SIZE = 50 #30  ## Must be an EVEN number
-# GENE_LENGTH = 32
-# MAX_ALLOWABLE_GENERATIONS = 1000 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
-# MAX_ALLOWABLE_GENERATIONS = 3 #10 #616 ##Calculated using ALANDER , J. 1992. On optimal population size of genetic algorithms.
-# NUMBER_OF_PARAMETERS = 17 ## Number of parameters to be evolved
-# CHROMOSOME_LENGTH = GENE_LENGTH * NUMBER_OF_PARAMETERS
-CHROMOSOME_TO_PRESERVE = 0 #4            ## Must be an EVEN number
-PARENTS_TO_BE_CHOSEN = 10
-
-SW_THRESHOLD = 35
-FOLDS = 10
-
-SCALE = 0.5
-
 class GA(object):
-    """docstring for GA"""
-    def __init__(self,init_form,mutations=None,target_sats: int = 2, population_size: int | None = None, max_generations: int | None = None, seed: int | None = None, fitness: Fitness | None = None, output_root: str | None = None
+    """GA over requirement formulas with AST-based mutation and harness-backed evaluation."""
+    def __init__(
+        self,
+        init_form,
+        mutations: dict | None = None,
+        target_sats: int = 2,
+        population_size: int | None = None,
+        max_generations: int | None = None,
+        crossover_rate: float | None = None,
+        mutation_rate: float | None = None,
+        seed: int | None = None,
+        fitness: Fitness | None = None,
+        output_root: str | None = None,
     ):
         super(GA, self).__init__()
 
@@ -105,11 +100,23 @@ class GA(object):
             self.size = POPULATION_SIZE
 
         # Max generations from config, falling back to legacy constant
-        # (assuming MAX_ALLOWABLE_GENERATIONS is defined in defs)
         if max_generations is not None:
             self.max_generations = int(max_generations)
         else:
             self.max_generations = MAX_ALLOWABLE_GENERATIONS
+
+        # Crossover rate from config, falling back to legacy constant
+        if crossover_rate is not None:
+            self.crossover_rate = crossover_rate
+        else:
+            self.crossover_rate = CROSSOVER_RATE
+        
+        if mutation_rate is not None:
+            self.mutation_rate = mutation_rate
+        else:
+            self.mutation_rate = MUTATION_RATE
+        
+        self.elitism = elitism
 
         self.highest_sat = None
         self.population = []

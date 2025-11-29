@@ -50,7 +50,9 @@ def build_ga_from_config(cfg: Config) -> GA:
         init_form=init_form,
         mutations=cfg.input.mutations if hasattr(cfg.input, "mutations") else None,
         population_size=cfg.ga.population_size,
-        max_generations=cfg.ga.generations,
+        generations=cfg.ga.generations,
+        crossover_rate=cfg.ga.crossover_rate,
+        mutation_rate=cfg.ga.mutation_rate,
         seed=cfg.ga.seed,
         output_root=output_root
     )
