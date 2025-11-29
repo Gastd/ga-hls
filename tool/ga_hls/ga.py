@@ -16,7 +16,6 @@ from typing import Optional
 
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-from scipy.cluster.hierarchy import dendrogram, linkage
 from pathlib import Path
 import matplotlib
 
@@ -35,12 +34,16 @@ from .individual import (
     FUNC,
 )
 from .diagnosis import Diagnosis
+from .diagnostics.j48 import run_j48
+from .diagnostics.arff import write_dataset_all, write_dataset_qty, write_dataset_threshold
+
 from .lang.python_printer import formula_to_python_expr
 from .lang.internal_parser import parse_internal_obj
 from .lang.ast import Formula
 from .harness_script import build_z3check_script
 from .harness import run_property_script, Verdict
 from .fitness_smithwaterman import Fitness, SmithWatermanFitness
+from .fitness_smithwaterman import Smith_Waterman as SW
 
 CROSSOVER_RATE = 0.95 ## Rate defined by Núnez-Letamendia
 MUTATION_RATE = 0.9  ## Rate defined by Núnez-Letamendia
@@ -58,27 +61,9 @@ FOLDS = 10
 
 SCALE = 0.5
 
-
-# defs.FILEPATH = 'ga_hls/prop_ctrl.py'
-# defs.FILEPATH2 = 'ga_hls/prop_ctrl1.py'
-# defs.FILEPATH = 'ga_hls/property_distance_obs_r2.py'
-# defs.FILEPATH2 = 'ga_hls/property_distance_obs_r2.py'
-
-# FILEPATH = 'ga_hls/benchmark/property_01_err_eight.py'
-# FILEPATH2 = 'ga_hls/benchmark/property_01_err_eight.py'
-
-def isfloat(num):
-    try:
-        float(num)
-        return True
-    except ValueError:
-        return False
-
 class GA(object):
     """docstring for GA"""
-    def __init__(self,init_form,mutations=None,target_sats: int = 2,
-        population_size: int | None = None, max_generations: int | None = None, seed: int | None = None,
-        fitness: Fitness | None = None,
+    def __init__(self,init_form,mutations=None,target_sats: int = 2, population_size: int | None = None, max_generations: int | None = None, seed: int | None = None, fitness: Fitness | None = None
     ):
         super(GA, self).__init__()
 
@@ -107,6 +92,12 @@ class GA(object):
         else:
             random.seed()
 
+        # Fitness configuration (default: Smith–Waterman)
+        if fitness is None:
+            self.fitness: Fitness = SmithWatermanFitness()
+        else:
+            self.fitness = fitness
+
         # Population size from config, falling back to legacy constant
         if population_size is not None:
             self.size = int(population_size)
@@ -120,6 +111,7 @@ class GA(object):
         else:
             self.max_generations = MAX_ALLOWABLE_GENERATIONS
 
+        self.highest_sat = None
         self.population = []
         self.now = datetime.datetime.now()
         curr_path = os.getcwd()
@@ -155,7 +147,6 @@ class GA(object):
         self.init_population()
         self.execution_report = {'TOTAL': 0}
 
-        self.check_highest_sat(None)
         self.hypots = []
         self.sats = []
         self.unsats = []
@@ -215,27 +206,9 @@ class GA(object):
             self.target_mutation = True
         return
 
-    def check_highest_sat(self, chromosome):
-        self.max_score += self.SW.compare(list(self.seed), list(self.seed), 0,0).traceback_score
-        self.highest_sat = None
-        return
-        if chromosome is None:
-            self.highest_sat = None
-        else:
-            if self.highest_sat is None:
-                self.highest_sat = chromosome
-                self.max_score += self.SW.compare(list(self.seed), list(self.highest_sat), 0,0).traceback_score
-            else:
-                result_old = self.SW.compare(list(self.seed), list(self.highest_sat), 0,0)
-                result_new = self.SW.compare(list(self.seed), list(chromosome), 0,0)
-                if result_old < result_new:
-                    self.max_score -= result_old.traceback_score
-                    self.highest_sat = chromosome
-                    self.max_score += result_new.traceback_score
-
     def get_max_score(self):
         tokens = self.replace_token(list(self.seed))
-        self.max_score = self.fitness.compute_max_score(tokens)
+        self.max_score = self.fitness.compute_max_score(tokens=tokens)
 
     def set_force_mutations(self, forced: bool):
         self.force_mutation = forced
@@ -254,8 +227,6 @@ class GA(object):
         self.seed_ch.show_idx()
         print(f'terminators = {terminators}')
 
-        # Fitness configuration (default: Smith–Waterman over token sequences)
-        self.fitness: Fitness = fitness or SmithWatermanFitness()
         self.max_score = 0.0
         self.get_max_score()
 
@@ -331,271 +302,27 @@ class GA(object):
         print(f'and {len(self.unsats)} unsatisfied')
         print(f'and {len(self.unknown)} unknown')
 
-    def build_attributes(self, formulae: list):
-        count_op = {
-            'QUANTIFIERS': 0,
-            'RELATIONALS': 0,
-            'EQUALS': 0,
-            'ARITHMETICS': 0,
-            'MULDIV': 0,
-            'EXP': 0,
-            'LOGICALS': 0,
-            'FUNC': 0,
-            'NEG': 0,
-            'IMP': 0,
-            'NUM': 0,
-            'SINGALS': 0,
-            'TERM': 0
-        }
-        terminators = list(set(treenode.get_terminators(self.seed)))
-        terminators = [value for value in terminators if not isinstance(value, int) and not isinstance(value, float)]
-        ret = []
-        for term in formulae:
-            if term in QUANTIFIERS:
-                qstring = str(QUANTIFIERS)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'QUANTIFIERS{count_op["QUANTIFIERS"]} {qstring}')
-                count_op['QUANTIFIERS'] = count_op['QUANTIFIERS'] + 1
-            elif term in RELATIONALS:
-                qstring = str(RELATIONALS)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'RELATIONALS{count_op["RELATIONALS"]} {qstring}')
-                count_op['RELATIONALS'] = count_op['RELATIONALS'] + 1
-            elif term in EQUALS:
-                qstring = str(EQUALS)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'EQUALS{count_op["EQUALS"]} {qstring}')
-                count_op['EQUALS'] = count_op['EQUALS'] + 1
-            elif term in ARITHMETICS:
-                qstring = str(ARITHMETICS)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'ARITHMETICS{count_op["ARITHMETICS"]} {qstring}')
-                count_op['ARITHMETICS'] = count_op['ARITHMETICS'] + 1
-            elif term in MULDIV:
-                qstring = str(MULDIV)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'MULDIV{count_op["MULDIV"]} {qstring}')
-                count_op['MULDIV'] = count_op['MULDIV'] + 1
-            elif term in EXP:
-                qstring = str(EXP)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'EXP{count_op["EXP"]} {qstring}')
-                count_op['EXP'] = count_op['EXP'] + 1
-            elif term in LOGICALS:
-                qstring = str(LOGICALS)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'LOGICALS{count_op["LOGICALS"]} {qstring}')
-                count_op['LOGICALS'] = count_op['LOGICALS'] + 1
-            elif term in NEG:
-                qstring = str(NEG)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'NEG{count_op["NEG"]} {qstring}')
-                count_op['NEG'] = count_op['NEG'] + 1
-            elif term in IMP:
-                qstring = str(IMP)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'IMP{count_op["IMP"]} {qstring}')
-                count_op['IMP'] = count_op['IMP'] + 1
-            elif term in terminators:
-                qstring = str(terminators)
-                qstring = qstring.replace('\'', '')
-                qstring = '{'+qstring[1:-1]+'}'
-                ret.append(f'TERM{count_op["TERM"]} {qstring}')
-                count_op['TERM'] = count_op['TERM'] + 1
-            elif term.isnumeric() or isfloat(term):
-                ret.append(f'NUM{count_op["NUM"]} NUMERIC')
-                count_op['NUM'] = count_op['NUM'] + 1
-            elif term in FUNC:
-                qstring = str(FUNC)
-                qstring = qstring.replace('\'', '')
-                qstring = qstring.replace(']', '}')
-                qstring = qstring.replace('[', '{')
-                ret.append(f'FUNC{count_op["FUNC"]} {qstring}')
-                count_op['FUNC'] = count_op['FUNC'] + 1
-        return ret
-
     def store_dataset_all(self):
-        # entire_dataset = self.sats + self.unsats + self.unknown
-        entire_dataset = list()
-        [self.entire_dataset.append(x) for x in self.unknown if (x not in self.entire_dataset)]
-        [self.entire_dataset.append(x) for x in self.unsats if (x not in self.entire_dataset)]
-        [self.entire_dataset.append(x) for x in self.sats if (x not in self.entire_dataset)]
-        per_cut = 1.0
+        return write_dataset_all(
+            path=self.path,
+            now=self.now,
+            seed=self.seed,
+            population=self.population,
+            seed_ch=self.seed_ch,
+            unknown=self.unknown,
+            unsats=self.unsats,
+            sats=self.sats,
+            entire_dataset=self.entire_dataset,
+        )
 
-        try:
-            chstr = self.population[0].arrf_str()
-        except Exception as e:
-            chstr = str(self.seed_ch)
-
-        attrs = self.build_attributes(chstr.split(','))
-        # for att in attrs:
-        #     print(att)
-
-        nowstr = f'{self.now}'.replace(' ', '_')
-        nowstr = nowstr.replace(':', '_')
-        filename_str = '{}/dataset_qty_{}_all.arff'.format(self.path, nowstr)
-        with open(filename_str, 'w') as f:
-            nowstr = f'{nowstr}\n'
-            nowstr = nowstr.replace(' ', '_')
-            s = f'@relation all.{nowstr}\n'
-            f.write(s)
-            f.write('\n')
-            for att in attrs:
-                f.write(f'@attribute {att}\n')
-
-            f.write('@attribute VEREDICT {TRUE, FALSE, UNKNOWN}\n')
-            f.write('\n')
-            f.write('@data\n')
-            for chromosome in entire_dataset:
-                # print('writing sats')
-                ch_str = chromosome.arrf_str()
-                # ch_str = ch_str.replace(' ', ',')
-                # ch_str = ch_str.replace(',t,In,(', ',')
-                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str)
-                f.write(f",{chromosome.madeit.upper()}\n")
-        return filename_str
-
-    def store_dataset_qty(self, per_cut: float):
-        self.sats.sort(key=lambda x : x.sw_score, reverse=True)
-        self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
-        self.unknown.sort(key=lambda x : x.sw_score, reverse=True)
-
-        min_len = min([len(self.sats), len(self.unsats), len(self.unknown)])
-        per_qty = math.ceil(min_len * per_cut)
-        # print(f'per_qty = {per_qty}')
-        sats = self.sats
-        unsats = self.unsats
-        unknown = self.unknown
-        if len(sats) > per_qty:
-            sats = sats[:per_qty]
-        if len(unsats) > per_qty:
-            unsats = unsats[:per_qty]
-        if len(unknown) > per_qty:
-            unknown = unknown[:per_qty]
-        # print(f'len sats = {len(sats)}')
-        # print(f'len unsats = {len(unsats)}')
-        # print(f'len unknown = {len(unknown)}')
-
-        try:
-            chstr = sats[0].arrf_str()
-        except Exception as e:
-            chstr = str(self.seed_ch)
-
-        # print(chstr)
-        # chstr = chstr.replace(' ', ',')
-        # chstr = chstr.replace(',In,(', ',')
-        # chstr = chstr.replace('),Implies,(', ',Implies,')
-        # chstr = chstr[:-1]
-        # print(chstr)
-        # print(sats[0].arrf_str())
-        # print(chstr.split(','))
-        attrs = self.build_attributes(chstr.split(','))
-        # for att in attrs:
-        #     print(att)
-
-        nowstr = f'{self.now}'.replace(' ', '_')
-        nowstr = nowstr.replace(':', '_')
-        filename_str = '{}/dataset_qty_{}_per{:0>3d}.arff'.format(self.path, nowstr, int(per_cut*100))
-        with open(filename_str, 'w') as f:
-            nowstr = f'{nowstr}\n'
-            nowstr = nowstr.replace(' ', '_')
-            s = f'@relation all.{nowstr}\n'
-            f.write(s)
-            f.write('\n')
-            for att in attrs:
-                f.write(f'@attribute {att}\n')
-
-            f.write('@attribute VEREDICT {TRUE, FALSE, UNKNOWN}\n')
-            f.write('\n')
-            f.write('@data\n')
-            for chromosome in sats:
-                # print('writing sats')
-                ch_str = chromosome.arrf_str()
-                # ch_str = ch_str.replace(' ', ',')
-                # ch_str = ch_str.replace(',t,In,(', ',')
-                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str)
-                f.write(f",{chromosome.madeit.upper()}\n")
-            for chromosome in unsats:
-                # print('writing unsats')
-                ch_str = chromosome.arrf_str()
-                # ch_str = ch_str.replace(' ', ',')
-                # ch_str = ch_str.replace(',t,In,(', ',')
-                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str)
-                f.write(f",{chromosome.madeit.upper()}\n")
-            for chromosome in unknown:
-                # print('writing unsats')
-                ch_str = chromosome.arrf_str()
-                # ch_str = ch_str.replace(' ', ',')
-                # ch_str = ch_str.replace(',t,In,(', ',')
-                # ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str)
-                f.write(f",{chromosome.madeit.upper()}\n")
-        return filename_str
 
     def store_dataset_threshold(self):
-        self.unsats.sort(key=lambda x : x.sw_score, reverse=True)
-        if len(self.unsats) > len(self.sats):
-            self.unsats = self.unsats[:len(self.sats)]
-        else:
-            self.sats = self.sats[:len(self.unsats)]
-
-        with open('{}/dataset_{}.arff'.format(self.path, self.now), 'w') as f:
-            f.write('@relation all.generationall\n')
-            f.write('\n')
-            f.write('@attribute QUANTIFIERS {ForAll, Exists}\n')
-            f.write('@attribute VARIABLE {s}\n')
-            f.write('@attribute RELATIONALS {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER NUMERIC\n')
-            f.write('@attribute LOGICALS1 {And, Or}\n')
-            f.write('@attribute VARIABLE1 {s}\n')
-            f.write('@attribute RELATIONALS1 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER1 NUMERIC\n')
-            f.write('@attribute IMP1 {Implies}\n')
-            f.write('@attribute SIGNALS {signal_2(s),signal_4(s)}\n')
-            f.write('@attribute RELATIONALS2 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER2 NUMERIC\n')
-            f.write('@attribute LOGICALS2 {And, Or}\n')
-            f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
-            f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
-            f.write('@attribute NUMBER3 NUMERIC\n')
-            f.write('@attribute VEREDICT {TRUE, FALSE, UNKNOWN}\n')
-            f.write('\n')
-            f.write('@data\n')
-            for chromosome in self.sats:
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
-                f.write(f",{chromosome.madeit.upper()}\n")
-            for chromosome in self.unsats:
-                ch_str = str(chromosome)
-                ch_str = ch_str.replace(' ', ',')
-                ch_str = ch_str.replace(',s,In,(', ',')
-                ch_str = ch_str.replace('),Implies,(', ',Implies,')
-                f.write(ch_str[:-1])
-                f.write(f",{chromosome.madeit.upper()}\n")
+        return write_dataset_threshold(
+            path=self.path,
+            unknown=self.unknown, 
+            unsats=self.unsats, 
+            sats=self.sats, 
+            now=self.now)
 
     def roulette_wheel_selection(self):
         population_fitness = sum([chromosome.fitness for chromosome in self.population])
@@ -644,12 +371,8 @@ class GA(object):
         
         while (not self.check_evolution()) and (self.generation_counter < self.max_generations):
             self.checkin('mutation_timestamp')
-        # for i in range(MAX_ALLOWABLE_GENERATIONS):
-        # for i in tqdm(range(MAX_ALLOWABLE_GENERATIONS)):
-
             self.population.sort(key=lambda x: x.fitness, reverse=True)
             self.write_population(self.generation_counter)
-            # self.dist2VF(self.generation_counter)
             self.generate_dataset_qty()
             s100 = self.store_dataset_all()
 
@@ -669,27 +392,11 @@ class GA(object):
                 else:
                     offspring1.mutate(MUTATION_RATE)
 
-                # while not offspring1.is_viable(self.path):
-                #     offspring1 = deepcopy(Individual(self.seed, terminators))
-                #     offspring1.mutations = self.mutations
-                #     if self.force_mutation:
-                #         offspring1.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring1)))
-                #     else:
-                #         offspring1.mutate(MUTATION_RATE)
-                #     # print(f"offspring1 is {'viable' if offspring1.is_viable(self.path) else 'not viable'}")
-
                 if self.force_mutation:
                     offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
                 else:
                     offspring2.mutate(MUTATION_RATE)
-                # while not offspring2.is_viable(self.path):
-                #     offspring2 = deepcopy(Individual(self.seed, terminators))
-                #     offspring2.mutations = self.mutations
-                #     if self.force_mutation:
-                #         offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
-                #     else:
-                #         offspring2.mutate(MUTATION_RATE)
-                #     # print(f"offspring2 is {'viable' if offspring2.is_viable(self.path) else 'not viable'}")
+
                 new_population.append(offspring1)
                 new_population.append(offspring2)
 
@@ -712,27 +419,27 @@ class GA(object):
             self.checkin('tracheck_timestamp')
             self.evaluate()
 
-            s100 = self.store_dataset_qty(1.0)
-            s025 = self.store_dataset_qty(.25)
-            s020 = self.store_dataset_qty(.20)
-            s015 = self.store_dataset_qty(.15)
-            s010 = self.store_dataset_qty(.10)
+            s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=1.0)
+            s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.25)
+            s020 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.20)
+            s015 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.15)
+            s010 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.10)
             self.store_dataset_all()
             self.checkout('tracheck_timestamp')
 
             self.write_timespan_log()
 
         self.checkin('diagnosi_timestamp')
-        s100 = self.store_dataset_qty(1.0)
-        s025 = self.store_dataset_qty(.25)
-        s020 = self.store_dataset_qty(.20)
-        s015 = self.store_dataset_qty(.15)
-        s010 = self.store_dataset_qty(.10)
-        self.j48(s100, 1.0)
-        self.j48(s025, .25)
-        self.j48(s020, .20)
-        self.j48(s015, .15)
-        self.j48(s010, .10)
+        s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=1.0)
+        s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.25)
+        s020 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.20)
+        s015 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.15)
+        s010 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.10)
+        run_j48(s100, 1.0, self.path)
+        run_j48(s025, .25, self.path)
+        run_j48(s020, .20, self.path)
+        run_j48(s015, .15, self.path)
+        run_j48(s010, .10, self.path)
         self.checkout('diagnosi_timestamp')
         self.write_timespan_log()
 
@@ -850,6 +557,12 @@ class GA(object):
                 chromosome.fitness = int(100 * (result_seed) / self.max_score)
             else:
                 chromosome.fitness = 0
+            
+            # Track the best satisfied chromosome seen so far for logging
+            if chromosome.madeit == 'True':
+                if self.highest_sat is None or chromosome.fitness > self.highest_sat.fitness:
+                    self.highest_sat = chromosome
+
 
     def crossover(self, parent1: Individual, parent2: Individual):
         offsprings = [parent1, parent2]
@@ -874,30 +587,3 @@ class GA(object):
         node1 += off0_sub
 
         return offsprings
-
-
-    def j48(self, arff_file, qty):
-        # filename_str = '{}/dataset_qty_{}_per{}.arff'.format(self.path, self.now, int(per_cut*100))
-
-        # export CLASSPATH="/home/gabriel/Downloads/weka-3-8-6/weka.jar"
-        # java -Xmx1024m weka.classifiers.trees.J48 -t data/breast-cancer.arff -k -d J48-data.model >& J48-data.out
-        weka_path='/home/gabriel/Downloads/weka-3-8-6/'
-        arff = '\''+arff_file+'\''
-        path = '\''+self.path+'\''
-        weka = f'java -Xmx1024m weka.classifiers.trees.J48 -t {arff_file} -k -d {self.path}/J48-data-{int(qty*100)}.model' # >& J48-data.out'
-        print(weka)
-        weka_tk = shlex.split(weka)
-        try:
-            run_process = subprocess.run(weka_tk,
-                                         stderr=subprocess.PIPE,
-                                         stdout=subprocess.PIPE,
-                                         universal_newlines=True,
-                                         timeout=100)
-            print(run_process.stdout)
-            print(run_process.stderr)
-            filename_str = f'{self.path}/J48-data-{int(qty*100)}.out'
-            with open(filename_str, 'w') as f:
-                f.write(run_process.stdout)
-                f.write(run_process.stderr)
-        except:
-            pass

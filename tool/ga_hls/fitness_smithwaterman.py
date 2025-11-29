@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Sequence, Any, Protocol
+import numpy as np
 
 
 class Fitness(Protocol):
