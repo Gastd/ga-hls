@@ -19,7 +19,19 @@ from matplotlib.backends.backend_pdf import PdfPages
 from pathlib import Path
 import matplotlib
 
-from . import treenode, defs
+from . import treenode
+from .defs import (
+    FILEPATH,
+    FILEPATH2,
+    CROSSOVER_RATE,
+    MUTATION_RATE,
+    POPULATION_SIZE,
+    CHROMOSOME_TO_PRESERVE,
+    PARENTS_TO_BE_CHOSEN,
+    SW_THRESHOLD,
+    FOLDS,
+    SCALE
+)
 from .individual import (
     Individual,
     QUANTIFIERS,
@@ -116,8 +128,6 @@ class GA(object):
         else:
             self.mutation_rate = MUTATION_RATE
         
-        self.elitism = elitism
-
         self.highest_sat = None
         self.population = []
         self.now = datetime.datetime.now()
@@ -162,12 +172,12 @@ class GA(object):
         self.entire_dataset = []  # collects sats/unsats/unknown for diagnostics
 
         name = self.copy_temp_file(self.path)
-        defs.FILEPATH = name
-        defs.FILEPATH2= name
-        print(f'Runnnig script {defs.FILEPATH} and {defs.FILEPATH2}')
+        FILEPATH = name
+        FILEPATH2= name
+        print(f'Runnnig script {FILEPATH} and {FILEPATH2}')
         # print(f'Runnnig script {name}')
         with open('{}/hypot.txt'.format(self.path), 'a') as f:
-            f.write(f'\t{defs.FILEPATH}\n')
+            f.write(f'\t{FILEPATH}\n')
 
 
     def _progress(self, iterable, desc: str = ""):
@@ -269,11 +279,11 @@ class GA(object):
 
     def copy_temp_file(self, folder_path):
         lines = []
-        with open(defs.FILEPATH2,'r') as file:
+        with open(FILEPATH2,'r') as file:
             for l in file:
                 lines.append(l)
 
-        filename = defs.FILEPATH2.split('/')[-1]
+        filename = FILEPATH2.split('/')[-1]
 
         with open(f'{folder_path}/{filename}','w') as file:
             for l in lines:
@@ -438,18 +448,38 @@ class GA(object):
             self.write_timespan_log()
 
         self.checkin('diagnosi_timestamp')
-        s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=1.0)
-        s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.25)
-        s020 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.20)
-        s015 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.15)
-        s010 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.10)
-        run_j48(s100, 1.0, self.path)
-        run_j48(s025, .25, self.path)
-        run_j48(s020, .20, self.path)
-        run_j48(s015, .15, self.path)
-        run_j48(s010, .10, self.path)
+        s100 = write_dataset_qty(
+            self.path, self.now, self.seed, self.seed_ch,
+            self.sats, self.unsats, self.unknown, per_cut=1.0,
+        )
+        s025 = write_dataset_qty(
+            self.path, self.now, self.seed, self.seed_ch,
+            self.sats, self.unsats, self.unknown, per_cut=.25,
+        )
+        s020 = write_dataset_qty(
+            self.path, self.now, self.seed, self.seed_ch,
+            self.sats, self.unsats, self.unknown, per_cut=.20,
+        )
+        s015 = write_dataset_qty(
+            self.path, self.now, self.seed, self.seed_ch,
+            self.sats, self.unsats, self.unknown, per_cut=.15,
+        )
+        s010 = write_dataset_qty(
+            self.path, self.now, self.seed, self.seed_ch,
+            self.sats, self.unsats, self.unknown, per_cut=.10,
+        )
         self.checkout('diagnosi_timestamp')
         self.write_timespan_log()
+
+        # Return the ARFF paths for the diagnostics layer (pipeline) to consume.
+        return {
+            1.0: s100,
+            0.25: s025,
+            0.20: s020,
+            0.15: s015,
+            0.10: s010,
+        }
+
 
 
     def replace_token(self, tk_list):
@@ -465,12 +495,12 @@ class GA(object):
     def save_file(self, nline: str):
         """
         Create self.path/temp.py by copying the original property script
-        (defs.FILEPATH) and replacing the property z3solver.add(Not(ForAll(...)))
+        (FILEPATH) and replacing the property z3solver.add(Not(ForAll(...)))
         line with the given expression.
 
         This preserves the order of interval_t / conditions_t definitions.
         """
-        src = defs.FILEPATH
+        src = FILEPATH
         dst = f"{self.path}/temp.py"
 
         with open(src, "r") as f:

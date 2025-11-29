@@ -61,7 +61,9 @@ def _cmd_run(args) -> int:
 
     print("\nStarting GA with encoded initial formula...")
     ga = GA(init_form=internal_obj)
-    ga.evolve()
+    datasets = ga.evolve()
+    for qty, arff_path in datasets.items():
+        run_j48(arff_path, qty, ga.path)
 
     return 0
 
