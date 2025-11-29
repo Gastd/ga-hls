@@ -63,7 +63,7 @@ SCALE = 0.5
 
 class GA(object):
     """docstring for GA"""
-    def __init__(self,init_form,mutations=None,target_sats: int = 2, population_size: int | None = None, max_generations: int | None = None, seed: int | None = None, fitness: Fitness | None = None, output_root: str
+    def __init__(self,init_form,mutations=None,target_sats: int = 2, population_size: int | None = None, max_generations: int | None = None, seed: int | None = None, fitness: Fitness | None = None, output_root: str | None = None
     ):
         super(GA, self).__init__()
 
