@@ -8,6 +8,7 @@ from .ga import GA
 from .lang.theodore_parser import load_formula_from_property
 from .lang.internal_encoder import formula_to_internal_obj
 from .diagnostics.j48 import run_j48
+from .mutation import MutationConfig
 
 
 def _ensure_output_dir(path: str) -> str:
@@ -28,34 +29,34 @@ def build_ga_from_config(cfg: Config) -> GA:
             -> Formula AST
             -> internal list-of-lists format
             -> GA(init_form)
-
-    This uses:
-      - ga_hls.lang.theodore_parser.load_formula_from_property
-      - ga_hls.lang.internal_encoder.formula_to_internal_obj
     """
     # 1) Load the formula as a typed AST from the ThEodorE property file.
     formula_ast = load_formula_from_property(cfg.input.requirement_file)
- 
-    # 1.1) Load output directory
-    output_root = Path(cfg.input.output_dir)
-    output_root.mkdir(parents=True, exist_ok=True)
 
     # 2) Encode the AST into the legacy internal format GA expects (list-of-lists).
     init_form = formula_to_internal_obj(formula_ast)
 
+    # 3) Build the AST-level mutation configuration from cfg.mutation.
+    mutation_cfg = MutationConfig(
+        max_mutations=cfg.mutation.max_mutations,
+        enable_numeric_perturbation=cfg.mutation.enable_numeric_perturbation,
+        enable_relop_flip=cfg.mutation.enable_relop_flip,
+        enable_logical_flip=cfg.mutation.enable_logical_flip,
+        enable_quantifier_flip=cfg.mutation.enable_quantifier_flip,
+        allowed_positions=cfg.mutation.allowed_positions,
+        numeric_bounds=cfg.mutation.numeric_bounds,
+    )
 
-    # 3) Build the GA instance. We keep `target_sats` at its default (2) for now
-    #    to preserve existing semantics; if you later add a `target_sats` field
-    #    to GAConfig, you can pass it through here.
+    # 4) Build the GA instance. We keep `target_sats` at its default (2) for now.
     ga = GA(
         init_form=init_form,
-        mutations=cfg.input.mutations if hasattr(cfg.input, "mutations") else None,
         population_size=cfg.ga.population_size,
         max_generations=cfg.ga.generations,
         crossover_rate=cfg.ga.crossover_rate,
         mutation_rate=cfg.ga.mutation_rate,
         seed=cfg.ga.seed,
-        output_root=cfg.input.output_dir
+        output_root=cfg.input .output_dir,
+        mutation_config=mutation_cfg
     )
 
     return ga
@@ -77,22 +78,15 @@ def run_diagnostics(cfg: Config) -> None:
     output_root = _ensure_output_dir(cfg.input.output_dir)
 
     # 2. Wire property paths into defs.py so GA's harness sees the right script.
-    #    Currently FILEPATH and FILEPATH2 both point to the same requirement;
-    #    if you later distinguish "err" vs "reference" properties, extend Config
-    #    and update these assignments accordingly.
     defs.FILEPATH = cfg.input.requirement_file
     defs.FILEPATH2 = cfg.input.requirement_file
 
-    # 3. Build GA from config (property Python -> AST -> internal format -> GA),
-    #    passing through GA, mutation, fitness, and output_root configuration.
+    # 3. Build GA from config (property Python -> AST -> internal format -> GA)
     ga = build_ga_from_config(cfg)
 
-    # 4. Run evolution. GA.evolve() now focuses on the GA loop and bookkeeping
-    #    (population snapshots, reports, etc.) under ga.path.
+    # 4. Run evolution. GA.evolve() returns {fraction_used -> arff_path}.
     datasets = ga.evolve()
 
-    # 5. ARFF generation and J48 invocation are handled by the diagnostics
-    #    modules (e.g., diagnostics.arff / diagnostics.j48) using cfg.diagnostics
-    #    and ga.path as the run directory; they are called from here, not GA.
+    # 5. Run J48 for each dataset via diagnostics layer.
     for qty, arff_path in datasets.items():
         run_j48(arff_path, qty, ga.path)

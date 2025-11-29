@@ -189,37 +189,18 @@ class Individual():
         return arrf(self.root)
 
     # @check_call
-    def mutate(self, rate: float, nmutations=MUTATION_NODES):
+    def mutate(self, rate: float, mutation_config: MutationConfig | None = None):
         """
         Default mutation operator.
         """
         # AST-based mutation path
         if self.ast is not None:
-            # Map the "number of mutations" to our AST config.
-            cfg = MutationConfig(max_mutations=max(1, int(nmutations)))
-
-            # We deliberately ignore `rate` here and treat `max_mutations`
-            # as the main knob, roughly analogous to the old loop count.
-            self.ast = mutate_formula(self.ast, cfg)
+            self.ast = mutate_formula(self.ast, mutation_config)
 
             # Keep the legacy tree representation in sync
             self._sync_root_from_ast()
-            return
-
-        # -- Legacy Mutation: used only if chosen explicitely --# 
-        for _ in range(0, nmutations):
-            if (random.random() < rate):
-                mut_idx = random.randrange(len(self.root))
-                subtree, parent = self.root.get_subtree(mut_idx)
-                if subtree.left is None:
-                    subtree.value = self.get_new_term(subtree.value)
-                else:
-                    new_operator = self.get_new_op(subtree.value)
-                    if parent:
-                        if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
-                            # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
-                            continue
-                    subtree.value = new_operator
+        
+        return
 
     # @check_call
     def force_mutate(self, mut_idxs=[], nmutations=MUTATION_NODES):

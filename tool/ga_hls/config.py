@@ -48,16 +48,29 @@ class DiagnosticsConfig:
         default_factory=lambda: ["-C", "0.25", "-M", "2"]
     )
 
+@dataclass
+class MutationConfig:
+    """
+    Configuration for mutations
+    """
+    max_mutations: int = 3
+    enable_numeric_perturbation: bool = True
+    enable_relop_flip: bool = True
+    enable_logical_flip: bool = True
+    enable_quantifier_flip: bool = True
+    allowed_positions: Optional[List[int]] = None
+    numeric_bounds: Dict[str, NumericBounds] = field(default_factory=dict)
 
 @dataclass
 class Config:
     """
     Top-level configuration object for a ga-hls run.
     """
-
-    input: InputConfig
+    input: InputConfig = field(default_factory=InputConfig)
     ga: GAConfig = field(default_factory=GAConfig)
     diagnostics: DiagnosticsConfig = field(default_factory=DiagnosticsConfig)
+    mutation: MutationConfigSpec = field(default_factory=MutationConfig)
+
 
 
 # --- Loader utilities --------------------------------------------------------

@@ -1,6 +1,6 @@
 {
   "input": {
-    "requirement_file": "tool/ga_hls/benchmark/property_01_err_twenty.py",
+    "requirement_file": "tool/ga_hls/benchmark/property_distance_obs_r2.py",
     "traces_file": "tool/ga_hls/tracesAT.csv",
     "output_dir": "outputs"
   },
@@ -15,5 +15,18 @@
     "arff_filename": "outputs/example.arff",
     "weka_jar": null,
     "j48_options": ["-C", "0.25", "-M", "2"]
+  },
+  "mutation": {
+  "max_mutations": 5,
+  "enable_numeric_perturbation": true,
+  "enable_relop_flip": true,
+  "enable_logical_flip": true,
+  "enable_quantifier_flip": true,
+
+  "allowed_positions": [0, 5, 7],
+  "numeric_bounds": {
+    "5": { "min": 0.0, "max": 10.0 },
+    "7": { "min": -5.0, "max": 5.0 }
   }
+}
 }

@@ -52,17 +52,20 @@ from .diagnostics.arff import write_dataset_all, write_dataset_qty, write_datase
 from .lang.python_printer import formula_to_python_expr
 from .lang.internal_parser import parse_internal_obj
 from .lang.ast import Formula
+
 from .harness_script import build_z3check_script
 from .harness import run_property_script, Verdict
+
 from .fitness_smithwaterman import Fitness, SmithWatermanFitness
 from .fitness_smithwaterman import Smith_Waterman as SW
+
+from .mutation import MutationConfig
 
 class GA(object):
     """GA over requirement formulas with AST-based mutation and harness-backed evaluation."""
     def __init__(
         self,
         init_form,
-        mutations: dict | None = None,
         target_sats: int = 2,
         population_size: int | None = None,
         max_generations: int | None = None,
@@ -71,6 +74,7 @@ class GA(object):
         seed: int | None = None,
         fitness: Fitness | None = None,
         output_root: str | None = None,
+        mutation_config: MutationConfig | None = None
     ):
         super(GA, self).__init__()
 
@@ -86,12 +90,8 @@ class GA(object):
             'diagnosi_timestamp': 0.0
         }
 
-        self.mutations = None
-        self.force_mutation = False
-        print(mutations)
-        if mutations is not None:
-            self.set_mutation_ranges(mutations)
-            self.set_force_mutations(True)
+        # AST-level mutation configuration (from pipeline / config.json)
+        self.mutation_config: MutationConfig | None = mutation_config
 
         # Seed the RNG (configurable)
         if seed is not None:
@@ -160,7 +160,6 @@ class GA(object):
 
         self.target_sats = int(target_sats)
         self.target_mutation = False
-        self.check_if_target_is_reachable()
 
         self.init_population()
         self.execution_report = {'TOTAL': 0}
@@ -172,7 +171,7 @@ class GA(object):
         self.entire_dataset = []  # collects sats/unsats/unknown for diagnostics
 
         name = self.copy_temp_file(self.path)
-        FILEPATH = name
+        FILEPATH = name 
         FILEPATH2= name
         print(f'Runnnig script {FILEPATH} and {FILEPATH2}')
         # print(f'Runnnig script {name}')
@@ -199,40 +198,9 @@ class GA(object):
         else:
             print(self.seed_ast)
 
-    def check_if_target_is_reachable(self):
-        total_combination = 1
-        combination_set = {}
-        f = math.factorial
-        if self.mutations is None:
-            return
-        else:
-            for i in self.mutations:
-                if self.mutations[i][0] == 'float':
-                    return
-                elif self.mutations[i][0] == 'int':
-                    combination_set[i] = self.mutations[i][1][1] - self.mutations[i][1][0] + 1
-                else:
-                    combination_set[i] = len(self.mutations[i][1])
-        # Check if the combinations are greater or equal than the requested satisfied requirements
-        for mutation_comb in combination_set:
-            print(mutation_comb)
-            total_combination = total_combination * combination_set[mutation_comb]
-        if self.target_sats > total_combination:
-            print('Requested Satisfied requirements unreachable. Changing to all possible combinations')
-            print(f'From {self.target_sats} to {total_combination}')
-            self.target_sats = total_combination
-            self.target_mutation = True
-        return
-
     def get_max_score(self):
         tokens = self.replace_token(list(self.seed))
         self.max_score = self.fitness.compute_max_score(tokens=tokens)
-
-    def set_force_mutations(self, forced: bool):
-        self.force_mutation = forced
-
-    def set_mutation_ranges(self, mutations: dict):
-        self.mutations = mutations
 
     def init_population(self):
         self.population = []
@@ -243,27 +211,22 @@ class GA(object):
         # Seed individual has both tree and AST
         self.seed_ch = deepcopy(Individual(root, terminators, self.seed_ast))
         self.seed_ch.show_idx()
-        print(f'terminators = {terminators}')
+        print(f"terminators = {terminators}")
 
-        self.max_score = 0.0
-        self.get_max_score()
-
-
-        self.checkin('mutation_timestamp')
-        for i in self._progress(range(self.size), desc="Initializing population"):
+        self.checkin("mutation_timestamp")
+        for i in range(0, self.size):
+            print(i)
             # Each chromosome starts from the same tree + AST seed
             chromosome = deepcopy(Individual(root, terminators, self.seed_ast))
-            chromosome.mutations = deepcopy(self.mutations)
 
             n = random.randrange(len(root))
-            if self.force_mutation:
-                chromosome.force_mutate(list(self.mutations.keys()), n)
-            else:
-                chromosome.mutate(1, n)
+
+            if self.mutation_config is not None:
+                chromosome.mutate(1, mutation_config=self.mutation_config)
 
             self.population.append(deepcopy(chromosome))
-        self.checkout('mutation_timestamp')
-        print("Population initialized. Size = {}".format(self.size))
+        self.checkout("mutation_timestamp")
+        print(f"Population initialized. Size = {self.size}")
 
     def init_log(self, parent_dir):
         directory = str(self.now)
@@ -405,18 +368,26 @@ class GA(object):
 
                 self.crossover(offspring1, offspring2)
 
-                if self.force_mutation:
-                    offspring1.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring1)))
-                else:
-                    offspring1.mutate(MUTATION_RATE)
+                # Offspring 1 mutation
+                if self.mutation_config is not None:
+                    offspring1.mutate(
+                        self.mutation_rate,
+                        mutation_config=self.mutation_config,
+                    )
 
-                if self.force_mutation:
-                    offspring2.force_mutate(list(self.mutations.keys()), random.randrange(len(offspring2)))
-                else:
-                    offspring2.mutate(MUTATION_RATE)
+                # Offspring 2 mutation
+                if self.mutation_config is not None:
+                    offspring2.mutate(
+                        self.mutation_rate,
+                        mutation_config=self.mutation_config,
+                    )
 
                 new_population.append(offspring1)
                 new_population.append(offspring2)
+
+                # Reset fitness 
+                offspring1.reset()
+                offspring2.reset()
 
                 # Reset fitness 
                 offspring1.reset()
@@ -591,6 +562,7 @@ class GA(object):
             chromosome.sw_score = result_seed
 
             # Normalized fitness in [0, 100] based on max_score
+            self.get_max_score()
             if self.max_score > 0:
                 chromosome.fitness = int(100 * (result_seed) / self.max_score)
             else:
