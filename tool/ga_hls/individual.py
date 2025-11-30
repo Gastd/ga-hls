@@ -4,7 +4,7 @@ import shlex
 import random
 import subprocess
 
-from . import treenode, defs
+from . import treenode
 from .lang.ast import Formula
 from .lang.internal_encoder import InternalEncodeError, formula_to_internal_obj
 from .mutation import MutationConfig, mutate_formula
@@ -77,89 +77,6 @@ class Individual():
 
         internal = formula_to_internal_obj(self.ast)
         self.root = treenode.parse(internal)
-
-
-    def copy_temp_file(self, folder_path):
-        lines = []
-        with open(defs.FILEPATH2,'r') as file:
-            for l in file:
-                lines.append(l)
-
-        with open(f'{folder_path}/z3check.py','w') as file:
-            for l in lines:
-                file.write(l)
-        return f'{folder_path}/z3check.py'
-
-    def is_viable(self, temp_path):
-        def get_file_w_traces(file_path = defs.FILEPATH2):
-            s = e = -1
-            lines = []
-            with open(file_path) as f:
-                for l in f:
-                    lines.append(l)
-            # print('lines')
-            for idx, l in enumerate(lines):
-                if l.find('z3solver.add') >= 0:
-                    # print(idx, l)
-                    s = idx
-                    break
-            for idx, l in enumerate(lines):
-                # print(l, l.find('z3solver.check'))
-                if l.find('z3solver.check') >= 0:
-                    # print(idx, l)
-                    e = idx
-                    break
-            # print('lines')
-            return s, e, lines
-
-        def save_check_wo_traces(start, end, lines, nline, file_path = 'ga_hls/z3check.py'):
-            before = lines[:start]
-            after = lines[end:]
-            with open(file_path,'w') as z3check_file:
-                for l in before:
-                    z3check_file.write(l)
-                form_line = (f'\tz3solver.add({nline})\n')
-                z3check_file.write('\n')
-                # print(form_line)
-                z3check_file.write(form_line)
-                z3check_file.write('\n')
-                for l in after:
-                    z3check_file.write(l)
-
-        def reset_file(path):
-            f = open(path, 'r')
-            f.seek(0, 0)
-            f.close()
-
-        new_file = self.copy_temp_file(temp_path)
-        start, end, lines = get_file_w_traces(new_file)
-        save_check_wo_traces(start, end, lines, f'Not({self.format()})', new_file)
-        reset_file(defs.FILEPATH2)
-        reset_file(new_file)
-
-        # folder_name = 'ga_hls'
-        folder_name = temp_path
-        run_str = f'python3 {folder_name}/z3check.py'
-        run_tk = shlex.split(run_str)
-        try:
-            run_process = subprocess.run(run_tk,
-                                         stderr=subprocess.PIPE,
-                                         stdout=subprocess.PIPE,
-                                         universal_newlines=True,
-                                         timeout=100)
-        except:
-            return False
-        # print(run_process.stdout)
-        if run_process.stdout.find('SATISFIED') > 0:
-            # print('Chromosome not viable')
-            return True
-        elif run_process.stdout.find('VIOLATED') > 0:
-            # print('Chromosome viable')
-            return True
-        else:
-            # print('Chromosome not viable')
-            return False
-        return False
 
     def reset(self):
         self.fitness = -1

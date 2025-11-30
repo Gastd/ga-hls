@@ -21,8 +21,6 @@ import matplotlib
 
 from . import treenode
 from .defs import (
-    FILEPATH,
-    FILEPATH2,
     CROSSOVER_RATE,
     MUTATION_RATE,
     POPULATION_SIZE,
@@ -74,7 +72,8 @@ class GA(object):
         seed: int | None = None,
         fitness: Fitness | None = None,
         output_root: str | None = None,
-        mutation_config: MutationConfig | None = None
+        mutation_config: MutationConfig | None = None,
+        property_path: str | None = None
     ):
         super(GA, self).__init__()
 
@@ -170,14 +169,19 @@ class GA(object):
         self.unknown = []
         self.entire_dataset = []  # collects sats/unsats/unknown for diagnostics
 
-        name = self.copy_temp_file(self.path)
-        FILEPATH = name 
-        FILEPATH2= name
-        print(f'Runnnig script {FILEPATH} and {FILEPATH2}')
-        # print(f'Runnnig script {name}')
-        with open('{}/hypot.txt'.format(self.path), 'a') as f:
-            f.write(f'\t{FILEPATH}\n')
+        self.property_path = property_path 
+        self.base_property_script: str | None = None
 
+        # Copy the original property script into this run's output dir
+        # for traceability, and remember where it ended up.
+        self.base_property_script = self.copy_temp_file()
+
+        if self.base_property_script:
+            print(f'Running script {self.base_property_script}')
+            with open(f'{self.path}/hypot.txt', 'a') as f:
+                f.write(f'\t{self.base_property_script}\n')
+        else:
+            print('[ga-hls] WARNING: no property script copied (property_path not set?)')
 
     def _progress(self, iterable, desc: str = ""):
         """
@@ -240,18 +244,29 @@ class GA(object):
         except OSError as error:
             print(error)
 
-    def copy_temp_file(self, folder_path):
-        lines = []
-        with open(FILEPATH2,'r') as file:
-            for l in file:
-                lines.append(l)
+    def copy_temp_file(self) -> str:
+        """
+        Copy the original property script (self.property_path) into this run's
+        output directory for traceability.
 
-        filename = FILEPATH2.split('/')[-1]
+        Returns the full path to the copied file, or "" if nothing was copied.
+        """
+        if not self.property_path:
+            return ""
 
-        with open(f'{folder_path}/{filename}','w') as file:
-            for l in lines:
-                file.write(l)
-        return f'{folder_path}/{filename}'
+        src = Path(self.property_path).resolve()
+        filename = src.name
+        dst = Path(self.path) / filename
+
+        try:
+            with src.open('r', encoding='utf-8') as infile, dst.open('w', encoding='utf-8') as outfile:
+                for line in infile:
+                    outfile.write(line)
+        except FileNotFoundError as exc:
+            print(f"[ga-hls] WARNING: could not copy property script {src}: {exc}")
+            return ""
+
+        return str(dst)
 
     def write_population(self, generation):
         with open('{}/{:0>2}.txt'.format(self.path, generation), 'w') as f:
@@ -466,17 +481,18 @@ class GA(object):
     def save_file(self, nline: str):
         """
         Create self.path/temp.py by copying the original property script
-        (FILEPATH) and replacing the property z3solver.add(Not(ForAll(...)))
+        (self.property_path) and replacing the property z3solver.add(Not(ForAll(...)))
         line with the given expression.
-
-        This preserves the order of interval_t / conditions_t definitions.
         """
-        src = FILEPATH
+        src = self.property_path or self.base_property_script
+        if not src:
+            raise RuntimeError("[ga-hls] save_file: no property_path/base_property_script set")
+
         dst = f"{self.path}/temp.py"
 
-        with open(src, "r") as f:
+        with open(src, "r", encoding="utf-8") as f:
             lines = f.readlines()
-
+        
         # First, try to replace the specific property line:
         #   z3solver.add(Not(ForAll([t], Implies(interval_t, conditions_t))))
         new_lines = []
