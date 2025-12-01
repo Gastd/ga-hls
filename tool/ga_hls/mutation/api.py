@@ -64,48 +64,71 @@ class MutationConfig:
 # Public entrypoint
 # ---------------------------------------------------------------------------
 
-
-def mutate_formula(formula: Formula, cfg: MutationConfig, rng: Optional[random.Random] = None) -> Formula:
+def mutate_formula(
+    formula: Formula,
+    cfg: MutationConfig,
+    rng: Optional[random.Random] = None,
+) -> Formula:
     """
-    Apply up to `cfg.max_mutations` random, semantics-preserving-ish mutations
-    to the given formula AST, and return a NEW formula.
+    Apply up to `cfg.max_mutations` random mutations to the given formula AST
+    and return a NEW formula.
 
     This function is pure: it never mutates the input `formula` in place.
+
+    Semantics of cfg.allowed_positions
+    ----------------------------------
+    - We conceptually number all nodes in the formula in a fixed preorder
+      traversal: 0, 1, 2, ...
+    - If cfg.allowed_positions is None:
+        * Any node position may be selected for mutation.
+    - If cfg.allowed_positions is a list of integers:
+        * Only nodes whose preorder index is in that list are *eligible*
+          for mutation (regardless of node kind: numeric literal, relop,
+          logical connective, quantifier, etc.).
+
+    Semantics of cfg.numeric_bounds
+    --------------------------------
+    - When a numeric literal at position P is mutated, if
+      cfg.numeric_bounds contains a key P, we interpret the value as
+      [lower, upper] and restrict the new numeric value to that range.
+    - The exact interpretation of numeric_bounds is handled inside
+      `_mutate_node`, which receives the node position P.
     """
     if rng is None:
         rng = random
+
+    if cfg.max_mutations <= 0:
+        return formula
 
     # Flatten nodes to get a stable index space to pick from
     nodes: List[Formula] = list(_walk(formula))
     if not nodes:
         return formula
 
-    # Build the candidate index set, respecting cfg.allowed_positions if set
     all_indices = list(range(len(nodes)))
+
+    # Restrict candidate positions if allowed_positions is set
     if cfg.allowed_positions is not None:
-        candidate_indices = [i for i in all_indices if i in cfg.allowed_positions]
+        allowed_set = set(cfg.allowed_positions)
+        candidate_indices = [i for i in all_indices if i in allowed_set]
     else:
         candidate_indices = all_indices
 
     if not candidate_indices:
-        # Nothing is allowed to mutate
+        print("[ga-hls][warning] mutate formula: no candidate indices, returning unchanged")
         return formula
 
     # Choose positions to mutate (without replacement)
     max_muts = min(cfg.max_mutations, len(candidate_indices))
-    if max_muts <= 0:
-        return formula
-
     positions = rng.sample(candidate_indices, k=max_muts)
 
-    # We implement mutation by a single pass rebuild where we keep a counter
-    # of visited nodes and mutate at the chosen indices.
+    # Rebuild once, mutating any node whose preorder index is in `positions`
     return _mutate_by_positions(formula, positions, cfg, rng)
-
 
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 
 def _walk(f: Formula) -> Iterable[Formula]:
@@ -130,7 +153,6 @@ def _walk(f: Formula) -> Iterable[Formula]:
             stack.append(node.left)
         # BoolConst, IntConst, RealConst, Var: no children
 
-
 def _mutate_by_positions(
     f: Formula,
     positions: List[int],
@@ -138,10 +160,24 @@ def _mutate_by_positions(
     rng: random.Random,
 ) -> Formula:
     """
-    Rebuild formula, mutating nodes whose preorder index is in `positions`.
+    Rebuild `f`, mutating nodes whose preorder index is in `positions`.
+
+    `positions` is a list of integers corresponding to the preorder
+    traversal index of each node. For each node, we:
+
+      1. Recursively rebuild its children.
+      2. If its index (here) is in `positions`, pass the rebuilt node
+         to `_mutate_node(new_node, cfg, rng, here)` to obtain a possibly
+         mutated node.
+
+    `_mutate_node` is responsible for:
+      - Deciding which specific mutation operator to apply (numeric
+        perturbation, relop flip, logical flip, quantifier flip, etc.).
+      - Looking at `cfg.numeric_bounds.get(here)` to constrain numeric
+        changes, if desired.
     """
     target_positions = set(positions)
-    counter = 0
+    counter = 0  # preorder index
 
     def rebuild(node: Formula) -> Formula:
         nonlocal counter
@@ -187,34 +223,50 @@ def _mutate_by_positions(
 
     return rebuild(f)
 
-
 def _mutate_node(node: Formula, cfg: MutationConfig, rng: random.Random, idx: int) -> Formula:
     """
     Mutate a single node, depending on its type and the config.
     """
-    # Numeric perturbation for constants
-    if cfg.enable_numeric_perturbation and isinstance(node, IntConst):
-        new_val = _mutate_int_const(node, cfg, rng).value
-        # If bounds exist for this position, clamp/enforce them
-        bounds = cfg.numeric_bounds.get(idx)
-        if bounds is not None:
-            lo, hi = bounds
-            if new_val < lo:
-                new_val = lo
-            elif new_val > hi:
-                new_val = hi
-        return RealConst(new_val)
-    if cfg.enable_numeric_perturbation and isinstance(node, RealConst):
-        new_val = _mutate_real_const(node, cfg, rng).value
-        # If bounds exist for this position, clamp/enforce them
-        bounds = cfg.numeric_bounds.get(idx)
-        if bounds is not None:
-            lo, hi = bounds
-            if new_val < lo:
-                new_val = lo
-            elif new_val > hi:
-                new_val = hi
-        return RealConst(new_val)
+# Look up numeric bounds for this AST index, if any
+    bounds_for_pos: Optional[Tuple[float, float]] = cfg.numeric_bounds.get(idx)
+
+    # --- Numeric perturbation ------------------------------------------------
+    if cfg.enable_numeric_perturbation and isinstance(node, (IntConst, RealConst)):
+        # Determine bounds
+        if bounds_for_pos is not None:
+            lo, hi = bounds_for_pos
+        else:
+            # Fallback: local ±10% window (at least size 1)
+            v = float(node.value)
+            span = max(abs(v) * 0.1, 1.0)
+            lo, hi = v - span, v + span
+
+        # Normalise bounds
+        lo = float(lo)
+        hi = float(hi)
+        if lo > hi:
+            lo, hi = hi, lo
+
+        # Sample new value *inside* [lo, hi]
+        if isinstance(node, IntConst):
+            lo_i = int(round(lo))
+            hi_i = int(round(hi))
+            if lo_i > hi_i:
+                lo_i, hi_i = hi_i, lo_i
+            new_val = rng.randint(lo_i, hi_i)
+            # print(
+            #     f"[ga-hls][mutate] numeric at id={idx}, old={node.value}, "
+            #     f"new={new_val}, bounds=({lo_i}, {hi_i})"
+            # )
+            return IntConst(value=new_val)
+
+        else:  # RealConst
+            new_val = rng.uniform(lo, hi)
+            # print(
+            #     f"[ga-hls][mutate] numeric at id={idx}, old={node.value}, "
+            #     f"new={new_val:.6f}, bounds=({lo:.3f}, {hi:.3f})"
+            # )
+            return RealConst(value=new_val)
 
     # Operator flips
     if cfg.enable_relop_flip and isinstance(node, RelOp):

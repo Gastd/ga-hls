@@ -51,14 +51,19 @@ class DiagnosticsConfig:
 @dataclass
 class MutationConfig:
     """
-    Configuration for mutations
+    Configuration for mutations.
     """
-    max_mutations: int = 3
+    max_mutations: int = 1
+
     enable_numeric_perturbation: bool = True
     enable_relop_flip: bool = True
     enable_logical_flip: bool = True
     enable_quantifier_flip: bool = True
+
+    # Positions in the flattened AST (preorder indices)
     allowed_positions: Optional[List[int]] = None
+
+    # Bounds keyed by AST index; values are (low, high)
     numeric_bounds: Dict[str, NumericBounds] = field(default_factory=dict)
 
 @dataclass
@@ -69,9 +74,7 @@ class Config:
     input: InputConfig = field(default_factory=InputConfig)
     ga: GAConfig = field(default_factory=GAConfig)
     diagnostics: DiagnosticsConfig = field(default_factory=DiagnosticsConfig)
-    mutation: MutationConfigSpec = field(default_factory=MutationConfig)
-
-
+    mutation: MutationConfig = field(default_factory=MutationConfig)
 
 # --- Loader utilities --------------------------------------------------------
 
@@ -124,6 +127,16 @@ def load_config(path: str | Path) -> Config:
         "arff_filename": "outputs/example.arff",
         "weka_jar": "path/to/weka.jar",
         "j48_options": ["-C", "0.25", "-M", "2"]
+      },
+      "mutation": {
+        "max_mutations": 1,
+        "enable_numeric_perturbation": true,
+        "enable_relop_flip": false,
+        "enable_logical_flip": false,
+        "enable_quantifier_flip": false,
+        "allowed_positions": [14],
+        "numeric_bounds": {
+            "14": [100.0, 140.0]
       }
     }
     """
@@ -133,8 +146,8 @@ def load_config(path: str | Path) -> Config:
     input_data = _as_dict(data.get("input", {}))
     ga_data = _as_dict(data.get("ga", {}))
     diag_data = _as_dict(data.get("diagnostics", {}))
+    mut_data = _as_dict(data.get("mutation", {}))
 
-    # Basic required fields for Stage 2.
     try:
         input_cfg = InputConfig(
             requirement_file=input_data["requirement_file"],
@@ -162,4 +175,25 @@ def load_config(path: str | Path) -> Config:
         j48_options=list(diag_data.get("j48_options", ["-C", "0.25", "-M", "2"])),
     )
 
-    return Config(input=input_cfg, ga=ga_cfg, diagnostics=diag_cfg)
+    # --- mutation section (NEW) ---
+    # numeric_bounds keys come from JSON as strings -> convert to int
+    raw_bounds = mut_data.get("numeric_bounds", {})
+    numeric_bounds: Dict[int, Tuple[float, float]] = {}
+    for k, v in raw_bounds.items():
+        idx = int(k)  # "14" -> 14
+        lo, hi = v
+        numeric_bounds[idx] = (float(lo), float(hi))
+
+    mut_cfg = MutationConfig(
+        max_mutations=int(mut_data.get("max_mutations", 1)),
+        enable_numeric_perturbation=bool(
+            mut_data.get("enable_numeric_perturbation", True)
+        ),
+        enable_relop_flip=bool(mut_data.get("enable_relop_flip", True)),
+        enable_logical_flip=bool(mut_data.get("enable_logical_flip", True)),
+        enable_quantifier_flip=bool(mut_data.get("enable_quantifier_flip", True)),
+        allowed_positions=mut_data.get("allowed_positions"),
+        numeric_bounds=numeric_bounds,
+    )
+
+    return Config(input=input_cfg, ga=ga_cfg, diagnostics=diag_cfg, mutation=mut_cfg)
