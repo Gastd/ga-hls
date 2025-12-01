@@ -24,10 +24,11 @@ def _get_version() -> str:
 
 def _cmd_explain_positions(args: argparse.Namespace) -> int:
     """
-    Show detailed info about a single mutation position:
-      - AST node and a 'Pretty' form
-      - The ARFF-style features (QUANTIFIERSk, NUMk, RELATIONALSk, TERMk, LOGICALSk)
-      - Current numeric_bounds for this position from the config, if present
+    Show a table of all positions in the requirement formula, with:
+      - Position index
+      - Node type
+      - Pretty-printed node
+      - ARFF-style feature names (QUANTIFIERSk, NUMk, RELATIONALSk, TERMk, LOGICALSk)
     """
     try:
         cfg = load_config(args.config)
@@ -41,23 +42,15 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
         print("No positions found in formula.", file=sys.stderr)
         return 1
 
-    idx = args.position
-    if idx not in positions:
-        print(f"No position {idx} found in formula.", file=sys.stderr)
-        return 1
-
-    pos = positions[idx]
-    node = pos.node
-
     sorted_idxs = sorted(positions.keys())
 
-    # Classify positions by role (same logic as in explain-positions)
+    # Classify positions by role
     quant_idxs = [i for i in sorted_idxs if positions[i].role == "QUANTIFIER"]
     logical_idxs = [i for i in sorted_idxs if positions[i].role == "LOGICAL_CONNECTIVE"]
     relop_idxs = [i for i in sorted_idxs if positions[i].role == "RELATION_OP"]
 
-    # For each relational operator, find its first numeric child and first term child.
-    from ga_hls.lang.ast import IntConst, RealConst, Var, Subscript, FuncCall, RelOp as RelOpNode  # local import
+    # For each relational operator, find its first numeric child and first term child
+    from ga_hls.lang.ast import IntConst, RealConst, Var, Subscript, FuncCall  # local import
 
     relop_slots: list[dict[str, int | None]] = []
     for r_idx in relop_idxs:
@@ -84,7 +77,7 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
 
         relop_slots.append({"relop": r_idx, "num": num_pos, "term": term_pos})
 
-    # Build a mapping: position index -> list of ARFF-style feature names
+    # Build mapping: position index -> list of ARFF-style feature names
     features_by_pos: dict[int, list[str]] = {}
 
     def _add_feature(pos_index: int | None, name: str) -> None:
@@ -106,15 +99,112 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
         _add_feature(slot["num"], f"NUM{k}")
         _add_feature(slot["term"], f"TERM{k}")
 
-    # Figure out which ARFF features affect this position
+    # Print table
+    print(f"{'Pos':>3}  {'NodeType':<18}  {'Node':<60}  Features")
+    print("-" * 100)
+
+    for idx in sorted_idxs:
+        pos = positions[idx]
+        node = pos.node
+        node_type = type(node).__name__
+
+        node_repr = str(node)
+        if len(node_repr) > 60:
+            node_repr = node_repr[:57] + "..."
+
+        feat_names = features_by_pos.get(idx, [])
+        features_str = ", ".join(feat_names) if feat_names else "-"
+
+        print(f"{idx:3d}  {node_type:<18}  {node_repr:<60}  {features_str}")
+
+    return 0
+
+def _cmd_explain_position(args: argparse.Namespace) -> int:
+    """
+    Show detailed info about a single mutation position:
+      - AST node and a 'Pretty' form
+      - ARFF-style features (QUANTIFIERSk, NUMk, RELATIONALSk, TERMk, LOGICALSk)
+      - Current numeric_bounds for this position from the config, if present
+    """
+    try:
+        cfg = load_config(args.config)
+    except ConfigError as exc:
+        print(f"Config error: {exc}", file=sys.stderr)
+        return 1
+
+    layout = build_layout_from_config(cfg)
+    positions = layout.positions
+    if not positions:
+        print("No positions found in formula.", file=sys.stderr)
+        return 1
+
+    idx = args.position
+    if idx not in positions:
+        print(f"No position {idx} found in formula.", file=sys.stderr)
+        return 1
+
+    pos = positions[idx]
+    node = pos.node
+
+    sorted_idxs = sorted(positions.keys())
+
+    # Classify positions by role
+    quant_idxs = [i for i in sorted_idxs if positions[i].role == "QUANTIFIER"]
+    logical_idxs = [i for i in sorted_idxs if positions[i].role == "LOGICAL_CONNECTIVE"]
+    relop_idxs = [i for i in sorted_idxs if positions[i].role == "RELATION_OP"]
+
+    from ga_hls.lang.ast import IntConst, RealConst, Var, Subscript, FuncCall, RelOp as RelOpNode
+
+    # Relational slots as in explain-positions
+    relop_slots: list[dict[str, int | None]] = []
+    for r_idx in relop_idxs:
+        relop_pos = positions[r_idx]
+        prefix = relop_pos.path + "." if relop_pos.path else ""
+        num_pos: int | None = None
+        term_pos: int | None = None
+        started = False
+
+        for j in sorted_idxs:
+            if j <= r_idx:
+                continue
+            p = positions[j]
+            if prefix and p.path.startswith(prefix):
+                started = True
+                child = p.node
+                if num_pos is None and isinstance(child, (IntConst, RealConst)):
+                    num_pos = j
+                if term_pos is None and isinstance(child, (Var, Subscript, FuncCall)):
+                    term_pos = j
+            else:
+                if started:
+                    break
+
+        relop_slots.append({"relop": r_idx, "num": num_pos, "term": term_pos})
+
+    # Build mapping: position index -> list of ARFF-style feature names
+    features_by_pos: dict[int, list[str]] = {}
+
+    def _add_feature(pos_index: int | None, name: str) -> None:
+        if pos_index is None:
+            return
+        features_by_pos.setdefault(pos_index, []).append(name)
+
+    for k, q_idx in enumerate(quant_idxs):
+        _add_feature(q_idx, f"QUANTIFIERS{k}")
+    for k, l_idx in enumerate(logical_idxs):
+        _add_feature(l_idx, f"LOGICALS{k}")
+    for k, slot in enumerate(relop_slots):
+        _add_feature(slot["relop"], f"RELATIONALS{k}")
+        _add_feature(slot["num"], f"NUM{k}")
+        _add_feature(slot["term"], f"TERM{k}")
+
     feat_names = sorted(features_by_pos.get(idx, []))
 
-    # --- AST node / Pretty representation ---
-
+    # AST node description
     ast_node_desc = str(node)
     pretty_repr = str(node)
 
-    # Special-case if this position is a relational operator, so we can show TERMk / NUMk notation
+    # If this is a RelOp, make it look like RelOp("<", left=TERMk, right=NUMk)
     relop_k: int | None = None
     if isinstance(node, RelOpNode):
         for k, slot in enumerate(relop_slots):
@@ -123,20 +213,15 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
                 break
 
     if isinstance(node, RelOpNode) and relop_k is not None:
-        # Format like: RelOp("<", left=TERM2, right=NUM2)
         ast_node_desc = f'RelOp("{node.op}", left=TERM{relop_k}, right=NUM{relop_k})'
-
-        # Pretty: left-term < NUMk
         term_pos = relop_slots[relop_k]["term"]
-        left_term = node.left
-        if term_pos is not None and isinstance(left_term, (Var, Subscript, FuncCall)):
-            left_term_repr = str(left_term)
+        if term_pos is not None:
+            left_term_repr = str(positions[term_pos].node)
         else:
             left_term_repr = str(node.left)
         pretty_repr = f"{left_term_repr} {node.op} NUM{relop_k}"
 
     # --- Print header ---
-
     print(f"Position {idx}")
     print("----------")
     print(f"AST node:      {ast_node_desc}")
@@ -144,22 +229,11 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
     print()
 
     # --- Affects ARFF ---
-
+    print("Affects ARFF:")
     if not feat_names:
-        print("Affects ARFF:")
         print("  (no direct ARFF features)")
     else:
-        print("Affects ARFF:")
         for name in feat_names:
-            # Determine the index k for this feature
-            k = None
-            for prefix in ("QUANTIFIERS", "LOGICALS", "RELATIONALS", "NUM", "TERM"):
-                if name.startswith(prefix):
-                    suffix = name[len(prefix):]
-                    if suffix.isdigit():
-                        k = int(suffix)
-                    break
-
             if name.startswith("RELATIONALS"):
                 print(f"  - {name}: {{<, >, <=, >=}}")
             elif name.startswith("QUANTIFIERS"):
@@ -168,22 +242,27 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
                 print(f"  - {name}: {{And, Or}}")
             elif name.startswith("NUM"):
                 print(f"  - {name}: NUMERIC")
-            elif name.startswith("TERM") and k is not None:
+            elif name.startswith("TERM"):
                 # Try to show something like {v_speed[...], t}
                 # Use the term child for the corresponding relational slot, if available.
+                k = None
+                for prefix in ("TERM",):
+                    if name.startswith(prefix):
+                        suffix = name[len(prefix):]
+                        if suffix.isdigit():
+                            k = int(suffix)
+                        break
                 term_node_repr = "t"
-                if k < len(relop_slots):
+                if k is not None and k < len(relop_slots):
                     term_pos = relop_slots[k]["term"]
                     if term_pos is not None:
                         term_node_repr = str(positions[term_pos].node)
                 print(f"  - {name}: {{{term_node_repr}, t}}")
             else:
-                # Fallback: just print the name
                 print(f"  - {name}: (unknown domain)")
+    print()
 
     # --- Current bounds (from config) ---
-
-    print()
     print("Current bounds (from config):")
 
     mut_cfg = None
@@ -201,10 +280,8 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
 
     value = None
     if numeric_bounds and isinstance(numeric_bounds, dict):
-        # Try int key first
         if idx in numeric_bounds:
             value = numeric_bounds[idx]
-        # Fallback: string key (if config loader kept them as strings)
         elif str(idx) in numeric_bounds:
             value = numeric_bounds[str(idx)]
 
@@ -212,7 +289,6 @@ def _cmd_explain_positions(args: argparse.Namespace) -> int:
         print(f'  - numeric_bounds["{idx}"]: {value}')
     else:
         print("  - none")
-
 
     return 0
 
@@ -380,13 +456,24 @@ def main(argv=None) -> int:
         required=True,
         help="Path to JSON config file.",
     )
-    explain_pos_p.add_argument(
+    explain_pos_p.set_defaults(func=_cmd_explain_positions)
+
+    explain_pos_single_p = subparsers.add_parser(
+        "explain-position",
+        help="Show detailed info about a single mutation position.",
+    )
+    explain_pos_single_p.add_argument(
+        "--config",
+        required=True,
+        help="Path to JSON config file.",
+    )
+    explain_pos_single_p.add_argument(
         "--position",
         type=int,
         required=True,
         help="Position index as used in mutation.allowed_positions.",
     )
-    explain_pos_p.set_defaults(func=_cmd_explain_positions)
+    explain_pos_single_p.set_defaults(func=_cmd_explain_position)
 
 
     args = parser.parse_args(argv)
@@ -414,6 +501,9 @@ def main(argv=None) -> int:
 
     if args.command == "explain-positions":
         return _cmd_explain_positions(args)
+
+    if args.command == "explain-position":
+        return _cmd_explain_position(args)
 
     # No subcommand: show help
     parser.print_help()
