@@ -1,0 +1,32 @@
+{
+  "input": {
+    "requirement_file": "tool/ga_hls/examples/AT1_AT001.py",
+    "traces_file": "tool/ga_hls/tracesAT.csv",
+    "output_dir": "outputs"
+  },
+  "ga": {
+    "population_size": 50,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.10,
+    "seed": 42
+  },
+  "mutation": {
+    "max_mutations": 1,
+
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+
+    "allowed_positions": [12],
+    "numeric_bounds": {
+      "12": [100.0, 140.0]
+    }
+  },
+  "diagnostics": {
+    "arff_filename": "outputs/example.arff",
+    "weka_jar": null,
+    "j48_options": ["-C", "0.25", "-M", "2"]
+  }
+}

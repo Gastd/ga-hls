@@ -5,16 +5,11 @@
     "output_dir": "outputs"
   },
   "ga": {
-    "population_size": 10,
-    "generations": 5,
-    "crossover_rate": 0.9,
-    "mutation_rate": 0.1,
+    "population_size": 50,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.10,
     "seed": 42
-  },
-  "diagnostics": {
-    "arff_filename": "outputs/example.arff",
-    "weka_jar": null,
-    "j48_options": ["-C", "0.25", "-M", "2"]
   },
   "mutation": {
   "max_mutations": 5,
@@ -23,10 +18,16 @@
   "enable_logical_flip": true,
   "enable_quantifier_flip": true,
 
-  "allowed_positions": [0, 5, 7],
+  "allowed_positions": [3, 7, 11],
   "numeric_bounds": {
-    "5": { "min": 0.0, "max": 10.0 },
-    "7": { "min": -5.0, "max": 5.0 }
+    "3": { "min": 0.0, "max": 10.0 },
+    "7": { "min": 10.0, "max": 30.0 },
+    "11": { "min": 100.0, "max": 140.0 }
+    }
+  },
+  "diagnostics": {
+    "arff_filename": "outputs/example.arff",
+    "weka_jar": null,
+    "j48_options": ["-C", "0.25", "-M", "2"]
   }
-}
 }

@@ -140,6 +140,7 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
     try:
         chstr = population[0].arrf_str()
     except Exception as e:
+        print(f"[ga-hls][dataset_all] population[0].arrf_str() failed: {e!r}")
         chstr = str(seed_ch)
 
     attrs = build_attributes(seed,chstr.split(','))

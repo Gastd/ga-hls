@@ -56,7 +56,7 @@ def run_property_script(
         rc = proc.returncode
 
     except subprocess.TimeoutExpired as exc:
-        # Treat timeouts as ERROR with a helpful message
+        print(f"[ga-hls][harness][TIMEOUT] {path}")
         return HarnessResult(
             verdict=Verdict.ERROR,
             stdout=exc.stdout or "",
@@ -65,7 +65,7 @@ def run_property_script(
             error=exc,
         )
     except Exception as exc:
-        # Any unexpected failure starting the process
+        print(f"[ga-hls][harness][ERROR] failed to start {path}: {exc!r}")
         return HarnessResult(
             verdict=Verdict.ERROR,
             stdout="",

@@ -1,7 +1,0 @@
-{
-  "input": {
-    "requirement_file": "tool/ga_hls/benchmark/property_01_err_twenty.py",
-    "traces_file": "tool/ga_hls/tracesAT.csv",
-    "output_dir": "outputs"
-  }
-}

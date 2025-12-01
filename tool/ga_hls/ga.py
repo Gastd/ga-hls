@@ -219,7 +219,6 @@ class GA(object):
 
         self.checkin("mutation_timestamp")
         for i in range(0, self.size):
-            print(i)
             # Each chromosome starts from the same tree + AST seed
             chromosome = deepcopy(Individual(root, terminators, self.seed_ast))
 
