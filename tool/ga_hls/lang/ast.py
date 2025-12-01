@@ -139,6 +139,12 @@ class FuncCall(Formula):
     func: str
     args: Tuple[Formula, ...]
 
+    def __str__(self) -> str:
+        if not self.args:
+            return f"{self.func}()"
+        inner = ", ".join(str(a) for a in self.args)
+        return f"{self.func}({inner})"
+
 
 @dataclass(frozen=True)
 class Subscript(Formula):
@@ -148,3 +154,6 @@ class Subscript(Formula):
     """
     base: Formula
     index: Formula
+
+    def __str__(self) -> str:
+        return f"{self.base}[{self.index}]"

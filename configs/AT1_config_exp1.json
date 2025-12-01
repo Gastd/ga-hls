@@ -19,9 +19,9 @@
     "enable_logical_flip": false,
     "enable_quantifier_flip": false,
 
-    "allowed_positions": [12],
+    "allowed_positions": [11],
     "numeric_bounds": {
-      "12": [100.0, 140.0]
+      "11": [100.0, 140.0]
     }
   },
   "diagnostics": {

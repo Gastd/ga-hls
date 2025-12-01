@@ -20,6 +20,7 @@ from ..individual import (
     IMP,
     FUNC,
 )
+from ..lang.internal_encoder import FormulaLayout
 
 def isfloat(num):
     try:
@@ -27,6 +28,124 @@ def isfloat(num):
         return True
     except ValueError:
         return False
+
+def _attach_features_to_layout(attrs: List[str], layout: FormulaLayout | None) -> None:
+    """
+    Given the list of ARFF attribute declarations (without the '@attribute' prefix)
+    and a FormulaLayout, populate layout.features with FeatureInfo objects that
+    map attribute names (e.g. NUM2, RELATIONALS1, TERM0, QUANTIFIERS0) to
+    AST position indices.
+
+    This uses simple, schema-specific heuristics:
+      - QUANTIFIERSk  -> k-th quantifier (role == QUANTIFIER)
+      - LOGICALSk     -> k-th logical connective (role == LOGICAL_CONNECTIVE)
+      - RELATIONALSk  -> k-th relational operator (role == RELATION_OP)
+      - NUMk          -> numeric literal child of k-th relational
+      - TERMk         -> term child (Var/Subscript/FuncCall) of k-th relational
+    """
+    if layout is None:
+        return
+
+    layout.features.clear()
+
+    positions = layout.positions
+    if not positions:
+        return
+
+    # Precompute sorted indices and some role-based lists
+    sorted_idxs = sorted(positions.keys())
+    quant_idxs = [i for i in sorted_idxs if positions[i].role == "QUANTIFIER"]
+    logical_idxs = [i for i in sorted_idxs if positions[i].role == "LOGICAL_CONNECTIVE"]
+    relop_idxs = [i for i in sorted_idxs if positions[i].role == "RELATION_OP"]
+
+    # Build per-relop slots: (relop_pos, numeric_child_pos, term_child_pos)
+    relop_slots: list[dict[str, int | None]] = []
+
+    for r_idx in relop_idxs:
+        relop_pos = positions[r_idx]
+        prefix = relop_pos.path + "." if relop_pos.path else ""
+        num_pos: int | None = None
+        term_pos: int | None = None
+        started = False
+
+        for idx in sorted_idxs:
+            if idx <= r_idx:
+                continue
+            p = positions[idx]
+            if prefix and p.path.startswith(prefix):
+                started = True
+                node = p.node
+                if num_pos is None and isinstance(node, (IntConst, RealConst)):
+                    num_pos = idx
+                if term_pos is None and isinstance(node, (Var, Subscript, FuncCall)):
+                    term_pos = idx
+            else:
+                if started:
+                    # We reached nodes outside this relop's subtree
+                    break
+
+        relop_slots.append({"relop": r_idx, "num": num_pos, "term": term_pos})
+
+    def _kind_from_decl(decl: str) -> str:
+        # Very simple: if it says NUMERIC, we treat it as numeric
+        return "NUMERIC" if "NUMERIC" in decl.upper() else "NOMINAL"
+
+    for att in attrs:
+        # att is something like 'NUM2 NUMERIC' or 'QUANTIFIERS0 {ForAll, Exists}'
+        if not att.strip():
+            continue
+        parts = att.split()
+        name = parts[0]
+        decl = " ".join(parts[1:]) if len(parts) > 1 else ""
+        kind = _kind_from_decl(decl)
+        pos_index: int | None = None
+
+        # QUANTIFIERSk, LOGICALSk, RELATIONALSk, NUMk, TERMk
+        def _parse_index(prefix: str) -> int | None:
+            if not name.startswith(prefix):
+                return None
+            suffix = name[len(prefix):]
+            if not suffix.isdigit():
+                return None
+            return int(suffix)
+
+        # Quantifiers
+        k = _parse_index("QUANTIFIERS")
+        if k is not None and k < len(quant_idxs):
+            pos_index = quant_idxs[k]
+
+        # Logical connectives
+        k = _parse_index("LOGICALS")
+        if k is not None and k < len(logical_idxs):
+            pos_index = logical_idxs[k]
+
+        # Relational operators
+        k = _parse_index("RELATIONALS")
+        if k is not None and k < len(relop_slots):
+            pos_index = relop_slots[k]["relop"]
+
+        # Numeric thresholds
+        k = _parse_index("NUM")
+        if k is not None and k < len(relop_slots):
+            num_pos = relop_slots[k]["num"]
+            if num_pos is not None:
+                pos_index = num_pos
+
+        # Term positions
+        k = _parse_index("TERM")
+        if k is not None and k < len(relop_slots):
+            term_pos = relop_slots[k]["term"]
+            if term_pos is not None:
+                pos_index = term_pos
+
+        # If we couldn't map the attribute, leave position_index = -1
+        layout.features.append(
+            FeatureInfo(
+                arff_name=name,
+                kind=kind,
+                position_index=-1 if pos_index is None else pos_index,
+            )
+        )
 
 def build_attributes(seed, formulae: list):
     count_op = {
@@ -165,50 +284,6 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
             f.write(ch_str)
             f.write(f",{chromosome.madeit.upper()}\n")
     return filename_str
-
-def write_dataset_threshold(path: str, unknown, unsats, sats, now):
-    unsats.sort(key=lambda x : x.sw_score, reverse=True)
-    if len(unsats) > len(sats):
-        unsats = unsats[:len(sats)]
-    else:
-        sats = sats[:len(unsats)]
-
-    with open('{}/dataset_{}.arff'.format(path, now), 'w') as f:
-        f.write('@relation all.generationall\n')
-        f.write('\n')
-        f.write('@attribute QUANTIFIERS {ForAll, Exists}\n')
-        f.write('@attribute VARIABLE {s}\n')
-        f.write('@attribute RELATIONALS {<,>,<=,>=, =}\n')
-        f.write('@attribute NUMBER NUMERIC\n')
-        f.write('@attribute LOGICALS1 {And, Or}\n')
-        f.write('@attribute VARIABLE1 {s}\n')
-        f.write('@attribute RELATIONALS1 {<,>,<=,>=, =}\n')
-        f.write('@attribute NUMBER1 NUMERIC\n')
-        f.write('@attribute IMP1 {Implies}\n')
-        f.write('@attribute SIGNALS {signal_2(s),signal_4(s)}\n')
-        f.write('@attribute RELATIONALS2 {<,>,<=,>=, =}\n')
-        f.write('@attribute NUMBER2 NUMERIC\n')
-        f.write('@attribute LOGICALS2 {And, Or}\n')
-        f.write('@attribute SIGNALS1 {signal_2(s),signal_4(s)}\n')
-        f.write('@attribute RELATIONALS3 {<,>,<=,>=, =}\n')
-        f.write('@attribute NUMBER3 NUMERIC\n')
-        f.write('@attribute VEREDICT {TRUE, FALSE, UNKNOWN}\n')
-        f.write('\n')
-        f.write('@data\n')
-        for chromosome in sats:
-            ch_str = str(chromosome)
-            ch_str = ch_str.replace(' ', ',')
-            ch_str = ch_str.replace(',s,In,(', ',')
-            ch_str = ch_str.replace('),Implies,(', ',Implies,')
-            f.write(ch_str[:-1])
-            f.write(f",{chromosome.madeit.upper()}\n")
-        for chromosome in unsats:
-            ch_str = str(chromosome)
-            ch_str = ch_str.replace(' ', ',')
-            ch_str = ch_str.replace(',s,In,(', ',')
-            ch_str = ch_str.replace('),Implies,(', ',Implies,')
-            f.write(ch_str[:-1])
-            f.write(f",{chromosome.madeit.upper()}\n")
 
 def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, unknown: List, per_cut: float) -> str:
     sats.sort(key=lambda x : x.sw_score, reverse=True)

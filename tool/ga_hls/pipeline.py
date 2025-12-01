@@ -5,8 +5,9 @@ from pathlib import Path
 from .config import Config
 from . import defs
 from .ga import GA
+from .config import Config
 from .lang.theodore_parser import load_formula_from_property
-from .lang.internal_encoder import formula_to_internal_obj
+from .lang.internal_encoder import formula_to_internal_obj, encode_with_layout, FormulaLayout
 from .diagnostics.j48 import run_j48
 from .mutation import MutationConfig
 
@@ -19,6 +20,23 @@ def _ensure_output_dir(path: str) -> str:
     out.mkdir(parents=True, exist_ok=True)
     return str(out.resolve())
 
+def build_layout_from_config(cfg: Config) -> FormulaLayout:
+    """
+    Build a FormulaLayout for the requirement in `cfg`, without running GA.
+
+    This is used by introspection / mapping features (e.g. CLI commands that
+    explain how mutation positions and ARFF attributes relate to the original
+    requirement).
+    """
+    _ensure_output_dir(cfg.input.output_dir)
+
+    # Load the ThEodorE Python property and parse it into an AST
+    formula_ast = load_formula_from_property(cfg.input.requirement_file)
+
+    # Encode to internal representation and collect layout metadata
+    _, layout = encode_with_layout(formula_ast)
+
+    return layout
 
 def build_ga_from_config(cfg: Config) -> GA:
     """
@@ -42,9 +60,11 @@ def build_ga_from_config(cfg: Config) -> GA:
         numeric_bounds=cfg.mutation.numeric_bounds,
     )
 
+    formula_ast = load_formula_from_property(cfg.input.requirement_file)
+    internal = formula_to_internal_obj(formula_ast)
     # 2) Build the GA instance.
     ga = GA(
-        init_form=formula_to_internal_obj(load_formula_from_property(cfg.input.requirement_file)),
+        init_form=internal,
         population_size=cfg.ga.population_size,
         max_generations=cfg.ga.generations,
         crossover_rate=cfg.ga.crossover_rate,

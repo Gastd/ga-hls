@@ -45,7 +45,7 @@ from .individual import (
 )
 from .diagnosis import Diagnosis
 from .diagnostics.j48 import run_j48
-from .diagnostics.arff import write_dataset_all, write_dataset_qty, write_dataset_threshold
+from .diagnostics.arff import write_dataset_all, write_dataset_qty
 
 from .lang.python_printer import formula_to_python_expr
 from .lang.internal_parser import parse_internal_obj
@@ -73,8 +73,7 @@ class GA(object):
         fitness: Fitness | None = None,
         output_root: str | None = None,
         mutation_config: MutationConfig | None = None,
-        property_path: str | None = None
-    ):
+        property_path: str | None = None    ):
         super(GA, self).__init__()
 
         # Log the timespaneach one of the tree steps in the approach
@@ -143,19 +142,6 @@ class GA(object):
             # Do not break GA if the AST view fails; just log and continue
             print(f"[ga-hls] Warning: failed to build seed AST: {exc}")
             self.seed_ast = None
-        
-        # DEBUG: print the seed AST for inspection
-        self.print_seed_ast()
-        print("seed_ast type:", type(self.seed_ast))
-        if self.seed_ast is not None:
-            try:
-                from ga_hls.lang.analysis import formula_size, formula_depth, collect_vars
-            except ImportError:
-                from .lang.analysis import formula_size, formula_depth, collect_vars
-
-            print("seed_ast size:", formula_size(self.seed_ast))
-            print("seed_ast depth:", formula_depth(self.seed_ast))
-            print("seed_ast vars:", sorted(collect_vars(self.seed_ast)))
 
         self.target_sats = int(target_sats)
         self.target_mutation = False
@@ -309,15 +295,6 @@ class GA(object):
             sats=self.sats,
             entire_dataset=self.entire_dataset,
         )
-
-
-    def store_dataset_threshold(self):
-        return write_dataset_threshold(
-            path=self.path,
-            unknown=self.unknown, 
-            unsats=self.unsats, 
-            sats=self.sats, 
-            now=self.now)
 
     def roulette_wheel_selection(self):
         population_fitness = sum([chromosome.fitness for chromosome in self.population])

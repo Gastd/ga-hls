@@ -1,6 +1,8 @@
+# ga_hls/lang/internal_encoder.py
 from __future__ import annotations
 
-from typing import Any, List
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 from .python_printer import formula_to_python_expr
 from .ast import (
@@ -20,6 +22,104 @@ from .ast import (
     Subscript,
     FuncCall,
 )
+
+
+@dataclass
+class PositionInfo:
+    index: int             # the integer used in allowed_positions / numeric_bounds
+    node: Formula          # the AST node
+    path: str              # a stable textual path, e.g. "body.antecedent.args[2].right"
+    role: str              # e.g. "NUMERIC_THRESHOLD", "RELATION_OP", "LOGICAL_CONNECTIVE"
+
+@dataclass
+class FeatureInfo:
+    arff_name: str         # e.g. "NUM2"
+    kind: str              # "NUMERIC", "NOMINAL"
+    position_index: int    # which PositionInfo this came from
+
+@dataclass
+class FormulaLayout:
+    positions: Dict[int, PositionInfo]        # index -> PositionInfo
+    features: List[FeatureInfo]               # in ARFF column order
+
+def _infer_role(node: Formula) -> str:
+    """
+    Heuristic role classification for layout / introspection.
+    """
+    if isinstance(node, ForAll) or isinstance(node, Exists):
+        return "QUANTIFIER"
+    if isinstance(node, And) or isinstance(node, Or):
+        return "LOGICAL_CONNECTIVE"
+    if isinstance(node, Not):
+        return "NEGATION"
+    if isinstance(node, Implies):
+        return "IMPLIES"
+    if isinstance(node, RelOp):
+        return "RELATION_OP"
+    if isinstance(node, ArithOp):
+        return "ARITH_OP"
+    if isinstance(node, (IntConst, RealConst)):
+        return "NUMERIC_LITERAL"
+    if isinstance(node, BoolConst):
+        return "BOOLEAN_LITERAL"
+    if isinstance(node, (Var, Subscript, FuncCall)):
+        return "TERM"
+    return "EXPR"
+
+
+def _collect_positions(formula: Formula) -> Dict[int, PositionInfo]:
+    """
+    Traverse the formula in a deterministic order (preorder) and assign
+    integer position indices with path strings and heuristic roles.
+    """
+    positions: Dict[int, PositionInfo] = {}
+    next_index = 0
+
+    def visit(node: Formula, path: str) -> None:
+        nonlocal next_index
+        idx = next_index
+        next_index += 1
+
+        positions[idx] = PositionInfo(
+            index=idx,
+            node=node,
+            path=path or ".",
+            role=_infer_role(node),
+        )
+
+        # Recurse according to node type
+        if isinstance(node, ForAll) or isinstance(node, Exists):
+            visit(node.body, f"{path}.body" if path else "body")
+
+        elif isinstance(node, And) or isinstance(node, Or):
+            for i, arg in enumerate(node.args):
+                child_path = f"{path}.args[{i}]" if path else f"args[{i}]"
+                visit(arg, child_path)
+
+        elif isinstance(node, Not):
+            child_path = f"{path}.arg" if path else "arg"
+            visit(node.arg, child_path)
+
+        elif isinstance(node, Implies):
+            left_path = f"{path}.left" if path else "left"
+            right_path = f"{path}.right" if path else "right"
+            visit(node.left, left_path)
+            visit(node.right, right_path)
+
+        elif isinstance(node, RelOp):
+            left_path = f"{path}.left" if path else "left"
+            right_path = f"{path}.right" if path else "right"
+            visit(node.left, left_path)
+            visit(node.right, right_path)
+
+        elif isinstance(node, ArithOp):
+            left_path = f"{path}.left" if path else "left"
+            right_path = f"{path}.right" if path else "right"
+            visit(node.left, left_path)
+            visit(node.right, right_path)
+
+    visit(formula, "")
+    return positions
 
 
 class InternalEncodeError(RuntimeError):
@@ -117,3 +217,13 @@ def formula_to_internal_obj(formula: Formula) -> Any:
     raise InternalEncodeError(
         f"Unsupported Formula node type for internal encoding: {type(formula)!r}"
     )
+
+def encode_with_layout(formula: Formula) -> tuple[Any, FormulaLayout]:
+    """
+    Convenience helper that returns both the internal representation and
+    a FormulaLayout describing mutation/position metadata.
+    """
+    internal = formula_to_internal_obj(formula)
+    positions = _collect_positions(formula)
+    layout = FormulaLayout(positions=positions, features=[])
+    return internal, layout
