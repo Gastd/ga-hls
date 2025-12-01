@@ -129,3 +129,22 @@ class ArithOp(Formula):
 
     def __str__(self) -> str:
         return f"({self.left} {self.op} {self.right})"
+
+@dataclass(frozen=True)
+class FuncCall(Formula):
+    """
+    Generic function-style expression, e.g. ToInt(RealVal(0) + ...).
+    We keep 'func' as a string name, and recursively store arguments.
+    """
+    func: str
+    args: Tuple[Formula, ...]
+
+
+@dataclass(frozen=True)
+class Subscript(Formula):
+    """
+    Array / sequence access: base[index], e.g. v_speed[ToInt(...)].
+    Both 'base' and 'index' are full Formula trees.
+    """
+    base: Formula
+    index: Formula

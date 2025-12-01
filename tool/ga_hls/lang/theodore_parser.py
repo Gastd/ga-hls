@@ -19,12 +19,46 @@ from .ast import (
     RealConst,
     RelOp,
     Var,
+    FuncCall,
+    Subscript,
 )
 
 
 class TheodoreParseError(RuntimeError):
     """Raised when we cannot extract or interpret a ThEodorE/HLS formula."""
 
+class TheodorePropertyExtractor(ast.NodeVisitor):
+    """
+    Walks a ThEodorE property file and extracts:
+      - definitions of alias variables (interval_t, conditions_t, ...)
+      - the z3solver.add(...) requirement formula.
+    """
+    def __init__(self) -> None:
+        self.alias_defs: dict[str, ast.AST] = {}
+        self.requirement_expr: ast.AST | None = None
+
+    # capture assignments like: interval_t = <expr>
+    def visit_Assign(self, node: ast.Assign) -> None:
+        # only handle simple "NAME = expr"
+        if len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+            name = node.targets[0].id
+            # Heuristic: only keep aliases we might inline
+            if name.endswith("_t") or name in {"interval_t", "conditions_t"}:
+                self.alias_defs[name] = node.value
+        self.generic_visit(node)
+
+    # capture: z3solver.add(<expr>)
+    def visit_Call(self, node: ast.Call) -> None:
+        if (
+            isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "z3solver"
+            and node.func.attr == "add"
+            and len(node.args) == 1
+        ):
+            # Remember the *last* add(...) call as the requirement
+            self.requirement_expr = node.args[0]
+        self.generic_visit(node)
 
 # --- Public API -------------------------------------------------------------
 
@@ -40,19 +74,49 @@ def load_formula_from_property(path: Union[str, Path]) -> Formula:
     except SyntaxError as exc:
         raise TheodoreParseError(f"Failed to parse Python in {path!s}: {exc}") from exc
 
-    call_node = _find_z3_add_call(module)
-    if call_node is None:
-        raise TheodoreParseError(
-            f"Could not find a 'z3solver.add(...)' call in {path!s}"
-        )
+    # First pass: collect alias definitions and the explicit requirement expr
+    extractor = TheodorePropertyExtractor()
+    extractor.visit(module)
 
-    if not call_node.args:
-        raise TheodoreParseError(
-            f"'z3solver.add' in {path!s} has no arguments; expected a formula."
-        )
+    requirement_expr: ast.AST | None = extractor.requirement_expr
 
-    formula_expr = call_node.args[0]
-    return _expr_to_formula(formula_expr)
+    # Fallback to the old heuristic if we didn't see a z3solver.add(...) in the visitor
+    if requirement_expr is None:
+        call_node = _find_z3_add_call(module)
+        if call_node is None:
+            raise TheodoreParseError(
+                f"Could not find a 'z3solver.add(...)' call in {path!s}"
+            )
+        if not call_node.args:
+            raise TheodoreParseError(
+                f"'z3solver.add' in {path!s} has no arguments; expected a formula."
+            )
+        requirement_expr = call_node.args[0]
+
+    # Parse the main requirement expression into a Formula
+    requirement_formula = _expr_to_formula(requirement_expr)
+
+    # Parse alias definitions (interval_t, conditions_t, etc.) into Formulas
+    alias_formulas: dict[str, Formula] = {}
+    for name, expr in extractor.alias_defs.items():
+        try:
+            alias_formulas[name] = _expr_to_formula(expr)
+        except TheodoreParseError as exc:
+            raise TheodoreParseError(
+                f"Failed to parse alias definition '{name}' in {path!s}: {exc}"
+            ) from exc
+
+    # Inline aliases so that Var('interval_t') / Var('conditions_t') are expanded
+    if alias_formulas:
+        requirement_formula = _inline_aliases(requirement_formula, alias_formulas)
+
+    # Strips out the outer Not:
+    #   Not( ForAll(...) )  -->  ForAll(...)
+    if isinstance(requirement_formula, Not):
+        requirement_formula = requirement_formula.arg
+
+    return requirement_formula
+
 
 
 # --- AST search helpers -----------------------------------------------------
@@ -114,6 +178,65 @@ def _find_z3_add_call(module: ast.Module) -> ast.Call | None:
     return max(candidates, key=lambda c: expr_size(c.args[0]))
 
 
+def _inline_aliases(formula: Formula, aliases: dict[str, Formula]) -> Formula:
+    """
+    Recursively replace Var(name) with aliases[name] wherever possible.
+
+    This returns a *new* Formula tree; the alias definitions themselves are
+    not mutated.
+    """
+
+    # Direct substitution for alias variables
+    if isinstance(formula, Var) and formula.name in aliases:
+        # Recurse once more in case aliases refer to other aliases
+        return _inline_aliases(aliases[formula.name], aliases)
+
+    # Structural recursion on all known node types
+    if isinstance(formula, Not):
+        return Not(_inline_aliases(formula.arg, aliases))
+
+    if isinstance(formula, And):
+        return And([_inline_aliases(a, aliases) for a in formula.args])
+
+    if isinstance(formula, Or):
+        return Or([_inline_aliases(a, aliases) for a in formula.args])
+
+    if isinstance(formula, Implies):
+        return Implies(
+            left=_inline_aliases(formula.left, aliases),
+            right=_inline_aliases(formula.right, aliases),
+        )
+
+    if isinstance(formula, ForAll):
+        return ForAll(
+            vars=list(formula.vars),
+            body=_inline_aliases(formula.body, aliases),
+        )
+
+    if isinstance(formula, Exists):
+        return Exists(
+            vars=list(formula.vars),
+            body=_inline_aliases(formula.body, aliases),
+        )
+
+    if isinstance(formula, RelOp):
+        return RelOp(
+            op=formula.op,
+            left=_inline_aliases(formula.left, aliases),
+            right=_inline_aliases(formula.right, aliases),
+        )
+
+    if isinstance(formula, ArithOp):
+        return ArithOp(
+            op=formula.op,
+            left=_inline_aliases(formula.left, aliases),
+            right=_inline_aliases(formula.right, aliases),
+        )
+
+    # Base cases: constants, already-opaque vars/signals, etc.
+    # BoolConst, IntConst, RealConst, Var (non-alias), or any other Formula subtype
+    # that doesn't contain children we care about.
+    return formula
 
 # --- Python expr -> Formula -------------------------------------------------
 
@@ -135,9 +258,20 @@ def _expr_to_formula(node: ast.expr) -> Formula:
     if isinstance(node, ast.Name):
         return Var(node.id)
 
-    # Subscript, e.g., signal_5[s]
+    # Subscript, e.g., v_speed[ToInt(...)]
     if isinstance(node, ast.Subscript):
-        return Var(_subscript_to_str(node))
+        # Base: v_speed
+        base_formula = _expr_to_formula(node.value)
+
+        # Slice (index): ToInt(RealVal(0) + (t - 0.0) / 10000.0)
+        slice_node = node.slice
+        # Python < 3.9 uses ast.Index wrapper
+        if hasattr(ast, "Index") and isinstance(slice_node, ast.Index):  # type: ignore[attr-defined]
+            slice_node = slice_node.value
+
+        index_formula = _expr_to_formula(slice_node)
+        return Subscript(base=base_formula, index=index_formula)
+
 
     # Unary operators (we only care about Not)
     if isinstance(node, ast.UnaryOp):
@@ -189,9 +323,10 @@ def _expr_to_formula(node: ast.expr) -> Formula:
             return rels[0]
         return And(rels)
 
-        # Calls: ForAll([...], body), Exists([...], body), Not(...), And(...),
-    # Or(...), Implies(...), etc.
+    # Calls: ForAll([...], body), Exists([...], body), Not(...), And(...),
+    # Or(...), Implies(...), ToInt(...), RealVal(...), etc.
     if isinstance(node, ast.Call):
+        # Simple function name, e.g. ForAll, Exists, ToInt, RealVal
         if isinstance(node.func, ast.Name):
             fname = node.func.id
 
@@ -229,11 +364,19 @@ def _expr_to_formula(node: ast.expr) -> Formula:
                 right = _expr_to_formula(node.args[1])
                 return Implies(left=left, right=right)
 
-            # Any other function-style call we treat as an opaque variable for now
-            return Var(_call_to_str(node))
+            # Any other function-style call: build a generic FuncCall and recurse.
+            # This covers ToInt(...), RealVal(...), etc.
+            args = tuple(_expr_to_formula(a) for a in node.args)
+            return FuncCall(func=fname, args=args)
 
-        # Something like f.g(...) – treat as opaque for now
-        return Var(_call_to_str(node))
+        # Something like obj.method(...): use textual name as 'func'
+        func_str = (
+            ast.unparse(node.func)
+            if hasattr(ast, "unparse")
+            else _fallback_func_str(node.func)
+        )
+        args = tuple(_expr_to_formula(a) for a in node.args)
+        return FuncCall(func=func_str, args=args)
 
     raise TheodoreParseError(f"Unsupported expression node: {ast.dump(node)}")
 

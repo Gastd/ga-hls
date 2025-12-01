@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, List
 
+from .python_printer import formula_to_python_expr
 from .ast import (
     And,
     ArithOp,
@@ -16,6 +17,8 @@ from .ast import (
     RealConst,
     RelOp,
     Var,
+    Subscript,
+    FuncCall,
 )
 
 
@@ -107,6 +110,9 @@ def formula_to_internal_obj(formula: Formula) -> Any:
                 formula_to_internal_obj(formula.right),
             ],
         ]
+    
+    if isinstance(formula, Subscript) or isinstance(formula, FuncCall):
+        return formula_to_python_expr(formula)
 
     raise InternalEncodeError(
         f"Unsupported Formula node type for internal encoding: {type(formula)!r}"

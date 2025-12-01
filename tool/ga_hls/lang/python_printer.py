@@ -16,6 +16,8 @@ from .ast import (
     RealConst,
     RelOp,
     Var,
+    FuncCall,
+    Subscript,
 )
 
 
@@ -77,6 +79,13 @@ def formula_to_python_expr(f: Formula) -> str:
         vars_list = "[" + ", ".join(f'"{v}"' for v in f.vars) + "]"
         body = formula_to_python_expr(f.body)
         return f"Exists({vars_list}, {body})"
+    
+    if isinstance(f, FuncCall):
+        args = ", ".join(formula_to_python_expr(a) for a in f.args)
+        return f"{f.func}({args})"
+
+    if isinstance(f, Subscript):
+        return f"{formula_to_python_expr(f.base)}[{formula_to_python_expr(f.index)}]"
 
     # Fallback – shouldn't really happen if the AST is well-formed
     return repr(f)
