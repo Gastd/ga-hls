@@ -164,7 +164,11 @@ def build_attributes(seed, formulae: list):
         'TERM': 0
     }
     terminators = list(set(treenode.get_terminators(seed)))
-    terminators = [value for value in terminators if not isinstance(value, int) and not isinstance(value, float)]
+    terminators = [
+        str(value).replace(' ', '')
+        for value in terminators
+        if not isinstance(value, int) and not isinstance(value, float)
+    ]
     ret = []
     for term in formulae:
         if term in QUANTIFIERS:
@@ -172,6 +176,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'QUANTIFIERS{count_op["QUANTIFIERS"]} {qstring}')
             count_op['QUANTIFIERS'] = count_op['QUANTIFIERS'] + 1
         elif term in RELATIONALS:
@@ -179,6 +184,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'RELATIONALS{count_op["RELATIONALS"]} {qstring}')
             count_op['RELATIONALS'] = count_op['RELATIONALS'] + 1
         elif term in EQUALS:
@@ -186,6 +192,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'EQUALS{count_op["EQUALS"]} {qstring}')
             count_op['EQUALS'] = count_op['EQUALS'] + 1
         elif term in ARITHMETICS:
@@ -193,6 +200,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'ARITHMETICS{count_op["ARITHMETICS"]} {qstring}')
             count_op['ARITHMETICS'] = count_op['ARITHMETICS'] + 1
         elif term in MULDIV:
@@ -200,6 +208,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'MULDIV{count_op["MULDIV"]} {qstring}')
             count_op['MULDIV'] = count_op['MULDIV'] + 1
         elif term in EXP:
@@ -207,6 +216,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'EXP{count_op["EXP"]} {qstring}')
             count_op['EXP'] = count_op['EXP'] + 1
         elif term in LOGICALS:
@@ -214,6 +224,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'LOGICALS{count_op["LOGICALS"]} {qstring}')
             count_op['LOGICALS'] = count_op['LOGICALS'] + 1
         elif term in NEG:
@@ -221,6 +232,7 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'NEG{count_op["NEG"]} {qstring}')
             count_op['NEG'] = count_op['NEG'] + 1
         elif term in IMP:
@@ -228,22 +240,26 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'IMP{count_op["IMP"]} {qstring}')
             count_op['IMP'] = count_op['IMP'] + 1
         elif term in terminators:
             qstring = str(terminators)
             qstring = qstring.replace('\'', '')
             qstring = '{'+qstring[1:-1]+'}'
+            qstring = qstring.replace(' ', '')
             ret.append(f'TERM{count_op["TERM"]} {qstring}')
             count_op['TERM'] = count_op['TERM'] + 1
         elif term.isnumeric() or isfloat(term):
             ret.append(f'NUM{count_op["NUM"]} NUMERIC')
+            qstring = qstring.replace(' ', '')
             count_op['NUM'] = count_op['NUM'] + 1
         elif term in FUNC:
             qstring = str(FUNC)
             qstring = qstring.replace('\'', '')
             qstring = qstring.replace(']', '}')
             qstring = qstring.replace('[', '{')
+            qstring = qstring.replace(' ', '')
             ret.append(f'FUNC{count_op["FUNC"]} {qstring}')
             count_op['FUNC'] = count_op['FUNC'] + 1
     return ret
@@ -262,7 +278,8 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
         print(f"[ga-hls][dataset_all] population[0].arrf_str() failed: {e!r}")
         chstr = str(seed_ch)
 
-    attrs = build_attributes(seed,chstr.split(','))
+    chstr_no_space = chstr.replace(" ", "")
+    attrs = build_attributes(seed,chstr_no_space.split(','))
 
     nowstr = f'{now}'.replace(' ', '_')
     nowstr = nowstr.replace(':', '_')
@@ -281,6 +298,7 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
         f.write('@data\n')
         for chromosome in entire_dataset:
             ch_str = chromosome.arrf_str()
+            ch_str = ch_str.replace(" ", "")
             f.write(ch_str)
             f.write(f",{chromosome.madeit.upper()}\n")
     return filename_str
@@ -307,7 +325,8 @@ def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, u
     except Exception as e:
         chstr = str(seed_ch)
 
-    attrs = build_attributes(seed,chstr.split(','))
+    chstr_no_space = chstr.replace(" ", "")
+    attrs = build_attributes(seed, chstr_no_space.split(','))
 
     nowstr = f'{now}'.replace(' ', '_')
     nowstr = nowstr.replace(':', '_')
@@ -325,27 +344,18 @@ def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, u
         f.write('\n')
         f.write('@data\n')
         for chromosome in sats:
-            # print('writing sats')
             ch_str = chromosome.arrf_str()
-            # ch_str = ch_str.replace(' ', ',')
-            # ch_str = ch_str.replace(',t,In,(', ',')
-            # ch_str = ch_str.replace('),Implies,(', ',Implies,')
+            ch_str = ch_str.replace(" ", "")
             f.write(ch_str)
             f.write(f",{chromosome.madeit.upper()}\n")
         for chromosome in unsats:
-            # print('writing unsats')
             ch_str = chromosome.arrf_str()
-            # ch_str = ch_str.replace(' ', ',')
-            # ch_str = ch_str.replace(',t,In,(', ',')
-            # ch_str = ch_str.replace('),Implies,(', ',Implies,')
+            ch_str = ch_str.replace(" ", "")
             f.write(ch_str)
             f.write(f",{chromosome.madeit.upper()}\n")
         for chromosome in unknown:
-            # print('writing unsats')
             ch_str = chromosome.arrf_str()
-            # ch_str = ch_str.replace(' ', ',')
-            # ch_str = ch_str.replace(',t,In,(', ',')
-            # ch_str = ch_str.replace('),Implies,(', ',Implies,')
+            ch_str = ch_str.replace(" ", "")
             f.write(ch_str)
             f.write(f",{chromosome.madeit.upper()}\n")
     return filename_str
