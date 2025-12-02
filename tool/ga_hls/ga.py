@@ -200,8 +200,8 @@ class GA(object):
 
         # Seed individual has both tree and AST
         self.seed_ch = deepcopy(Individual(root, terminators, self.seed_ast))
-        self.seed_ch.show_idx()
-        print(f"terminators = {terminators}")
+        # self.seed_ch.show_idx()
+        #print(f"terminators = {terminators}")
 
         self.checkin("mutation_timestamp")
         for i in range(0, self.size):
