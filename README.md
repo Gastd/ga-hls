@@ -24,38 +24,28 @@ The result is a **diagnostic decision tree** that relates parts of the requireme
 
 ```text
 ga-hls/
-├── cli.py                   # `ga-hls` console entry (run, explain-positions, ...)
-├── config.py                # Config dataclasses + JSON loader
-├── defs.py                  # Legacy path settings for benchmarks
-├── diagnosis.py             # Diagnosis scaffold
-│
-├── diagnostics/
-│   ├── arff.py              # ARFF writer utilities
-│   └── j48.py               # Weka J48 subprocess wrapper
-│
-├── examples/
-│   └── AT1_AT001.py         # Minimal example property
-│
-├── fitness.py # Smith–Waterman similarity (fitness support)
-├── ga.py                    # Genetic Algorithm loop (selection, crossover, mutation)
-├── harness.py               # Robust Z3 harness: SAT/UNSAT/ERROR execution
-├── harness_script.py        # Utilities for generating temporary Z3 scripts
-├── individual.py            # GA individual (AST + internal treenode view)
+├── cli.py                   # CLI: run, explain-positions, inspect-internal, ...
+├── config.py                # JSON config -> dataclasses
+├── pipeline.py              # Unified pipeline: property → AST → GA → ARFF → J48
 │
 ├── lang/
-│   ├── analysis.py          # AST analysis helpers (vars, depth, size,…)
-│   ├── ast.py               # Typed AST nodes
-│   ├── hls_parser.py        # (Optional) HLS textual parser
-│   ├── internal_encoder.py  # AST → internal GA format + ARFF feature layout
-│   ├── internal_parser.py   # Parser for old JSON list-of-lists format
-│   ├── python_printer.py    # Pretty-printer: AST → executable Python/Z3 script
-│   └── theodore_parser.py   # Extract AST from ThEodorE Python properties
+│   ├── ast.py               # Typed AST definitions
+│   ├── theodore_parser.py   # Parse ThEodorE Python property → AST
+│   ├── internal_encoder.py  # AST → GA internal format + ARFF layout
+│   ├── python_printer.py    # AST → executable Python script for Z3
+│   └── analysis.py          # AST utilities (size, vars, depth, etc.)
 │
 ├── mutation/
-│   └── api.py               # MutationConfig + mutate_formula (typed AST mutation)
+│   └── api.py               # MutationConfig + mutate_formula (typed, safe)
 │
-├── pipeline.py              # Unified pipeline: property → AST → GA → ARFF → J48
-└── treenode.py              # Binary tree representation
+├── diagnostics/
+│   ├── arff.py              # ARFF writer
+│   └── j48.py               # Weka J48 runner
+│
+├── ga.py                    # GA loop
+├── individual.py            # GA individual (AST + internal treenode)
+├── harness.py               # Safe Z3 evaluation
+└── examples/                # Example ThEodorE properties
 ```
 
 ---  
@@ -79,28 +69,49 @@ ga-hls run --config <file.json>
 
 ## Prerequisites
 
-- Python ≥ 3.8
-- Z3 (pip install z3-solver)
-- Java (for using Weka J48)
+You can use the docker installation or local cli installation:
 
-Install the package in editable mode:
+For Docker (recommended):
+- Docker 
+
+Build docker. From /docker run:
 ```
-python -m pip install -e .
+docker compose build
 ```
 
 Check CLI availability:
 ```
+docker compose run --rm ga-hls --help
+docker compose run --rm ga-hls --version
+```
+
+If you do not want to use the docker installation, you'll need:
+- Python ≥ 3.8
+- Z3 (pip install z3-solver)
+- Java (for using Weka J48)
+
+Install the python envrionment:
+```
+python -m pip install -e .
+```
+
+Simply use the tool via:
+```
 ga-hls --help
-ga-hls --version
 ```
 
 ---
 
-## Usage
+## Usage (docker-oriented)
 
-Full pipeline:
+Basic command help:
 ```
-ga-hls run --config ga-hls/configs/AT1_config_exp1.json
+docker compose run --rm ga-hls --help
+```
+
+Full pipeline (AT1 example):
+```
+docker compose run --rm  ga-hls run --config ga-hls/configs/AT1_config_exp1.json
 ```
 
 This performs:
@@ -140,36 +151,44 @@ Example:
 ```json
 {
   "input": {
-    "requirement_file": "ga-hls/examples/AT1_AT001.py",
-    "traces_file": "ga-hls/tracesAT.csv",
-    "output_dir": "outputs"
+    "requirement_file": "ga-hls/examples/AT1_AT001.py",   // ThEodorE-generated Python requirement
+    "traces_file": "ga-hls/tracesAT.csv",                // Execution traces encoded for Z3
+    "output_dir": "outputs"                              // Directory for ARFF + decision trees + logs
   },
+
   "ga": {
-    "population_size": 50,
-    "generations": 10,
-    "crossover_rate": 0.95,
-    "mutation_rate": 0.10,
-    "seed": 42
+    "population_size": 50,       // Number of candidate formulas per generation
+    "generations": 10,           // Number of evolution iterations
+    "crossover_rate": 0.95,      // Probability of combining two parents
+    "mutation_rate": 0.10,       // Probability of mutating an individual
+    "seed": 42                   // Random seed for reproducibility
   },
+
   "mutation": {
-    "max_mutations": 1,
+    "max_mutations": 1,          // Max number of AST-level edits per mutation step
 
-    "enable_numeric_perturbation": true,
-    "enable_relop_flip": false,
-    "enable_logical_flip": false,
-    "enable_quantifier_flip": false,
+    "enable_numeric_perturbation": true,  // Allow jittering numeric constants
+    "enable_relop_flip": false,           // Allow flipping relational operators (< → >, ≤ → ≥, etc.)
+    "enable_logical_flip": false,         // Allow switching AND ↔ OR, etc.
+    "enable_quantifier_flip": false,      // Allow switching ∀ ↔ ∃
 
+    // Specific AST positions that are allowed to mutate (see explain-positions)
     "allowed_positions": [11],
+
+    // Numeric bounds applied to NUM2 (position 11)
+    // e.g., NUMBER at position 11 ∈ [100.0, 140.0]
     "numeric_bounds": {
       "11": [100.0, 140.0]
     }
   },
+
   "diagnostics": {
-    "arff_filename": "outputs/example.arff",
-    "weka_jar": null,
-    "j48_options": ["-C", "0.25", "-M", "2"]
+    "arff_filename": "outputs/example.arff",    // ARFF output file for Weka
+    "weka_jar": null,                           // Path to Weka JAR (null = use $WEKA_JAR in container)
+    "j48_options": ["-C", "0.25", "-M", "2"]    // J48 pruning and leaf-size parameters
   }
 }
+
 ```
 
 ---
@@ -178,7 +197,7 @@ Example:
 
 To see where every mutation position sits in the requirement:
 ```
-ga-hls explain-positions --config configs/AT1_config_exp1.json
+docker compose run --rm  ga-hls explain-positions --config configs/AT1_config_exp1.json
 ```
 
 Example:
@@ -203,7 +222,7 @@ Pos  NodeType            Node                                      Features
 
 To inspect a single mutation slot:
 ```
-ga-hls explain-position --config configs/AT1_config_exp1.json --position 12
+docker compose run --rm  ga-hls explain-position --config configs/AT1_config_exp1.json --position 12
 ```
 
 ---
