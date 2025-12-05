@@ -180,12 +180,6 @@ Example:
     "numeric_bounds": {
       "11": [100.0, 140.0]
     }
-  },
-
-  "diagnostics": {
-    "arff_filename": "outputs/example.arff",    // ARFF output file for Weka
-    "weka_jar": null,                           // Path to Weka JAR (null = use $WEKA_JAR in container)
-    "j48_options": ["-C", "0.25", "-M", "2"]    // J48 pruning and leaf-size parameters
   }
 }
 
