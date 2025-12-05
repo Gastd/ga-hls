@@ -37,15 +37,16 @@ class TheodorePropertyExtractor(ast.NodeVisitor):
         self.alias_defs: dict[str, ast.AST] = {}
         self.requirement_expr: ast.AST | None = None
 
-    # capture assignments like: interval_t = <expr>
+    # capture assignments like: interval = <expr>, in_zone = <expr>, etc.
     def visit_Assign(self, node: ast.Assign) -> None:
         # only handle simple "NAME = expr"
         if len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
             name = node.targets[0].id
-            # Heuristic: only keep aliases we might inline
-            if name.endswith("_t") or name in {"interval_t", "conditions_t"}:
-                self.alias_defs[name] = node.value
+            # Treat all simple assignments as potential aliases.
+            # They will only be inlined where Var(name) appears in the main formula.
+            self.alias_defs[name] = node.value
         self.generic_visit(node)
+
 
     # capture: z3solver.add(<expr>)
     def visit_Call(self, node: ast.Call) -> None:
