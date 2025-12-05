@@ -33,21 +33,6 @@ class GAConfig:
     elitism: int = 1
     seed: Optional[int] = None
 
-
-@dataclass
-class DiagnosticsConfig:
-    """
-    Configuration for dataset generation and decision-tree diagnostics.
-    """
-
-    arff_filename: str = "dataset.arff"
-    # Directory or file where Weka JAR is located (if used).
-    weka_jar: Optional[str] = None
-    # Extra options for J48; we'll actually use these in a later stage.
-    j48_options: List[str] = field(
-        default_factory=lambda: ["-C", "0.25", "-M", "2"]
-    )
-
 @dataclass
 class MutationConfig:
     """
@@ -73,7 +58,6 @@ class Config:
     """
     input: InputConfig = field(default_factory=InputConfig)
     ga: GAConfig = field(default_factory=GAConfig)
-    diagnostics: DiagnosticsConfig = field(default_factory=DiagnosticsConfig)
     mutation: MutationConfig = field(default_factory=MutationConfig)
 
 # --- Loader utilities --------------------------------------------------------
@@ -169,12 +153,6 @@ def load_config(path: str | Path) -> Config:
         seed=ga_data.get("seed"),
     )
 
-    diag_cfg = DiagnosticsConfig(
-        arff_filename=str(diag_data.get("arff_filename", "dataset.arff")),
-        weka_jar=diag_data.get("weka_jar"),
-        j48_options=list(diag_data.get("j48_options", ["-C", "0.25", "-M", "2"])),
-    )
-
     # --- mutation section (NEW) ---
     # numeric_bounds keys come from JSON as strings -> convert to int
     raw_bounds = mut_data.get("numeric_bounds", {})
@@ -196,4 +174,4 @@ def load_config(path: str | Path) -> Config:
         numeric_bounds=numeric_bounds,
     )
 
-    return Config(input=input_cfg, ga=ga_cfg, diagnostics=diag_cfg, mutation=mut_cfg)
+    return Config(input=input_cfg, ga=ga_cfg, mutation=mut_cfg)

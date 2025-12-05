@@ -24,10 +24,5 @@
     "7": { "min": 10.0, "max": 30.0 },
     "11": { "min": 100.0, "max": 140.0 }
     }
-  },
-  "diagnostics": {
-    "arff_filename": "outputs/example.arff",
-    "weka_jar": null,
-    "j48_options": ["-C", "0.25", "-M", "2"]
   }
 }

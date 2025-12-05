@@ -5,7 +5,7 @@
     "output_dir": "outputs"
   },
   "ga": {
-    "population_size": 50,
+    "population_size": 1000,
     "generations": 10,
     "crossover_rate": 0.95,
     "mutation_rate": 0.10,
@@ -23,10 +23,5 @@
     "numeric_bounds": {
       "11": [100.0, 140.0]
     }
-  },
-  "diagnostics": {
-    "arff_filename": "outputs/example.arff",
-    "weka_jar": null,
-    "j48_options": ["-C", "0.25", "-M", "2"]
   }
 }
