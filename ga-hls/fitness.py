@@ -1,4 +1,4 @@
-# tool/ga_hls/fitness_smithwaterman.py
+# ga-hls/fitness.py
 
 from __future__ import annotations
 

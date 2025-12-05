@@ -4,16 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ga-hls"
-version = "0.1.0"
+version = "1.0.0"
 description = "Genetic algorithm-based HLS requirement mutation and diagnostics"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { file = "LICENSE" }
 authors = [
-  { name = "ga-hls contributors" }
+  { name = "Gabriel Araujo" },
+  { name = "Ricardo Caldas" },
+  { name = "Federico Formica"}
 ]
 
-# These are approximate; we can refine later if you want strict versions
 dependencies = [
   "numpy",
   "matplotlib",
@@ -31,5 +32,6 @@ ga-hls = "ga_hls.cli:main"
 [tool.setuptools]
 packages = ["ga_hls", "ga_hls.lang"]
 
+
 [tool.setuptools.package-dir]
-ga_hls = "tool/ga_hls"
+ga_hls = "ga-hls"

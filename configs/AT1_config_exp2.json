@@ -1,7 +1,7 @@
 {
   "input": {
-    "requirement_file": "tool/ga_hls/benchmark/property_distance_obs_r2.py",
-    "traces_file": "tool/ga_hls/tracesAT.csv",
+    "requirement_file": "ga-hls/benchmark/property_distance_obs_r2.py",
+    "traces_file": "ga-hls/tracesAT.csv",
     "output_dir": "outputs"
   },
   "ga": {

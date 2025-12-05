@@ -1,11 +1,11 @@
 __pycache__
 2022*/
 2023*/
-ga_hls/prop_ctrl.py
-ga_hls/temp.py
-ga_hls/z3check.py
+ga-hls/prop_ctrl.py
+ga-hls/temp.py
+ga-hls/z3check.py
 # Hidden file to sort folders on MacOS systems.
 .DS_Store
 */.DS_Store
-ga_hls.egg-info/
+ga-hls.egg-info/
 tmp/

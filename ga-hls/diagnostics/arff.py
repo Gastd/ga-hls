@@ -1,4 +1,4 @@
-# tool/ga_hls/diagnostics/arff.py
+# ga-hls/diagnostics/arff.py
 
 from __future__ import annotations
 

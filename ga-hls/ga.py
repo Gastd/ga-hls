@@ -54,8 +54,8 @@ from .lang.ast import Formula
 from .harness_script import build_z3check_script
 from .harness import run_property_script, Verdict
 
-from .fitness_smithwaterman import Fitness, SmithWatermanFitness
-from .fitness_smithwaterman import Smith_Waterman as SW
+from .fitness import Fitness, SmithWatermanFitness
+from .fitness import Smith_Waterman as SW
 
 from .mutation import MutationConfig
 

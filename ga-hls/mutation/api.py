@@ -5,7 +5,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Callable, Iterable, List, Optional, Tuple
 
-from ga_hls.lang.ast import (
+from ..lang.ast import (
     And,
     ArithOp,
     BoolConst,

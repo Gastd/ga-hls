@@ -20,10 +20,10 @@ The result is a **diagnostic decision tree** that relates parts of the requireme
 
 ---
 
-## Package layout (`tool/ga_hls`)
+## Package layout (`ga-hls`)
 
 ```text
-ga_hls/
+ga-hls/
 ├── cli.py                   # `ga-hls` console entry (run, explain-positions, ...)
 ├── config.py                # Config dataclasses + JSON loader
 ├── defs.py                  # Legacy path settings for benchmarks
@@ -36,7 +36,7 @@ ga_hls/
 ├── examples/
 │   └── AT1_AT001.py         # Minimal example property
 │
-├── fitness_smithwaterman.py # Smith–Waterman similarity (fitness support)
+├── fitness.py # Smith–Waterman similarity (fitness support)
 ├── ga.py                    # Genetic Algorithm loop (selection, crossover, mutation)
 ├── harness.py               # Robust Z3 harness: SAT/UNSAT/ERROR execution
 ├── harness_script.py        # Utilities for generating temporary Z3 scripts
@@ -140,8 +140,8 @@ Example:
 ```json
 {
   "input": {
-    "requirement_file": "tool/ga_hls/examples/AT1_AT001.py",
-    "traces_file": "tool/ga_hls/tracesAT.csv",
+    "requirement_file": "ga-hls/examples/AT1_AT001.py",
+    "traces_file": "ga-hls/tracesAT.csv",
     "output_dir": "outputs"
   },
   "ga": {

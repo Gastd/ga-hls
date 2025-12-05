@@ -1,4 +1,4 @@
-# tool/ga_hls/diagnostics/j48.py
+# ga-hls/diagnostics/j48.py
 
 from __future__ import annotations
 

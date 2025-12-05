@@ -1,4 +1,4 @@
-# ga_hls/lang/internal_encoder.py
+# ga-hls/lang/internal_encoder.py
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -131,7 +131,7 @@ def formula_to_internal_obj(formula: Formula) -> Any:
     Encode a `Formula` AST node into the original internal list-of-lists format
     expected by `treenode.parse`.
 
-    This is the inverse of `ga_hls.lang.internal_parser.parse_internal_obj` for
+    This is the inverse of `ga-hls.lang.internal_parser.parse_internal_obj` for
     the node types we support.
     """
     if isinstance(formula, BoolConst):
