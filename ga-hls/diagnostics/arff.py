@@ -22,6 +22,35 @@ from ..individual import (
 )
 from ..lang.internal_encoder import FormulaLayout
 
+
+def _normalize_token(term: str) -> str:
+    """
+    Normalize a single token used in ARFF:
+
+    - Strip spaces.
+    - Turn Int('t') / Int("t") / Real('t') / Real("t") into plain t.
+    - Leave everything else as-is (but space-free).
+    """
+    term = term.replace(" ", "")
+    # Collapse Int('var') / Real('var') -> var
+    if (term.startswith("Int(") or term.startswith("Real(")) and term.endswith(")"):
+        inner = term[term.find("(") + 1 : -1]
+        if (
+            (inner.startswith("'") and inner.endswith("'"))
+            or (inner.startswith('"') and inner.endswith('"'))
+        ):
+            inner = inner[1:-1]
+        return inner
+    return term
+
+def _normalize_row_str(row: str) -> str:
+    """
+    Normalize a full arrf_str row: split, normalize each token, re-join.
+    """
+    tokens = row.replace(" ", "").split(",")
+    tokens = [_normalize_token(t) for t in tokens]
+    return ",".join(tokens)
+
 def isfloat(num):
     try:
         float(num)
@@ -163,14 +192,43 @@ def build_attributes(seed, formulae: list):
         'SINGALS': 0,
         'TERM': 0
     }
-    terminators = list(set(treenode.get_terminators(seed)))
-    terminators = [
-        str(value).replace(' ', '')
-        for value in terminators
-        if not isinstance(value, int) and not isinstance(value, float)
-    ]
+    raw_terminators = list(set(treenode.get_terminators(seed)))
+
+    # Build a set of operator-like tokens that should NEVER be treated as terms
+    operator_tokens = set(
+        str(x).replace(" ", "")
+        for family in (
+            QUANTIFIERS,
+            RELATIONALS,
+            EQUALS,
+            ARITHMETICS,
+            MULDIV,
+            EXP,
+            LOGICALS,
+            NEG,
+            IMP,
+            FUNC,
+        )
+        for x in family
+    )
+
+    terminators: list[str] = []
+    for value in raw_terminators:
+        # Skip numeric leaves
+        if isinstance(value, (int, float)):
+            continue
+        tok = _normalize_token(str(value))
+        # Drop anything that is actually an operator/binder, not a term
+        if tok in operator_tokens:
+            continue
+        terminators.append(tok)
+
+    # Deduplicate while preserving order
+    terminators = list(dict.fromkeys(terminators))
+
     ret = []
     for term in formulae:
+        term = _normalize_token(term)
         if term in QUANTIFIERS:
             qstring = str(QUANTIFIERS)
             qstring = qstring.replace('\'', '')
@@ -278,8 +336,8 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
         print(f"[ga-hls][dataset_all] population[0].arrf_str() failed: {e!r}")
         chstr = str(seed_ch)
 
-    chstr_no_space = chstr.replace(" ", "")
-    attrs = build_attributes(seed,chstr_no_space.split(','))
+    chstr_norm = _normalize_row_str(chstr)
+    attrs = build_attributes(seed, chstr_norm.split(","))
 
     nowstr = f'{now}'.replace(' ', '_')
     nowstr = nowstr.replace(':', '_')
@@ -298,8 +356,8 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
         f.write('@data\n')
         for chromosome in entire_dataset:
             ch_str = chromosome.arrf_str()
-            ch_str = ch_str.replace(" ", "")
-            f.write(ch_str)
+            ch_str_norm = _normalize_row_str(ch_str)
+            f.write(ch_str_norm)
             f.write(f",{chromosome.madeit.upper()}\n")
     return filename_str
 
@@ -325,8 +383,8 @@ def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, u
     except Exception as e:
         chstr = str(seed_ch)
 
-    chstr_no_space = chstr.replace(" ", "")
-    attrs = build_attributes(seed, chstr_no_space.split(','))
+    chstr_norm = _normalize_row_str(chstr)
+    attrs = build_attributes(seed, chstr_norm.split(","))
 
     nowstr = f'{now}'.replace(' ', '_')
     nowstr = nowstr.replace(':', '_')
@@ -344,19 +402,16 @@ def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, u
         f.write('\n')
         f.write('@data\n')
         for chromosome in sats:
-            ch_str = chromosome.arrf_str()
-            ch_str = ch_str.replace(" ", "")
-            f.write(ch_str)
+            ch_str_norm = _normalize_row_str(chromosome.arrf_str())
+            f.write(ch_str_norm)
             f.write(f",{chromosome.madeit.upper()}\n")
         for chromosome in unsats:
-            ch_str = chromosome.arrf_str()
-            ch_str = ch_str.replace(" ", "")
-            f.write(ch_str)
+            ch_str_norm = _normalize_row_str(chromosome.arrf_str())
+            f.write(ch_str_norm)
             f.write(f",{chromosome.madeit.upper()}\n")
         for chromosome in unknown:
-            ch_str = chromosome.arrf_str()
-            ch_str = ch_str.replace(" ", "")
-            f.write(ch_str)
+            ch_str_norm = _normalize_row_str(chromosome.arrf_str())
+            f.write(ch_str_norm)
             f.write(f",{chromosome.madeit.upper()}\n")
     return filename_str
 

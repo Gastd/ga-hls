@@ -71,12 +71,12 @@ def formula_to_python_expr(f: Formula) -> str:
         return f"Implies({left}, {right})"
 
     if isinstance(f, ForAll):
-        vars_list = "[" + ", ".join(f'"{v}"' for v in f.vars) + "]"
+        vars_list = "[" + ", ".join(v for v in f.vars) + "]"
         body = formula_to_python_expr(f.body)
         return f"ForAll({vars_list}, {body})"
 
     if isinstance(f, Exists):
-        vars_list = "[" + ", ".join(f'"{v}"' for v in f.vars) + "]"
+        vars_list = "[" + ", ".join(v for v in f.vars) + "]"
         body = formula_to_python_expr(f.body)
         return f"Exists({vars_list}, {body})"
     

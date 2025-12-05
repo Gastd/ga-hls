@@ -49,7 +49,7 @@ from .diagnostics.arff import write_dataset_all, write_dataset_qty
 
 from .lang.python_printer import formula_to_python_expr
 from .lang.internal_parser import parse_internal_obj
-from .lang.ast import Formula
+from .lang.ast import Formula, Not
 
 from .harness_script import build_z3check_script
 from .harness import run_property_script, Verdict
@@ -509,7 +509,11 @@ class GA(object):
             if chromosome.fitness != -1:
                 continue
 
-            self.save_file(f'Not({chromosome.format()})')
+            # Wrap the ForAll(...) formula back into a Not(...) for trace checking
+            wrapped: Formula = Not(chromosome.ast)
+            nline = formula_to_python_expr(wrapped)
+
+            self.save_file(nline)
 
             script_path = Path(self.path) / "temp.py"
             err = ""
