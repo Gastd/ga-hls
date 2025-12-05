@@ -336,16 +336,31 @@ def _mutate_relop(node: RelOp, cfg: MutationConfig, rng: random.Random) -> RelOp
     """
     Flip between relational operators in the configured family.
     """
-    # If the current op is not in the configured family, leave it alone.
-    if node.op not in cfg.relops:
-        return node
+    op = node.op
+    
+    # Equality family
+    if op in ("==", "!="):
+        family = ("==", "!=")
+        choices = [o for o in family if o != op]
+        if not choices:
+            return node
+        new_op = rng.choice(choices)
+        return RelOp(op=new_op, left=node.left, right=node.right)
 
-    choices = [op for op in cfg.relops if op != node.op]
-    if not choices:
-        return node
-
-    new_op = rng.choice(choices)
-    return RelOp(op=new_op, left=node.left, right=node.right)
+    # Ordering family
+    ordering_family = ("<", ">", "<=", ">=")
+    if op in ordering_family:
+        # Respect cfg.relops as a filter if you want, but never cross into equality ops.
+        allowed = [o for o in cfg.relops if o in ordering_family]
+        if not allowed:
+            allowed = list(ordering_family)
+        choices = [o for o in allowed if o != op]
+        if not choices:
+            return node
+        new_op = rng.choice(choices)
+        return RelOp(op=new_op, left=node.left, right=node.right)
+    
+    return node
 
 
 def _flip_logical(node: And | Or, cfg: MutationConfig, rng: random.Random) -> Formula:

@@ -238,13 +238,9 @@ def build_attributes(seed, formulae: list):
             ret.append(f'QUANTIFIERS{count_op["QUANTIFIERS"]} {qstring}')
             count_op['QUANTIFIERS'] = count_op['QUANTIFIERS'] + 1
         elif term in RELATIONALS:
-            qstring = str(RELATIONALS)
-            qstring = qstring.replace('\'', '')
-            qstring = qstring.replace(']', '}')
-            qstring = qstring.replace('[', '{')
-            qstring = qstring.replace(' ', '')
-            ret.append(f'RELATIONALS{count_op["RELATIONALS"]} {qstring}')
-            count_op['RELATIONALS'] = count_op['RELATIONALS'] + 1
+            rel_domain = "{<,>,<=,>=}"
+            ret.append(f'RELATIONALS{count_op["RELATIONALS"]} {rel_domain}')
+            count_op["RELATIONALS"] += 1
         elif term in EQUALS:
             qstring = str(EQUALS)
             qstring = qstring.replace('\'', '')
