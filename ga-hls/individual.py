@@ -5,6 +5,22 @@ import random
 import subprocess
 
 from . import treenode
+from .lang.ast import (
+    ForAll,
+    Exists,
+    And,
+    Or,
+    Implies,
+    RelOp,
+    IntConst,
+    RealConst,
+    Var,
+    Subscript,
+    FuncCall,
+    ArithOp,
+    Not,
+)
+from .lang.python_printer import formula_to_python_expr
 from .lang.ast import Formula
 from .lang.internal_encoder import InternalEncodeError, formula_to_internal_obj
 from .mutation import MutationConfig, mutate_formula
@@ -102,8 +118,91 @@ class Individual():
     def __len__(self):
         return len(self.root)
 
-    def arrf_str(self):
-        return arrf(self.root)
+    def arrf_str(self) -> str:
+        """
+        Return a flat, comma-separated representation of the current formula
+        used for ARFF generation.
+        """
+        # Use AST if we have it
+        formula = getattr(self, "ast", None)
+        if formula is None:
+            return None
+
+        tokens: list[str] = []
+
+        def visit(node):
+            # Quantifiers
+            if isinstance(node, ForAll):
+                tokens.append("ForAll")
+                # ForAll vars are something like ["t"]
+                for v in node.vars:
+                    tokens.append(str(v))
+                visit(node.body)
+
+            elif isinstance(node, Exists):
+                tokens.append("Exists")
+                for v in node.vars:
+                    tokens.append(str(v))
+                visit(node.body)
+
+            # Logical connectives
+            elif isinstance(node, And):
+                tokens.append("And")
+                for arg in node.args:
+                    visit(arg)
+
+            elif isinstance(node, Or):
+                tokens.append("Or")
+                for arg in node.args:
+                    visit(arg)
+
+            elif isinstance(node, Implies):
+                tokens.append("Implies")
+                visit(node.left)
+                visit(node.right)
+
+            elif isinstance(node, Not):
+                tokens.append("Not")
+                visit(node.arg)
+
+            # Relational operators
+            elif isinstance(node, RelOp):
+                # left op right, e.g., target_y[t], >, 0.5
+                visit(node.left)
+                tokens.append(node.op)
+                visit(node.right)
+
+            # Arithmetic expressions (we inline them and let TERM/NUM domains handle them)
+            elif isinstance(node, ArithOp):
+                visit(node.left)
+                visit(node.right)
+
+            # Numeric constants
+            elif isinstance(node, IntConst):
+                tokens.append(str(int(node.value)))
+
+            elif isinstance(node, RealConst):
+                tokens.append(f"{float(node.value):.6f}")
+
+            # Terms
+            elif isinstance(node, Var):
+                tokens.append(node.name)
+
+            elif isinstance(node, Subscript):
+                # Serialize as something like target_y[t], ego_y[t+1], etc.
+                tokens.append(formula_to_python_expr(node))
+
+            elif isinstance(node, FuncCall):
+                # e.g. Abs((ego_y[t]-target_y[t]))
+                tokens.append(formula_to_python_expr(node))
+
+            else:
+                # Fallback: just stringify it
+                tokens.append(str(node))
+
+        visit(formula)
+        return ",".join(tokens)
+
 
     # @check_call
     def mutate(self, rate: float, mutation_config: MutationConfig | None = None):

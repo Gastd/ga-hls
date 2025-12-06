@@ -20,8 +20,8 @@ from ..individual import (
     IMP,
     FUNC,
 )
-from ..lang.internal_encoder import FormulaLayout
-
+from ..lang.internal_encoder import FormulaLayout, FeatureInfo
+from ..lang.ast import IntConst, RealConst, Var, Subscript, FuncCall
 
 def _normalize_token(term: str) -> str:
     """
@@ -226,6 +226,20 @@ def build_attributes(seed, formulae: list):
     # Deduplicate while preserving order
     terminators = list(dict.fromkeys(terminators))
 
+    for tok in formulae:
+        tnorm = _normalize_token(tok)
+        if not tnorm:
+            continue
+        # Skip operators / function names
+        if tnorm in operator_tokens:
+            continue
+        # Skip pure numbers
+        if tnorm.isnumeric() or isfloat(tnorm):
+            continue
+        # Add any new term-like tokens
+        if tnorm not in terminators:
+            terminators.append(tnorm)
+
     ret = []
     for term in formulae:
         term = _normalize_token(term)
@@ -318,7 +332,7 @@ def build_attributes(seed, formulae: list):
             count_op['FUNC'] = count_op['FUNC'] + 1
     return ret
 
-def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats, sats, entire_dataset):
+def write_dataset_all( path: str, now, seed, population, seed_ch, unknown, unsats, sats, entire_dataset, layout):
     # entire_dataset = sats + unsats + unknown
     entire_dataset = list()
     [entire_dataset.append(x) for x in unknown if (x not in entire_dataset)]
@@ -334,6 +348,7 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
 
     chstr_norm = _normalize_row_str(chstr)
     attrs = build_attributes(seed, chstr_norm.split(","))
+    _attach_features_to_layout(attrs, layout)
 
     nowstr = f'{now}'.replace(' ', '_')
     nowstr = nowstr.replace(':', '_')
@@ -357,7 +372,7 @@ def write_dataset_all(path: str, now, seed, population, seed_ch, unknown, unsats
             f.write(f",{chromosome.madeit.upper()}\n")
     return filename_str
 
-def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, unknown: List, per_cut: float) -> str:
+def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, unknown: List, layout: FormulaLayout, per_cut: float) -> str:
     sats.sort(key=lambda x : x.sw_score, reverse=True)
     unsats.sort(key=lambda x : x.sw_score, reverse=True)
     unknown.sort(key=lambda x : x.sw_score, reverse=True)
@@ -381,6 +396,7 @@ def write_dataset_qty(path: str, now, seed, seed_ch, sats: List, unsats: List, u
 
     chstr_norm = _normalize_row_str(chstr)
     attrs = build_attributes(seed, chstr_norm.split(","))
+    _attach_features_to_layout(attrs, layout)
 
     nowstr = f'{now}'.replace(' ', '_')
     nowstr = nowstr.replace(':', '_')

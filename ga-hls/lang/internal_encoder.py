@@ -121,6 +121,99 @@ def _collect_positions(formula: Formula) -> Dict[int, PositionInfo]:
     visit(formula, "")
     return positions
 
+def _build_features(positions: Dict[int, PositionInfo]) -> List[FeatureInfo]:
+    """
+    Map PositionInfo entries to ARFF feature slots.
+
+    The policy here is:
+      - every quantifier becomes QUANTIFIERS<i>
+      - every TERM-like node becomes TERM<i>
+      - every RelOp becomes RELATIONALS<i>
+      - every numeric literal becomes NUM<i>
+      - every logical connective (And/Or) becomes LOGICALS<i>
+      - every Implies becomes IMP<i>
+
+    This walks positions in ascending index order, so the mapping is deterministic.
+    """
+    features: List[FeatureInfo] = []
+
+    quant_idx = 0
+    term_idx = 0
+    rel_idx = 0
+    num_idx = 0
+    log_idx = 0
+    imp_idx = 0
+
+    for pos in sorted(positions.keys()):
+        pi = positions[pos]
+
+        if pi.role == "QUANTIFIER":
+            arff_name = f"QUANTIFIERS{quant_idx}"
+            quant_idx += 1
+            features.append(
+                FeatureInfo(
+                    arff_name=arff_name,
+                    kind="NOMINAL",
+                    position_index=pi.index,
+                )
+            )
+
+        elif pi.role == "TERM":
+            arff_name = f"TERM{term_idx}"
+            term_idx += 1
+            features.append(
+                FeatureInfo(
+                    arff_name=arff_name,
+                    kind="NOMINAL",
+                    position_index=pi.index,
+                )
+            )
+
+        elif pi.role == "RELATION_OP":
+            arff_name = f"RELATIONALS{rel_idx}"
+            rel_idx += 1
+            features.append(
+                FeatureInfo(
+                    arff_name=arff_name,
+                    kind="NOMINAL",
+                    position_index=pi.index,
+                )
+            )
+
+        elif pi.role == "NUMERIC_LITERAL":
+            arff_name = f"NUM{num_idx}"
+            num_idx += 1
+            features.append(
+                FeatureInfo(
+                    arff_name=arff_name,
+                    kind="NUMERIC",
+                    position_index=pi.index,
+                )
+            )
+
+        elif pi.role == "LOGICAL_CONNECTIVE":
+            arff_name = f"LOGICALS{log_idx}"
+            log_idx += 1
+            features.append(
+                FeatureInfo(
+                    arff_name=arff_name,
+                    kind="NOMINAL",
+                    position_index=pi.index,
+                )
+            )
+
+        elif pi.role == "IMPLIES":
+            arff_name = f"IMP{imp_idx}"
+            imp_idx += 1
+            features.append(
+                FeatureInfo(
+                    arff_name=arff_name,
+                    kind="NOMINAL",
+                    position_index=pi.index,
+                )
+            )
+
+    return features
 
 class InternalEncodeError(RuntimeError):
     """Raised when we cannot encode a Formula into the internal JSON format."""
@@ -221,9 +314,13 @@ def formula_to_internal_obj(formula: Formula) -> Any:
 def encode_with_layout(formula: Formula) -> tuple[Any, FormulaLayout]:
     """
     Convenience helper that returns both the internal representation and
-    a FormulaLayout describing mutation/position metadata.
+    a FormulaLayout describing mutation/position and feature metadata.
     """
     internal = formula_to_internal_obj(formula)
     positions = _collect_positions(formula)
-    layout = FormulaLayout(positions=positions, features=[])
+
+    # Build ARFF feature mapping for all relevant positions.
+    features = _build_features(positions)
+    layout = FormulaLayout(positions=positions, features=features)
+    
     return internal, layout

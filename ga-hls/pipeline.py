@@ -23,10 +23,6 @@ def _ensure_output_dir(path: str) -> str:
 def build_layout_from_config(cfg: Config) -> FormulaLayout:
     """
     Build a FormulaLayout for the requirement in `cfg`, without running GA.
-
-    This is used by introspection / mapping features (e.g. CLI commands that
-    explain how mutation positions and ARFF attributes relate to the original
-    requirement).
     """
     _ensure_output_dir(cfg.input.output_dir)
 
@@ -61,7 +57,8 @@ def build_ga_from_config(cfg: Config) -> GA:
     )
 
     formula_ast = load_formula_from_property(cfg.input.requirement_file)
-    internal = formula_to_internal_obj(formula_ast)
+    internal, layout = encode_with_layout(formula_ast)
+
     # 2) Build the GA instance.
     ga = GA(
         init_form=internal,
@@ -72,7 +69,8 @@ def build_ga_from_config(cfg: Config) -> GA:
         seed=cfg.ga.seed,
         output_root=cfg.input .output_dir,
         mutation_config=mutation_cfg,
-        property_path=str(cfg.input.requirement_file)
+        property_path=str(cfg.input.requirement_file),
+        formula_layout=layout,
     )
 
     return ga

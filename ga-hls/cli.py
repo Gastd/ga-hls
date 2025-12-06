@@ -20,7 +20,7 @@ def _get_version() -> str:
         return version("ga-hls")
     except PackageNotFoundError:
         # Fallback when running from source without an installed dist
-        return "0.1.0-dev"
+        return "1.0.0"
 
 def _cmd_explain_positions(args: argparse.Namespace) -> int:
     """

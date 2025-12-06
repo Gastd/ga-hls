@@ -49,6 +49,7 @@ from .diagnostics.arff import write_dataset_all, write_dataset_qty
 
 from .lang.python_printer import formula_to_python_expr
 from .lang.internal_parser import parse_internal_obj
+from .lang.internal_encoder import FormulaLayout
 from .lang.ast import Formula, Not
 
 from .harness_script import build_z3check_script
@@ -73,7 +74,9 @@ class GA(object):
         fitness: Fitness | None = None,
         output_root: str | None = None,
         mutation_config: MutationConfig | None = None,
-        property_path: str | None = None    ):
+        property_path: str | None = None,
+        formula_layout: FormulaLayout | None = None
+        ):
         super(GA, self).__init__()
 
         # Log the timespaneach one of the tree steps in the approach
@@ -168,6 +171,8 @@ class GA(object):
                 f.write(f'\t{self.base_property_script}\n')
         else:
             print('[ga-hls] WARNING: no property script copied (property_path not set?)')
+
+        self.formula_layout = formula_layout
 
     def _progress(self, iterable, desc: str = ""):
         """
@@ -294,6 +299,7 @@ class GA(object):
             unsats=self.unsats,
             sats=self.sats,
             entire_dataset=self.entire_dataset,
+            layout=self.formula_layout
         )
 
     def roulette_wheel_selection(self):
@@ -399,37 +405,22 @@ class GA(object):
             self.checkin('tracheck_timestamp')
             self.evaluate()
 
-            s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=1.0)
-            s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.25)
-            s020 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.20)
-            s015 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.15)
-            s010 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, per_cut=.10)
+            s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=1.0)
+            s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.25)
+            s020 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.20)
+            s015 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.15)
+            s010 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.10)
             self.store_dataset_all()
             self.checkout('tracheck_timestamp')
 
             self.write_timespan_log()
 
         self.checkin('diagnosi_timestamp')
-        s100 = write_dataset_qty(
-            self.path, self.now, self.seed, self.seed_ch,
-            self.sats, self.unsats, self.unknown, per_cut=1.0,
-        )
-        s025 = write_dataset_qty(
-            self.path, self.now, self.seed, self.seed_ch,
-            self.sats, self.unsats, self.unknown, per_cut=.25,
-        )
-        s020 = write_dataset_qty(
-            self.path, self.now, self.seed, self.seed_ch,
-            self.sats, self.unsats, self.unknown, per_cut=.20,
-        )
-        s015 = write_dataset_qty(
-            self.path, self.now, self.seed, self.seed_ch,
-            self.sats, self.unsats, self.unknown, per_cut=.15,
-        )
-        s010 = write_dataset_qty(
-            self.path, self.now, self.seed, self.seed_ch,
-            self.sats, self.unsats, self.unknown, per_cut=.10,
-        )
+        s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=1.0)
+        s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.25)
+        s020 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.20)
+        s015 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.15)
+        s010 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.10)
         self.checkout('diagnosi_timestamp')
         self.write_timespan_log()
 
