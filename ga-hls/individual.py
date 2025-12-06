@@ -204,130 +204,47 @@ class Individual():
         return ",".join(tokens)
 
 
-    # @check_call
+        # @check_call
     def mutate(self, rate: float, mutation_config: MutationConfig | None = None):
         """
         Default mutation operator.
+
+        Parameters
+        ----------
+        rate : float
+            Probability in [0, 1] that this individual is mutated when this
+            method is called. If rate <= 0, no mutation is applied. If
+            rate >= 1, mutation is always applied.
+        mutation_config : MutationConfig | None
+            Configuration for AST-level mutation. If None, this is a no-op.
         """
+        # No AST or no config → nothing to do
+        if self.ast is None or mutation_config is None:
+            return
+
+        # Normalize the rate
+        try:
+            r = float(rate)
+        except (TypeError, ValueError):
+            # Backwards-compatible fallback: if something weird is passed,
+            # behave like "always mutate"
+            r = 1.0
+
+        if r <= 0.0:
+            # Mutation disabled
+            return
+        elif r < 1.0:
+            # Probabilistic mutation
+            if random.random() >= r:
+                return
+        # else: r >= 1.0 → always mutate
+
         # AST-based mutation path
-        if self.ast is not None:
-            self.ast = mutate_formula(self.ast, mutation_config)
+        self.ast = mutate_formula(self.ast, mutation_config)
 
-            # Keep the legacy tree representation in sync
-            self._sync_root_from_ast()
-        
-        return
-
-    # @check_call
-    def force_mutate(self, mut_idxs=[], nmutations=MUTATION_NODES):
-        if len(mut_idxs) == 0:
-            print('MUT_IDX is empty')
-            return
-        # print(self.mutations)
-        if self.mutations is not None:
-            self.force_mutate_with_ranges(mut_idxs)
-            return
-        else:
-            raise ValueError(f'{__class__}.mutations is {self.mutations}')
-            rate = 1.0
-            for mut_idx in mut_idxs:
-                if (random.random() < rate):
-                    # mut_idx = random.choice(mut_idxs)
-                    subtree, parent = self.root.get_subtree(mut_idx)
-                    # print(f"Mutating {mut_idx} from {subtree.value}")
-                    if subtree.left is None:
-                        subtree.value = self.get_new_term(subtree.value)
-                    else:
-                        new_operator = self.get_new_op(subtree.value)
-                        if subtree.value in QUANTIFIERS:
-                            subtree.right.value = 'Implies' if new_operator == 'ForAll' else 'And'
-                        if parent:
-                            if subtree.value == 'And'     and (parent.value == 'Exists'):
-                                continue
-                            if subtree.value == 'Implies' and (parent.value == 'ForAll'):
-                                # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
-                                continue
-                        subtree.value = new_operator
-                    # print(f"To {subtree.value}")
-
-    def show_idx(self):
-        for idx in range(0, len(self)):
-            subtree, parent = self.root.get_subtree(idx)
-            print(f"{idx} = {subtree.value}")
-
-    # @show_arg_ret_decorator
-    def force_mutate_with_ranges(self, mut_idxs=[], nmutations=MUTATION_NODES):
-        rate = 1.0
-        for idx in mut_idxs:
-            if (random.random() < rate):
-                subtree, parent = self.root.get_subtree(int(idx))
-                # print(f"{self}")
-                # print(f"Mutating {idx} from {subtree.value} with {self.mutations[str(idx)]}")
-                if subtree.left is None:
-                    subtree.value = self.get_new_forced_term(subtree.value, self.mutations[str(idx)])
-                else:
-                    new_operator = random.choice(self.mutations[str(idx)][1])
-                    if subtree.value in QUANTIFIERS:
-                        subtree.right.value = 'Implies' if new_operator == 'ForAll' else 'And'
-                    #     if subtree.value == 'Implies' and (parent.value in QUANTIFIERS):
-                    #         # print(f'Found Implies from Quantifier: {subtree.value}, parent = {parent.value}')
-                    #         continue
-                    subtree.value = new_operator
-                # print(f"To {subtree.value}")
-
-    def get_new_forced_term(self, t, mutation):
-        interval = mutation[1]
-        if mutation[0] == 'int':
-            lower = int(interval[0])
-            upper = int(interval[1])
-        if mutation[0] == 'float':
-            lower = float(interval[0])
-            upper = float(interval[1])
-        # print(f'For term {t} we have interval {lower}, {upper}')
-        if mutation[0] == 'int':
-            ## Change the terminator inside the same maginitude order from the input
-            ret = random.randint(lower, upper)
-            # print(ret)
-            return ret
-        elif mutation[0] == 'float':
-            ret = random.uniform(lower, upper)
-            # print(ret)
-            return ret
-        else:
-            ret = random.choice(interval)
-            # print(ret)
-            return ret
-
-    # @show_arg_ret_decorator
-    def get_new_term(self, t):
-        # print(f'For terminator t = {t}: {self.print_genes()}')
-        if t.__class__ in self.term.keys():
-            if isinstance(t, int):
-                if t == 0:
-                    if random.random() > 0.5:
-                        return +1
-                    else:
-                        return -1
-                if random.random() > 0.5:
-                    ## Change the terminator inside the same maginitude order from the input
-                    return t + random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
-                else:
-                    return t - random.randint(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1)-1)
-            elif isinstance(t, float):
-                if abs(t) >= 1.0:
-                    diff = random.uniform(10 ** int(math.log(abs(t),10)), 10 ** int(math.log(abs(t),10)+1))
-                else:
-                    diff = random.uniform(0, 10 ** int(math.log(abs(t),10)))
-                if random.random() > 0.5:
-                    return t + diff
-                else:
-                    return t - diff
-            else:
-                # return random.choice(self.term[t.__class__])
-                return t
-        else:
-            raise ValueError(f'Unknown terminator of type {t.__class__} from {t}')
-
+        # Keep the legacy tree representation in sync
+        self._sync_root_from_ast()
+   
     def check_terminators(self, term_list):
         term_dict = {}
         for t in term_list:
