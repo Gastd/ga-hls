@@ -43,7 +43,6 @@ from .individual import (
     IMP,
     FUNC,
 )
-from .diagnosis import Diagnosis
 from .diagnostics.j48 import run_j48
 from .diagnostics.arff import write_dataset_all, write_dataset_qty
 
