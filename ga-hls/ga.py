@@ -19,9 +19,8 @@ from .defs import (
     CROSSOVER_RATE,
     MUTATION_RATE,
     POPULATION_SIZE,
-    CHROMOSOME_TO_PRESERVE,
-    SCALE
-)
+    CHROMOSOME_TO_PRESERVE
+    )
 from .individual import (
     Individual,
     QUANTIFIERS,

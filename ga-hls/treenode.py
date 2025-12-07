@@ -17,15 +17,6 @@ def node_depth_first_iter(node):
             children.append(node.right)
         stack.extendleft(reversed(children))
 
-def strcmp(str1, str2):
-    c1 = 0
-    c2 = 0
-    l = len(str1) if len(str1) < len(str2) else len(str2)
-    for i in range(l):
-        c1 += ord(str1[i])
-        c2 += ord(str2[i])
-    return c1-c2
-
 def compare_tree(root1, root2, level=0):
     MISMATCH = 5
 
@@ -61,19 +52,6 @@ class Node(object):
 
     def __iter__(self):
         return node_depth_first_iter(self)
-
-    # def __sub__(self, other):
-    #     try:
-    #         if isinstance(self.value, str) and isinstance(other.value, str):
-    #             return strcmp(self.value, other.value)
-    #         elif isinstance(self.value, str):
-    #             return ord(self.value[0]) - other.value
-    #         elif isinstance(other.value, str):
-    #             return self.value - ord(other.value[0])
-    #         else:
-    #             return self.value - other.value
-    #     except:
-    #         pass
 
     def __eq__(self, other):
         if not isinstance(other, Node):

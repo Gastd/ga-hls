@@ -24,8 +24,6 @@ from .lang.ast import Formula
 from .lang.internal_encoder import InternalEncodeError, formula_to_internal_obj
 from .mutation import MutationConfig, mutate_formula
 
-MUTATION_NODES = 5
-MUT_IDXS =[4, 7]
 
 # OPS = ['ForAll', 'And', 'Or', 'Exists', 'Implies', '<', '>', '<=', '>=', '+', '-', '*', '/', '^']
 QUANTIFIERS = ['ForAll', 'Exists']
@@ -39,26 +37,8 @@ NEG = ['Not']   # PROBLEM
 IMP = ['Implies']
 FUNC = ['ToInt']
 
-def show_arg_ret_decorator(function):
-    def wrapper(self, *args, **kwargs):
-        ret = function(self, *args, **kwargs)
-        print(f'arg = {args[0]}, ret = {ret}')
-        return ret
-    return wrapper
 
-def check_call(function):
-    def wrapper(self, *args, **kwargs):
-        print(f'{function} called')
-        ret = function(self, *args, **kwargs)
-        return ret
-    return wrapper
 
-def choose_mutation(function):
-    def wrapper(self, *args, **kwargs):
-        print(f'{self.mutations}')
-        ret = function(self, *args, **kwargs)
-        return ret
-    return wrapper
 
 class Individual():
     """docstring for Individual"""
@@ -72,7 +52,6 @@ class Individual():
         self.term = self.check_terminators(terminators)
         self.madeit = 'Unknown'
         self.sw_score = -1
-        self.self_test = None
         self.mutations = None
         # self.maxint, self.minint = self.get_minmax(terminators, int)
         # self.maxfloat, self.minfloat = self.get_minmax(terminators, float)
@@ -96,11 +75,6 @@ class Individual():
     def reset(self):
         self.fitness = -1
         self.madeit = 'Unknown'
-
-    def print_genes(self):
-        if self.root is not None:
-            print(self.root)
-        # print()
 
     def __eq__(self, other):
         return str(self) == str(other)
