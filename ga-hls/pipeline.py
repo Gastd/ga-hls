@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from .config import Config
-from . import defs
 from .ga import GA
 from .config import Config
 from .lang.theodore_parser import load_formula_from_property

@@ -2,22 +2,17 @@ import os
 import math
 import time
 import json
-import shlex
 import random
 import datetime
 import subprocess
 from tqdm import tqdm
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from copy import deepcopy
 from typing import Optional
 
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 from pathlib import Path
-import matplotlib
 
 from . import treenode
 from .defs import (
@@ -25,9 +20,6 @@ from .defs import (
     MUTATION_RATE,
     POPULATION_SIZE,
     CHROMOSOME_TO_PRESERVE,
-    PARENTS_TO_BE_CHOSEN,
-    SW_THRESHOLD,
-    FOLDS,
     SCALE
 )
 from .individual import (
@@ -51,11 +43,9 @@ from .lang.internal_parser import parse_internal_obj
 from .lang.internal_encoder import FormulaLayout
 from .lang.ast import Formula, Not
 
-from .harness_script import build_z3check_script
 from .harness import run_property_script, Verdict
 
 from .fitness import Fitness, SmithWatermanFitness
-from .fitness import Smith_Waterman as SW
 
 from .mutation import MutationConfig
 

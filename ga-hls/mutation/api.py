@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass, field
-from typing import Callable, Iterable, List, Optional, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 from ..lang.ast import (
     And,

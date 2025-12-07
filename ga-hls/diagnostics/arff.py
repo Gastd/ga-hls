@@ -6,7 +6,7 @@ import json
 import math
 from typing import List
 
-from .. import treenode, defs
+from .. import treenode
 from ..individual import (
     Individual,
     QUANTIFIERS,
