@@ -33,11 +33,13 @@ class GAConfig:
     elitism: int = 1
     seed: Optional[int] = None
 
+
 @dataclass
 class MutationConfig:
     """
     Configuration for mutations.
     """
+
     max_mutations: int = 1
 
     enable_numeric_perturbation: bool = True
@@ -48,17 +50,21 @@ class MutationConfig:
     # Positions in the flattened AST (preorder indices)
     allowed_positions: Optional[List[int]] = None
 
-    # Bounds keyed by AST index; values are (low, high)
-    numeric_bounds: Dict[str, NumericBounds] = field(default_factory=dict)
+    # Unified per-position constraints:
+    # idx -> {"numeric": [lo, hi], "relational": [...], "equals": [...], "logical": [...], "arith": [...], "quantifier": [...]}
+    allowed_changes: Dict[int, Dict[str, object]] = field(default_factory=dict)
+
 
 @dataclass
 class Config:
     """
     Top-level configuration object for a ga-hls run.
     """
+
     input: InputConfig = field(default_factory=InputConfig)
     ga: GAConfig = field(default_factory=GAConfig)
     mutation: MutationConfig = field(default_factory=MutationConfig)
+
 
 # --- Loader utilities --------------------------------------------------------
 
@@ -86,6 +92,60 @@ def _load_json(path: Path) -> Dict[str, Any]:
 
     return _as_dict(data)
 
+_ALLOWED_CHANGE_KEYS = {"numeric", "logical", "relational", "equals", "quantifier", "arith"}
+
+def _parse_allowed_changes(mut_data: Dict[str, Any], path: Path) -> Dict[int, Dict[str, object]]:
+    raw = mut_data.get("allowed_changes", {})
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        raise ConfigError(
+            f"Expected 'mutation.allowed_changes' to be an object/dict in {path!s}, got {type(raw)!r}"
+        )
+
+    allowed_changes: Dict[int, Dict[str, object]] = {}
+
+    for k, spec in raw.items():
+        try:
+            idx = int(k)  # JSON keys are strings -> int
+        except Exception as exc:
+            raise ConfigError(
+                f"Invalid key in mutation.allowed_changes: {k!r} (expected an integer-like string)"
+            ) from exc
+
+        if not isinstance(spec, dict):
+            raise ConfigError(
+                f"mutation.allowed_changes[{k!r}] must be an object/dict, got {type(spec)!r}"
+            )
+
+        parsed_spec: Dict[str, object] = {}
+        for family, payload in spec.items():
+            if family not in _ALLOWED_CHANGE_KEYS:
+                raise ConfigError(
+                    f"Unknown allowed_changes family {family!r} at position {idx}. "
+                    f"Expected one of: {sorted(_ALLOWED_CHANGE_KEYS)}"
+                )
+
+            if family == "numeric":
+                if not (isinstance(payload, (list, tuple)) and len(payload) == 2):
+                    raise ConfigError(
+                        f"mutation.allowed_changes[{idx}].numeric must be [lo, hi], got: {payload!r}"
+                    )
+                lo, hi = payload
+                parsed_spec["numeric"] = [float(lo), float(hi)]
+                continue
+
+            # operator families: must be non-empty list[str]
+            if not (isinstance(payload, list) and payload and all(isinstance(x, str) for x in payload)):
+                raise ConfigError(
+                    f"mutation.allowed_changes[{idx}].{family} must be a non-empty list of strings, got: {payload!r}"
+                )
+            parsed_spec[family] = payload
+
+        allowed_changes[idx] = parsed_spec
+
+    return allowed_changes
+
 
 def load_config(path: str | Path) -> Config:
     """
@@ -107,11 +167,6 @@ def load_config(path: str | Path) -> Config:
         "elitism": 2,
         "seed": 42
       },
-      "diagnostics": {
-        "arff_filename": "outputs/example.arff",
-        "weka_jar": "path/to/weka.jar",
-        "j48_options": ["-C", "0.25", "-M", "2"]
-      },
       "mutation": {
         "max_mutations": 1,
         "enable_numeric_perturbation": true,
@@ -119,8 +174,9 @@ def load_config(path: str | Path) -> Config:
         "enable_logical_flip": false,
         "enable_quantifier_flip": false,
         "allowed_positions": [14],
-        "numeric_bounds": {
-            "14": [100.0, 140.0]
+        "allowed_changes": {
+          "14": {"numeric": [100.0, 140.0]}
+        }
       }
     }
     """
@@ -129,7 +185,6 @@ def load_config(path: str | Path) -> Config:
 
     input_data = _as_dict(data.get("input", {}))
     ga_data = _as_dict(data.get("ga", {}))
-    diag_data = _as_dict(data.get("diagnostics", {}))
     mut_data = _as_dict(data.get("mutation", {}))
 
     try:
@@ -153,25 +208,17 @@ def load_config(path: str | Path) -> Config:
         seed=ga_data.get("seed"),
     )
 
-    # --- mutation section (NEW) ---
-    # numeric_bounds keys come from JSON as strings -> convert to int
-    raw_bounds = mut_data.get("numeric_bounds", {})
-    numeric_bounds: Dict[int, Tuple[float, float]] = {}
-    for k, v in raw_bounds.items():
-        idx = int(k)  # "14" -> 14
-        lo, hi = v
-        numeric_bounds[idx] = (float(lo), float(hi))
+    # --- mutation section ---
+    allowed_changes = _parse_allowed_changes(mut_data, path)
 
     mut_cfg = MutationConfig(
         max_mutations=int(mut_data.get("max_mutations", 1)),
-        enable_numeric_perturbation=bool(
-            mut_data.get("enable_numeric_perturbation", True)
-        ),
+        enable_numeric_perturbation=bool(mut_data.get("enable_numeric_perturbation", True)),
         enable_relop_flip=bool(mut_data.get("enable_relop_flip", True)),
         enable_logical_flip=bool(mut_data.get("enable_logical_flip", True)),
         enable_quantifier_flip=bool(mut_data.get("enable_quantifier_flip", True)),
         allowed_positions=mut_data.get("allowed_positions"),
-        numeric_bounds=numeric_bounds,
+        allowed_changes=allowed_changes,
     )
 
     return Config(input=input_cfg, ga=ga_cfg, mutation=mut_cfg)

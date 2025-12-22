@@ -52,7 +52,7 @@ def build_ga_from_config(cfg: Config) -> GA:
         enable_logical_flip=cfg.mutation.enable_logical_flip,
         enable_quantifier_flip=cfg.mutation.enable_quantifier_flip,
         allowed_positions=cfg.mutation.allowed_positions,
-        numeric_bounds=cfg.mutation.numeric_bounds,
+        allowed_changes=cfg.mutation.allowed_changes,
     )
 
     formula_ast = load_formula_from_property(cfg.input.requirement_file)

@@ -5,7 +5,7 @@
     "output_dir": "outputs"
   },
   "ga": {
-    "population_size": 1000,
+    "population_size": 5,
     "generations": 10,
     "crossover_rate": 0.95,
     "mutation_rate": 0.10,
@@ -15,13 +15,21 @@
     "max_mutations": 1,
 
     "enable_numeric_perturbation": true,
-    "enable_relop_flip": false,
-    "enable_logical_flip": false,
+    "enable_relop_flip": true,
+    "enable_logical_flip": true,
     "enable_quantifier_flip": false,
 
-    "allowed_positions": [11],
-    "numeric_bounds": {
-      "11": [100.0, 140.0]
+    "allowed_positions": [2,6,11],
+    "allowed_changes": {
+      "2": {
+        "logical": ["And","Or"]
+      },
+      "6": {
+        "relational": ["<", ">"]
+      },
+      "11": {
+        "numeric": [100.0, 140.0]
+      }
     }
   }
 }

@@ -168,18 +168,30 @@ Example:
     "max_mutations": 1,          // Max number of AST-level edits per mutation step
 
     "enable_numeric_perturbation": true,  // Allow jittering numeric constants
-    "enable_relop_flip": false,           // Allow flipping relational operators (< → >, ≤ → ≥, etc.)
-    "enable_logical_flip": false,         // Allow switching AND ↔ OR, etc.
+    "enable_relop_flip": true,            // Allow flipping relational operators (< → >, ≤ → ≥, etc.)
+    "enable_logical_flip": true,          // Allow switching AND ↔ OR ↔ Implies
     "enable_quantifier_flip": false,      // Allow switching ∀ ↔ ∃
 
     // Specific AST positions that are allowed to mutate (see explain-positions)
-    "allowed_positions": [11],
+    "allowed_positions": [2,6,11],
 
-    // Numeric bounds applied to NUM2 (position 11)
-    // e.g., NUMBER at position 11 ∈ [100.0, 140.0]
-    "numeric_bounds": {
-      "11": [100.0, 140.0]
-    }
+    // Fine-grained control over *what* each position may change into
+    "allowed_changes": {
+
+      // Position 2: logical connective restricted to And, Or only, excludes Implies
+      "2": {
+        "logical": ["And","Or"]
+      },
+
+      // Position 6: relational operator restricted to < or >
+      "6": {
+        "relational": ["<", ">"]
+      },
+
+      // Position 11: numeric literal bounded to [100.0, 140.0]
+      "11": {
+        "numeric": [100.0, 140.0]
+      }
   }
 }
 
@@ -199,8 +211,8 @@ Example:
 Pos  NodeType            Node                                      Features
 --------------------------------------------------------------------------------
   0  ForAll              ∀ t. (((0 <= t) ∧ (t <= 20000000)) → ...  QUANTIFIERS0
-  1  Implies             (((0 <= t) ∧ (t <= 20000000)) → (v_sp...  -
-  2  And                 ((0 <= t) ∧ (t <= 20000000))              LOGICALS0
+  1  Implies             (((0 <= t) ∧ (t <= 20000000)) → (v_sp...  LOGICALS0
+  2  And                 ((0 <= t) ∧ (t <= 20000000))              LOGICALS1
   3  RelOp               (0 <= t)                                  RELATIONALS0
   4  IntConst            0                                         NUM0
   5  Var                 t                                         TERM0

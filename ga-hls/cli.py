@@ -124,7 +124,7 @@ def _cmd_explain_position(args: argparse.Namespace) -> int:
     Show detailed info about a single mutation position:
       - AST node and a 'Pretty' form
       - ARFF-style features (QUANTIFIERSk, NUMk, RELATIONALSk, TERMk, LOGICALSk)
-      - Current numeric_bounds for this position from the config, if present
+      - Current allowed_changes for this position from the config, if present
     """
     try:
         cfg = load_config(args.config)
@@ -244,14 +244,11 @@ def _cmd_explain_position(args: argparse.Namespace) -> int:
                 print(f"  - {name}: NUMERIC")
             elif name.startswith("TERM"):
                 # Try to show something like {v_speed[...], t}
-                # Use the term child for the corresponding relational slot, if available.
                 k = None
-                for prefix in ("TERM",):
-                    if name.startswith(prefix):
-                        suffix = name[len(prefix):]
-                        if suffix.isdigit():
-                            k = int(suffix)
-                        break
+                if name.startswith("TERM"):
+                    suffix = name[len("TERM") :]
+                    if suffix.isdigit():
+                        k = int(suffix)
                 term_node_repr = "t"
                 if k is not None and k < len(relop_slots):
                     term_pos = relop_slots[k]["term"]
@@ -262,8 +259,8 @@ def _cmd_explain_position(args: argparse.Namespace) -> int:
                 print(f"  - {name}: (unknown domain)")
     print()
 
-    # --- Current bounds (from config) ---
-    print("Current bounds (from config):")
+    # --- Current allowed changes (from config) ---
+    print("Allowed changes (from config):")
 
     mut_cfg = None
     if hasattr(cfg, "mutation"):
@@ -271,22 +268,26 @@ def _cmd_explain_position(args: argparse.Namespace) -> int:
     elif hasattr(cfg, "ga") and hasattr(cfg.ga, "mutation"):
         mut_cfg = cfg.ga.mutation
 
-    numeric_bounds = None
+    allowed_changes = None
     if mut_cfg is not None:
-        if hasattr(mut_cfg, "numeric_bounds"):
-            numeric_bounds = getattr(mut_cfg, "numeric_bounds")
-        elif isinstance(mut_cfg, dict) and "numeric_bounds" in mut_cfg:
-            numeric_bounds = mut_cfg["numeric_bounds"]
+        if hasattr(mut_cfg, "allowed_changes"):
+            allowed_changes = getattr(mut_cfg, "allowed_changes")
+        elif isinstance(mut_cfg, dict) and "allowed_changes" in mut_cfg:
+            allowed_changes = mut_cfg["allowed_changes"]
 
-    value = None
-    if numeric_bounds and isinstance(numeric_bounds, dict):
-        if idx in numeric_bounds:
-            value = numeric_bounds[idx]
-        elif str(idx) in numeric_bounds:
-            value = numeric_bounds[str(idx)]
+    spec = None
+    if isinstance(allowed_changes, dict):
+        spec = allowed_changes.get(idx) or allowed_changes.get(str(idx))
 
-    if value is not None:
-        print(f'  - numeric_bounds["{idx}"]: {value}')
+    if spec:
+        # Print in a stable, readable order
+        order = ["numeric", "relational", "equals", "logical", "quantifier", "arith"]
+        for key in order:
+            if key in spec:
+                print(f"  - {key}: {spec[key]}")
+        # Any unknown keys (shouldn't happen if config validation is strict)
+        for key in sorted(set(spec.keys()) - set(order)):
+            print(f"  - {key}: {spec[key]}")
     else:
         print("  - none")
 

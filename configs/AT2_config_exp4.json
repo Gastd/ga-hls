@@ -5,7 +5,7 @@
     "output_dir": "outputs"
   },
   "ga": {
-    "population_size": 10,
+    "population_size": 5,
     "generations": 10,
     "crossover_rate": 0.95,
     "mutation_rate": 0.10,
@@ -20,10 +20,10 @@
     "enable_quantifier_flip": false,
 
     "allowed_positions": [4,8,11],
-    "numeric_bounds": {
-      "4": [0, 5000000],
-      "8": [5000000, 15000000],
-      "11": [4700.0, 4800.0]
+    "numeric_changes": {
+      "4": {"numeric": [0, 5000000]},
+      "8": {"numeric": [5000000, 15000000]},
+      "11": {"numeric": [4700.0, 4800.0]}
     }
   }
 }
