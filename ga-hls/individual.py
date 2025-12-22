@@ -32,9 +32,8 @@ EQUALS = ['==', '!=']
 ARITHMETICS = ['+', '-', '*', '/']
 MULDIV = ['*', '/']
 EXP = ['^']
-LOGICALS = ['And', 'Or']
+LOGICALS = ['And', 'Or', 'Implies']
 NEG = ['Not']   # PROBLEM
-IMP = ['Implies']
 FUNC = ['ToInt']
 
 
@@ -266,7 +265,7 @@ def readable(root):
 
     if root.value in QUANTIFIERS:
         return f'{root.value} {readable(root.left)} In ({readable(root.right.left)}) {root.right.value} ({readable(root.right.right)})'
-    elif root.value in LOGICALS+IMP+NEG:
+    elif root.value in LOGICALS+NEG:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
     elif root.value in RELATIONALS+EQUALS:
         return f'{readable(root.left)} {root.value} {readable(root.right)}'
@@ -292,7 +291,7 @@ def arrf(root):
 
     if root.value in QUANTIFIERS:
         return f'{root.value},{arrf(root.right.left)},{arrf(root.right.right)}'
-    elif root.value in LOGICALS+IMP+NEG:
+    elif root.value in LOGICALS+NEG:
         return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
     elif root.value in RELATIONALS+EQUALS:
         return f'{arrf(root.left)},{root.value},{arrf(root.right)}'
@@ -318,7 +317,7 @@ def build_str(root):
         # print(root.left.value, root.right.value)
         # print(f'{root.value}([{root.left.value}], {build_str(root.right)})')
         return f'{root.value}([{root.left.value}], {build_str(root.right)})'
-    elif root.value in LOGICALS+IMP+NEG:
+    elif root.value in LOGICALS+NEG:
         return f'{root.value}({build_str(root.left)}, {build_str(root.right)})'
     elif root.value in RELATIONALS+EQUALS:
         return f'({build_str(root.left)} {root.value} {build_str(root.right)})'

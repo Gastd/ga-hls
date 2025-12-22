@@ -239,7 +239,7 @@ def _cmd_explain_position(args: argparse.Namespace) -> int:
             elif name.startswith("QUANTIFIERS"):
                 print(f"  - {name}: {{ForAll, Exists}}")
             elif name.startswith("LOGICALS"):
-                print(f"  - {name}: {{And, Or}}")
+                print(f"  - {name}: {{And, Or, Implies}}")
             elif name.startswith("NUM"):
                 print(f"  - {name}: NUMERIC")
             elif name.startswith("TERM"):

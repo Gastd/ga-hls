@@ -31,7 +31,6 @@ from .individual import (
     EXP,
     LOGICALS,
     NEG,
-    IMP,
     FUNC,
 )
 from .diagnostics.j48 import run_j48

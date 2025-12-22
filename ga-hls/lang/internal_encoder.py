@@ -48,12 +48,10 @@ def _infer_role(node: Formula) -> str:
     """
     if isinstance(node, ForAll) or isinstance(node, Exists):
         return "QUANTIFIER"
-    if isinstance(node, And) or isinstance(node, Or):
+    if isinstance(node, And) or isinstance(node, Or) or isinstance(node, Implies):
         return "LOGICAL_CONNECTIVE"
     if isinstance(node, Not):
         return "NEGATION"
-    if isinstance(node, Implies):
-        return "IMPLIES"
     if isinstance(node, RelOp):
         return "RELATION_OP"
     if isinstance(node, ArithOp):
@@ -130,8 +128,7 @@ def _build_features(positions: Dict[int, PositionInfo]) -> List[FeatureInfo]:
       - every TERM-like node becomes TERM<i>
       - every RelOp becomes RELATIONALS<i>
       - every numeric literal becomes NUM<i>
-      - every logical connective (And/Or) becomes LOGICALS<i>
-      - every Implies becomes IMP<i>
+      - every logical connective (And/Or/Implies) becomes LOGICALS<i>
 
     This walks positions in ascending index order, so the mapping is deterministic.
     """
@@ -194,17 +191,6 @@ def _build_features(positions: Dict[int, PositionInfo]) -> List[FeatureInfo]:
         elif pi.role == "LOGICAL_CONNECTIVE":
             arff_name = f"LOGICALS{log_idx}"
             log_idx += 1
-            features.append(
-                FeatureInfo(
-                    arff_name=arff_name,
-                    kind="NOMINAL",
-                    position_index=pi.index,
-                )
-            )
-
-        elif pi.role == "IMPLIES":
-            arff_name = f"IMP{imp_idx}"
-            imp_idx += 1
             features.append(
                 FeatureInfo(
                     arff_name=arff_name,

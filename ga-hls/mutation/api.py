@@ -56,7 +56,7 @@ class MutationConfig:
 
     # Operator families (mirroring individual.py)
     relops: Tuple[str, ...] = ("<", ">", "<=", ">=", "==", "!=")
-    logicals: Tuple[str, ...] = ("And", "Or")
+    logicals: Tuple[str, ...] = ("And", "Or", "Implies")
     quantifiers: Tuple[str, ...] = ("ForAll", "Exists")
 
 
@@ -271,9 +271,7 @@ def _mutate_node(node: Formula, cfg: MutationConfig, rng: random.Random, idx: in
     # Operator flips
     if cfg.enable_relop_flip and isinstance(node, RelOp):
         return _mutate_relop(node, cfg, rng)
-    if cfg.enable_logical_flip and isinstance(node, And):
-        return _flip_logical(node, cfg, rng)
-    if cfg.enable_logical_flip and isinstance(node, Or):
+    if cfg.enable_logical_flip and isinstance(node, (And, Or, Implies)):
         return _flip_logical(node, cfg, rng)
     if cfg.enable_quantifier_flip and isinstance(node, ForAll):
         return _flip_quantifier(node, cfg, rng)
@@ -363,18 +361,59 @@ def _mutate_relop(node: RelOp, cfg: MutationConfig, rng: random.Random) -> RelOp
     return node
 
 
-def _flip_logical(node: And | Or, cfg: MutationConfig, rng: random.Random) -> Formula:
+def _flip_logical(node: And | Or | Implies, cfg: MutationConfig, rng: random.Random) -> Formula:
     """
-    Flip between And/Or, preserving children.
+    Flip among And/Or/Implies, preserving children when possible.
+    Note: Implies is binary. We only flip And/Or -> Implies when they have exactly 2 args.
     """
+    allowed = list(cfg.logicals)
+
     if isinstance(node, And):
-        if "Or" not in cfg.logicals:
+        # And -> Or / Implies
+        choices = [op for op in allowed if op != "And"]
+        if not choices:
             return node
-        return Or(args=node.args)
-    elif isinstance(node, Or):
-        if "And" not in cfg.logicals:
+        new_op = rng.choice(choices)
+
+        if new_op == "Or":
+            return Or(args=node.args)
+
+        if new_op == "Implies":
+            if len(node.args) != 2:
+                print("Tried to convert n-ary And/Or to binary Implies. Returning node without mutation.")
+                return node  # cannot convert n-ary And to Implies without normalization
+            return Implies(left=node.args[0], right=node.args[1])
+
+        return node
+
+    if isinstance(node, Or):
+        # Or -> And / Implies
+        choices = [op for op in allowed if op != "Or"]
+        if not choices:
             return node
-        return And(args=node.args)
+        new_op = rng.choice(choices)
+
+        if new_op == "And":
+            return And(args=node.args)
+
+        if new_op == "Implies":
+            if len(node.args) != 2:
+                return node
+            return Implies(left=node.args[0], right=node.args[1])
+
+        return node
+
+    # node is Implies
+    choices = [op for op in allowed if op != "Implies"]
+    if not choices:
+        return node
+    new_op = rng.choice(choices)
+
+    if new_op == "And":
+        return And(args=[node.left, node.right])
+    if new_op == "Or":
+        return Or(args=[node.left, node.right])
+
     return node
 
 

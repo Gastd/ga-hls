@@ -17,7 +17,6 @@ from ..individual import (
     EXP,
     LOGICALS,
     NEG,
-    IMP,
     FUNC,
 )
 from ..lang.internal_encoder import FormulaLayout, FeatureInfo
@@ -187,7 +186,6 @@ def build_attributes(seed, formulae: list):
         'LOGICALS': 0,
         'FUNC': 0,
         'NEG': 0,
-        'IMP': 0,
         'NUM': 0,
         'SINGALS': 0,
         'TERM': 0
@@ -206,7 +204,6 @@ def build_attributes(seed, formulae: list):
             EXP,
             LOGICALS,
             NEG,
-            IMP,
             FUNC,
         )
         for x in family
@@ -303,14 +300,6 @@ def build_attributes(seed, formulae: list):
             qstring = qstring.replace(' ', '')
             ret.append(f'NEG{count_op["NEG"]} {qstring}')
             count_op['NEG'] = count_op['NEG'] + 1
-        elif term in IMP:
-            qstring = str(IMP)
-            qstring = qstring.replace('\'', '')
-            qstring = qstring.replace(']', '}')
-            qstring = qstring.replace('[', '{')
-            qstring = qstring.replace(' ', '')
-            ret.append(f'IMP{count_op["IMP"]} {qstring}')
-            count_op['IMP'] = count_op['IMP'] + 1
         elif term in terminators:
             qstring = str(terminators)
             qstring = qstring.replace('\'', '')
