@@ -308,34 +308,58 @@ class GA(object):
         [self.unknown.append(x) for x in self.population if (x not in self.unknown) and (x.madeit == 'Unknown')]
         [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
         [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.madeit == 'True')]
-        sat = len(self.sats)
-        unsat = len(self.unsats)
-        unk = len(self.unknown)
-        total = sat + unsat + unk
 
-        labeled = sat + unsat
-        labeled_pct = (100.0 * labeled / total) if total else 0.0
-        sat_pct = (100.0 * sat / total) if total else 0.0
-        unsat_pct = (100.0 * unsat / total) if total else 0.0
-        unk_pct = (100.0 * unk / total) if total else 0.0
+        # --- current (per-population) view ---
+        pop = self.population
+        cur_sat = sum(1 for x in pop if x.madeit == "True")
+        cur_unsat = sum(1 for x in pop if x.madeit == "False")
+        cur_unk = sum(1 for x in pop if x.madeit == "Unknown")
+        cur_total = len(pop)
 
-        # progress bar for labeled%
-        bar_width = 20
-        filled = int(round(bar_width * labeled / total)) if total else 0
-        filled = max(0, min(bar_width, filled))
-        bar = "█" * filled + "░" * (bar_width - filled)
+        # --- cumulative (ever-seen) view (used by check_evolution) ---
+        cum_sat = len(self.sats)
+        cum_unsat = len(self.unsats)
+        cum_unk = len(self.unknown)
+        cum_total = cum_sat + cum_unsat + cum_unk
 
-        # optional: include generation counter if it exists
+        def pct(part, whole):
+            return (100.0 * part / whole) if whole else 0.0
+
+        def tri_bar(sat, unsat, unk, total, width=20):
+            if not total:
+                return "░" * width
+            sat_w = int(round(width * sat / total))
+            unsat_w = int(round(width * unsat / total))
+            unk_w = max(0, width - sat_w - unsat_w)
+            return ("█" * sat_w) + ("▓" * unsat_w) + ("░" * unk_w)
+
+        cur_bar = tri_bar(cur_sat, cur_unsat, cur_unk, cur_total, width=20)
+        cum_bar = tri_bar(cum_sat, cum_unsat, cum_unk, cum_total, width=20)
+
         gen = getattr(self, "generation_counter", None)
         gen_str = f"gen={gen:02d}  " if isinstance(gen, int) else ""
 
+        # show stopping criterion progress explicitly
+        target = getattr(self, "target_sats", None)
+        tm = getattr(self, "target_mutation", None)
+
+        # check_evolution uses both cum_sat >= target_sats AND cum_unsat >= target_sats
+        stop_str = f"stop criterion = sat {cum_sat}/{target} & unsat {cum_unsat}/{target}"
+
         print(
-            f"[eval] {gen_str}total={total}  "
-            f"sat={sat} ({sat_pct:4.1f}%)  "
-            f"unsat={unsat} ({unsat_pct:4.1f}%)  "
-            f"unk={unk} ({unk_pct:4.1f}%)  "
-            f"|{bar}|  labeled={labeled_pct:4.1f}%"
+            f"[eval] {gen_str}"
+            f"cur total={cur_total} sat={cur_sat}({pct(cur_sat,cur_total):4.1f}%) "
+            f"unsat={cur_unsat}({pct(cur_unsat,cur_total):4.1f}%) "
+            f"unk={cur_unk}({pct(cur_unk,cur_total):4.1f}%) |{cur_bar}|  \n"
+            f"               "
+            f"cum total={cum_total} sat={cum_sat}({pct(cum_sat,cum_total):4.1f}%) "
+            f"unsat={cum_unsat}({pct(cum_unsat,cum_total):4.1f}%) "
+            f"unk={cum_unk}({pct(cum_unk,cum_total):4.1f}%) |{cum_bar}|  \n"
+            f"               "
+            f"{stop_str}"
         )
+
+
 
     def store_dataset_all(self):
         return write_dataset_all(
