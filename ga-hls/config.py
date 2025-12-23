@@ -32,6 +32,7 @@ class GAConfig:
     mutation_rate: float = 0.1
     elitism: int = 1
     seed: Optional[int] = None
+    target_sats: int = 2
 
 
 @dataclass
@@ -206,6 +207,7 @@ def load_config(path: str | Path) -> Config:
         mutation_rate=float(ga_data.get("mutation_rate", GAConfig.mutation_rate)),
         elitism=int(ga_data.get("elitism", GAConfig.elitism)),
         seed=ga_data.get("seed"),
+        target_sats=ga_data.get("target_sats")
     )
 
     # --- mutation section ---

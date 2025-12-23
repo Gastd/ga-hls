@@ -137,7 +137,6 @@ class GA(object):
             self.seed_ast = None
 
         self.target_sats = int(target_sats)
-        self.target_mutation = False
 
         self.init_population()
         self.execution_report = {'TOTAL': 0}
@@ -362,10 +361,7 @@ class GA(object):
         return deepcopy(np.random.choice(self.population, p=chromosome_probabilities))
 
     def check_evolution(self):
-        if self.target_mutation == True:
-            evolved = (len(self.sats)+len(self.unsats)) >= self.target_sats
-        else:
-            evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
+        evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
         return (evolved)
 
     def checkin(self, logtype: str):

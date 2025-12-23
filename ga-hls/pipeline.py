@@ -63,6 +63,7 @@ def build_ga_from_config(cfg: Config) -> GA:
     # 2) Build the GA instance.
     ga = GA(
         init_form=internal,
+        target_sats=cfg.ga.target_sats,
         population_size=cfg.ga.population_size,
         max_generations=cfg.ga.generations,
         crossover_rate=cfg.ga.crossover_rate,
@@ -149,6 +150,7 @@ def run_diagnostics(cfg: Config) -> None:
             summary["ga_path"] = getattr(ga, "path", None)
             summary["population_size"] = getattr(ga, "population_size", None) or getattr(ga, "size", None)
             summary["max_generations"] = getattr(ga, "max_generations", None)
+            summary["ga_target_sats"] = getattr(ga, "target_sats", None)
 
         # Write summary in the GA run directory if available; else output_root
         out_dir = getattr(ga, "path", None) or output_root
