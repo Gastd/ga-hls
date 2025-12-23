@@ -322,6 +322,10 @@ class GA(object):
         cum_unk = len(self.unknown)
         cum_total = cum_sat + cum_unsat + cum_unk
 
+        # Skip the "pre-eval" view (it is typically all-Unknown).
+        if cur_total > 0 and cur_unk == cur_total:
+            return
+
         def pct(part, whole):
             return (100.0 * part / whole) if whole else 0.0
 
@@ -330,34 +334,43 @@ class GA(object):
                 return "░" * width
             sat_w = int(round(width * sat / total))
             unsat_w = int(round(width * unsat / total))
-            unk_w = max(0, width - sat_w - unsat_w)
+
+            # Clamp to avoid rounding overflow
+            sat_w = max(0, min(width, sat_w))
+            unsat_w = max(0, min(width - sat_w, unsat_w))
+            unk_w = width - sat_w - unsat_w
+
             return ("█" * sat_w) + ("▓" * unsat_w) + ("░" * unk_w)
 
-        cur_bar = tri_bar(cur_sat, cur_unsat, cur_unk, cur_total, width=20)
-        cum_bar = tri_bar(cum_sat, cum_unsat, cum_unk, cum_total, width=20)
+        BAR_W = 20
+        BAR_COL = 110  # <- pick a column that fits your terminal width (100–130 is typical)
+
+        cur_bar = tri_bar(cur_sat, cur_unsat, cur_unk, cur_total, width=BAR_W)
+        cum_bar = tri_bar(cum_sat, cum_unsat, cum_unk, cum_total, width=BAR_W)
 
         gen = getattr(self, "generation_counter", None)
-        gen_str = f"gen={gen:02d}  " if isinstance(gen, int) else ""
+        gen_str = f"gen={gen:02d}" if isinstance(gen, int) else "gen=NA"
 
-        # show stopping criterion progress explicitly
         target = getattr(self, "target_sats", None)
-        tm = getattr(self, "target_mutation", None)
+        stop_str = f"stop criteria: sat {cum_sat}/{target} & unsat {cum_unsat}/{target}"
 
-        # check_evolution uses both cum_sat >= target_sats AND cum_unsat >= target_sats
-        stop_str = f"stop criterion = sat {cum_sat}/{target} & unsat {cum_unsat}/{target}"
+        def fmt_counts(total, sat, unsat, unk) -> str:
+            return (
+                f"total={total:5d}  "
+                f"sat={sat:5d}({pct(sat,total):5.1f}%)  "
+                f"unsat={unsat:5d}({pct(unsat,total):5.1f}%)  "
+                f"unk={unk:5d}({pct(unk,total):5.1f}%)"
+            )
 
-        print(
-            f"[eval] {gen_str}"
-            f"cur total={cur_total} sat={cur_sat}({pct(cur_sat,cur_total):4.1f}%) "
-            f"unsat={cur_unsat}({pct(cur_unsat,cur_total):4.1f}%) "
-            f"unk={cur_unk}({pct(cur_unk,cur_total):4.1f}%) |{cur_bar}|  \n"
-            f"               "
-            f"cum total={cum_total} sat={cum_sat}({pct(cum_sat,cum_total):4.1f}%) "
-            f"unsat={cum_unsat}({pct(cum_unsat,cum_total):4.1f}%) "
-            f"unk={cum_unk}({pct(cum_unk,cum_total):4.1f}%) |{cum_bar}|  \n"
-            f"               "
-            f"{stop_str}"
-        )
+        # Left parts (no bar yet)
+        cur_left = f"[eval] {gen_str}  cur {fmt_counts(cur_total, cur_sat, cur_unsat, cur_unk)}"
+        cum_left = f"            cum {fmt_counts(cum_total, cum_sat, cum_unsat, cum_unk)}"
+        stop_left = f"            {stop_str}"
+
+        # Pad to a fixed column, then append the bar
+        print(cur_left.ljust(BAR_COL) + f"|{cur_bar}|")
+        print(cum_left.ljust(BAR_COL) + f"|{cum_bar}|")
+        print(stop_left)
 
 
 
