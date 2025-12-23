@@ -275,9 +275,39 @@ def _expr_to_formula(node: ast.expr) -> Formula:
 
 
     # Unary operators (we only care about Not)
+        # Unary operators: Not, unary +/- on numeric literals (e.g., -3.0)
     if isinstance(node, ast.UnaryOp):
+        # Logical negation
         if isinstance(node.op, ast.Not):
             return Not(_expr_to_formula(node.operand))
+
+        # Unary plus: +x  (just return x)
+        if isinstance(node.op, ast.UAdd):
+            return _expr_to_formula(node.operand)
+
+        # Unary minus: -x
+        if isinstance(node.op, ast.USub):
+            operand = node.operand
+
+            # Common case: negative numeric literal, e.g., -3 or -3.0
+            if isinstance(operand, ast.Constant) and isinstance(operand.value, (int, float)):
+                v = operand.value
+                if isinstance(v, int):
+                    return IntConst(-v)
+                else:
+                    return RealConst(-float(v))
+
+            # Fallback: if operand parses to a numeric const, negate it
+            inner = _expr_to_formula(operand)
+            if isinstance(inner, IntConst):
+                return IntConst(-inner.value)
+            if isinstance(inner, RealConst):
+                return RealConst(-inner.value)
+
+            raise TheodoreParseError(
+                f"Unary '-' is only supported on numeric literals/consts, got: {ast.dump(node)}"
+            )
+
         raise TheodoreParseError(f"Unsupported unary operator: {ast.dump(node.op)}")
 
     # Boolean operators: And, Or
