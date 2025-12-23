@@ -79,6 +79,7 @@ def run_j48(
 
     arff_path = Path(arff_file)
     model_path = out_dir_path / f"J48-data-{int(qty * 100)}.model"
+    out_path = out_dir_path / f"J48-data-{int(qty * 100)}.out"
 
     # Determine a safe number of CV folds
     num_instances = _count_instances_in_arff(arff_path)
@@ -130,4 +131,7 @@ def run_j48(
         return str(out_path)
     except Exception as exc:
         print(f"[ga-hls] Weka J48 failed: {exc}")
-        return ""
+        with out_path.open("w", encoding="utf-8") as f:
+            f.write(f"[ga-hls] Weka J48 failed: {type(exc).__name__}: {exc}\n")
+        return str(out_path)
+

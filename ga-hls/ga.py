@@ -47,6 +47,9 @@ from .fitness import Fitness, SmithWatermanFitness
 
 from .mutation import MutationConfig
 
+# Prints check-in and checkout timings
+CHECK_PRINT = False
+
 class GA(object):
     """GA over requirement formulas with AST-based mutation and harness-backed evaluation."""
     def __init__(
@@ -160,6 +163,41 @@ class GA(object):
             print('[ga-hls] WARNING: no property script copied (property_path not set?)')
 
         self.formula_layout = formula_layout
+
+                # --- Instrumentation: lightweight run statistics (for sensitivity experiments) ---
+        self.stats = {
+            "generations_completed": 0,
+            "individuals_evaluated": 0,
+            "best_fitness": None,
+            "best_fitness_by_gen": [],
+        }
+
+    def _update_stats_after_evaluate(self):
+        """
+        Update self.stats after self.evaluate() has assigned fitness values.
+        Assumes larger fitness is better (consistent with reverse=True sorting).
+        """
+        try:
+            pop = getattr(self, "population", None) or []
+            n = len(pop)
+            self.stats["individuals_evaluated"] += n
+
+            if n > 0:
+                # Some individuals may have None fitness if evaluation errored; ignore them
+                fitness_vals = [c.fitness for c in pop if getattr(c, "fitness", None) is not None]
+                if fitness_vals:
+                    gen_best = max(fitness_vals)
+                    self.stats["best_fitness_by_gen"].append(gen_best)
+
+                    best_so_far = self.stats["best_fitness"]
+                    if best_so_far is None or gen_best > best_so_far:
+                        self.stats["best_fitness"] = gen_best
+
+            # generations_completed tracks how many GA generations have been *produced* so far
+            self.stats["generations_completed"] = int(getattr(self, "generation_counter", 0))
+        except Exception:
+            # Never let instrumentation break the GA
+            pass
 
     def _progress(self, iterable, desc: str = ""):
         """
@@ -307,13 +345,13 @@ class GA(object):
 
     def checkin(self, logtype: str):
         self.checkin_start[logtype] = time.time()
-        print(f'Check in: {logtype} {self.checkin_start[logtype]} seconds')
+        if CHECK_PRINT: print(f'Check in: {logtype} {self.checkin_start[logtype]} seconds')
 
     def checkout(self, logtype: str):
         self.checkin_start[logtype] = time.time() - self.checkin_start[logtype]
-        print(f'Check out: {logtype} {self.checkin_start[logtype]} seconds')
+        if CHECK_PRINT: print(f'Check out: {logtype} {self.checkin_start[logtype]} seconds')
         self.timespan_log[logtype] = self.timespan_log[logtype] + self.checkin_start[logtype]
-        print(f'Timespan: {logtype} {self.timespan_log[logtype]} seconds')
+        if CHECK_PRINT: print(f'Timespan: {logtype} {self.timespan_log[logtype]} seconds')
 
     def write_timespan_log(self):
         json_object = json.dumps(self.timespan_log, indent=4)
@@ -332,6 +370,7 @@ class GA(object):
         
         self.checkin('tracheck_timestamp')
         self.evaluate()
+        self._update_stats_after_evaluate()
         self.checkout('tracheck_timestamp')
         
         while (not self.check_evolution()) and (self.generation_counter < self.max_generations):
@@ -391,6 +430,7 @@ class GA(object):
             ## score population
             self.checkin('tracheck_timestamp')
             self.evaluate()
+            self._update_stats_after_evaluate()
 
             s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=1.0)
             s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.25)
