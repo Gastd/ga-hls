@@ -309,9 +309,34 @@ class GA(object):
         [self.unknown.append(x) for x in self.population if (x not in self.unknown) and (x.madeit == 'Unknown')]
         [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
         [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.madeit == 'True')]
-        print(f'\nWe have so far {len(self.sats)} satisfied')
-        print(f'and {len(self.unsats)} unsatisfied')
-        print(f'and {len(self.unknown)} unknown')
+        sat = len(self.sats)
+        unsat = len(self.unsats)
+        unk = len(self.unknown)
+        total = sat + unsat + unk
+
+        labeled = sat + unsat
+        labeled_pct = (100.0 * labeled / total) if total else 0.0
+        sat_pct = (100.0 * sat / total) if total else 0.0
+        unsat_pct = (100.0 * unsat / total) if total else 0.0
+        unk_pct = (100.0 * unk / total) if total else 0.0
+
+        # progress bar for labeled%
+        bar_width = 20
+        filled = int(round(bar_width * labeled / total)) if total else 0
+        filled = max(0, min(bar_width, filled))
+        bar = "█" * filled + "░" * (bar_width - filled)
+
+        # optional: include generation counter if it exists
+        gen = getattr(self, "generation_counter", None)
+        gen_str = f"gen={gen:02d}  " if isinstance(gen, int) else ""
+
+        print(
+            f"[eval] {gen_str}total={total}  "
+            f"sat={sat} ({sat_pct:4.1f}%)  "
+            f"unsat={unsat} ({unsat_pct:4.1f}%)  "
+            f"unk={unk} ({unk_pct:4.1f}%)  "
+            f"|{bar}|  labeled={labeled_pct:4.1f}%"
+        )
 
     def store_dataset_all(self):
         return write_dataset_all(
