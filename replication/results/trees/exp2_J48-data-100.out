@@ -1,0 +1,149 @@
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+NUM2 <= 124.873017
+|   NUM1 <= 18917859
+|   |   NUM1 <= 13986527
+|   |   |   NUM2 <= 105.291267
+|   |   |   |   NUM1 <= 12696411: TRUE (31.0)
+|   |   |   |   NUM1 > 12696411
+|   |   |   |   |   NUM2 <= 102.890852: FALSE (6.0)
+|   |   |   |   |   NUM2 > 102.890852
+|   |   |   |   |   |   NUM1 <= 13309259: TRUE (4.0)
+|   |   |   |   |   |   NUM1 > 13309259: FALSE (3.0/1.0)
+|   |   |   NUM2 > 105.291267: TRUE (186.0)
+|   |   NUM1 > 13986527
+|   |   |   NUM2 <= 115.435108
+|   |   |   |   NUM2 <= 108.980719: FALSE (130.0/1.0)
+|   |   |   |   NUM2 > 108.980719
+|   |   |   |   |   NUM1 <= 15896834: TRUE (28.0)
+|   |   |   |   |   NUM1 > 15896834
+|   |   |   |   |   |   NUM1 <= 17003177
+|   |   |   |   |   |   |   NUM2 <= 111.497926: FALSE (9.0)
+|   |   |   |   |   |   |   NUM2 > 111.497926: TRUE (7.0/1.0)
+|   |   |   |   |   |   NUM1 > 17003177: FALSE (40.0)
+|   |   |   NUM2 > 115.435108: TRUE (112.0/2.0)
+|   NUM1 > 18917859
+|   |   NUM2 <= 119.726918: FALSE (612.0)
+|   |   NUM2 > 119.726918
+|   |   |   NUM1 <= 21228596
+|   |   |   |   NUM2 <= 120.487499
+|   |   |   |   |   NUM1 <= 19969545: TRUE (3.0)
+|   |   |   |   |   NUM1 > 19969545: FALSE (4.0)
+|   |   |   |   NUM2 > 120.487499: TRUE (15.0)
+|   |   |   NUM1 > 21228596: FALSE (114.0/1.0)
+NUM2 > 124.873017
+|   NUM1 <= 23563323: TRUE (493.0)
+|   NUM1 > 23563323
+|   |   NUM2 <= 131.000874
+|   |   |   NUM1 <= 25842157
+|   |   |   |   NUM2 <= 127.344796: FALSE (15.0)
+|   |   |   |   NUM2 > 127.344796
+|   |   |   |   |   NUM1 <= 25066859: TRUE (16.0)
+|   |   |   |   |   NUM1 > 25066859
+|   |   |   |   |   |   NUM2 <= 129.003908: FALSE (6.0/1.0)
+|   |   |   |   |   |   NUM2 > 129.003908: TRUE (5.0)
+|   |   |   NUM1 > 25842157: FALSE (62.0)
+|   |   NUM2 > 131.000874
+|   |   |   NUM1 <= 28286904: TRUE (83.0)
+|   |   |   NUM1 > 28286904
+|   |   |   |   NUM2 <= 134.017274: FALSE (11.0/1.0)
+|   |   |   |   NUM2 > 134.017274: TRUE (25.0)
+
+Number of Leaves  : 	25
+
+Size of the tree : 	49
+
+
+Time taken to build model: 0.59 seconds
+
+Time taken to test model on training data: 0.08 seconds
+
+=== Error on training data ===
+
+Correctly Classified Instances        2012               99.604  %
+Incorrectly Classified Instances         8                0.396  %
+Kappa statistic                          0.9921
+K&B Relative Info Score                 98.7305 %
+K&B Information Score                 1994.3563 bits      0.9873 bits/instance
+Class complexity | order 0            2020      bits      1      bits/instance
+Class complexity | scheme               46.8341 bits      0.0232 bits/instance
+Complexity improvement     (Sf)       1973.1659 bits      0.9768 bits/instance
+Mean absolute error                      0.0071
+Root mean squared error                  0.0598
+Relative absolute error                  1.4285 %
+Root relative squared error             11.9521 %
+Total Number of Instances             2020     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.995    0.003    0.997      0.995    0.996      0.992    1.000     0.999     TRUE
+                 0.997    0.005    0.995      0.997    0.996      0.992    1.000     0.999     FALSE
+Weighted Avg.    0.996    0.004    0.996      0.996    0.996      0.992    1.000     0.999     
+
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 1005    5 |    a = TRUE
+    3 1007 |    b = FALSE
+
+Time taken to perform cross-validation: 0.47 seconds
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances        1983               98.1683 %
+Incorrectly Classified Instances        37                1.8317 %
+Kappa statistic                          0.9634
+K&B Relative Info Score                 95.7774 %
+K&B Information Score                 1934.7026 bits      0.9578 bits/instance
+Class complexity | order 0            2020      bits      1      bits/instance
+Class complexity | scheme            30131.2801 bits     14.9165 bits/instance
+Complexity improvement     (Sf)     -28111.2801 bits    -13.9165 bits/instance
+Mean absolute error                      0.022 
+Root mean squared error                  0.1344
+Relative absolute error                  4.3944 %
+Root relative squared error             26.8805 %
+Total Number of Instances             2020     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.981    0.018    0.982      0.981    0.982      0.963    0.983     0.977     TRUE
+                 0.982    0.019    0.981      0.982    0.982      0.963    0.983     0.975     FALSE
+Weighted Avg.    0.982    0.018    0.982      0.982    0.982      0.963    0.983     0.976     
+
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 991  19 |   a = TRUE
+  18 992 |   b = FALSE
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx2g
+java.lang.reflect.InaccessibleObjectException: Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain) throws java.lang.ClassFormatError accessible: module java.base does not "opens java.lang" to unnamed module @4b6995df
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:199)
+	at java.base/java.lang.reflect.Method.setAccessible(Method.java:193)
+	at weka.core.WekaPackageClassLoaderManager.injectClasses(WekaPackageClassLoaderManager.java:792)
+	at weka.core.WekaPackageClassLoaderManager.injectAllClassesInFromStream(WekaPackageClassLoaderManager.java:690)
+	at weka.core.WekaPackageClassLoaderManager.injectMTJCoreClasses(WekaPackageClassLoaderManager.java:118)
+	at weka.core.WekaPackageManager.<clinit>(WekaPackageManager.java:255)
+	at weka.core.ResourceUtils.readProperties(ResourceUtils.java:241)
+	at weka.core.ResourceUtils.readProperties(ResourceUtils.java:184)
+	at weka.core.Utils.readProperties(Utils.java:183)
+	at weka.core.Capabilities.<clinit>(Capabilities.java:104)
+	at weka.classifiers.trees.J48.getCapabilities(J48.java:250)
+	at weka.classifiers.trees.J48.buildClassifier(J48.java:300)
+	at weka.classifiers.evaluation.Evaluation.evaluateModel(Evaluation.java:1632)
+	at weka.classifiers.Evaluation.evaluateModel(Evaluation.java:668)
+	at weka.classifiers.AbstractClassifier.runClassifier(AbstractClassifier.java:141)
+	at weka.classifiers.trees.J48.main(J48.java:1221)

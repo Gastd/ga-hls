@@ -1,0 +1,119 @@
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+NUM2 <= 125.964264
+|   NUM1 <= 18384456
+|   |   NUM2 <= 114.647894
+|   |   |   NUM1 <= 13963310: TRUE (10.0)
+|   |   |   NUM1 > 13963310
+|   |   |   |   NUM2 <= 108.852723: FALSE (15.0)
+|   |   |   |   NUM2 > 108.852723
+|   |   |   |   |   NUM1 <= 15639851: TRUE (4.0)
+|   |   |   |   |   NUM1 > 15639851: FALSE (5.0/1.0)
+|   |   NUM2 > 114.647894: TRUE (22.0)
+|   NUM1 > 18384456
+|   |   NUM2 <= 123.17017: FALSE (71.0)
+|   |   NUM2 > 123.17017
+|   |   |   NUM1 <= 21525460: TRUE (3.0)
+|   |   |   NUM1 > 21525460: FALSE (8.0)
+NUM2 > 125.964264
+|   NUM1 <= 28240017: TRUE (60.0)
+|   NUM1 > 28240017: FALSE (4.0/1.0)
+
+Number of Leaves  : 	10
+
+Size of the tree : 	19
+
+
+Time taken to build model: 0.26 seconds
+
+Time taken to test model on training data: 0.01 seconds
+
+=== Error on training data ===
+
+Correctly Classified Instances         200               99.0099 %
+Incorrectly Classified Instances         2                0.9901 %
+Kappa statistic                          0.9802
+K&B Relative Info Score                 97.1308 %
+K&B Information Score                  196.2041 bits      0.9713 bits/instance
+Class complexity | order 0             202      bits      1      bits/instance
+Class complexity | scheme                6.8548 bits      0.0339 bits/instance
+Complexity improvement     (Sf)        195.1452 bits      0.9661 bits/instance
+Mean absolute error                      0.0153
+Root mean squared error                  0.0876
+Relative absolute error                  3.0693 %
+Root relative squared error             17.5194 %
+Total Number of Instances              202     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.980    0.000    1.000      0.980    0.990      0.980    0.999     0.999     TRUE
+                 1.000    0.020    0.981      1.000    0.990      0.980    0.999     0.999     FALSE
+Weighted Avg.    0.990    0.010    0.990      0.990    0.990      0.980    0.999     0.999     
+
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+  99   2 |   a = TRUE
+   0 101 |   b = FALSE
+
+Time taken to perform cross-validation: 0.13 seconds
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances         189               93.5644 %
+Incorrectly Classified Instances        13                6.4356 %
+Kappa statistic                          0.8713
+K&B Relative Info Score                 85.1702 %
+K&B Information Score                  172.058  bits      0.8518 bits/instance
+Class complexity | order 0             202.0167 bits      1.0001 bits/instance
+Class complexity | scheme             6478.2442 bits     32.0705 bits/instance
+Complexity improvement     (Sf)      -6276.2275 bits    -31.0704 bits/instance
+Mean absolute error                      0.0765
+Root mean squared error                  0.2488
+Relative absolute error                 15.3063 %
+Root relative squared error             49.766  %
+Total Number of Instances              202     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.911    0.040    0.958      0.911    0.934      0.872    0.955     0.948     TRUE
+                 0.960    0.089    0.915      0.960    0.937      0.872    0.955     0.933     FALSE
+Weighted Avg.    0.936    0.064    0.937      0.936    0.936      0.872    0.955     0.940     
+
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 92  9 |  a = TRUE
+  4 97 |  b = FALSE
+
+Picked up JAVA_TOOL_OPTIONS: -Xmx2g
+java.lang.reflect.InaccessibleObjectException: Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain) throws java.lang.ClassFormatError accessible: module java.base does not "opens java.lang" to unnamed module @4b6995df
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:199)
+	at java.base/java.lang.reflect.Method.setAccessible(Method.java:193)
+	at weka.core.WekaPackageClassLoaderManager.injectClasses(WekaPackageClassLoaderManager.java:792)
+	at weka.core.WekaPackageClassLoaderManager.injectAllClassesInFromStream(WekaPackageClassLoaderManager.java:690)
+	at weka.core.WekaPackageClassLoaderManager.injectMTJCoreClasses(WekaPackageClassLoaderManager.java:118)
+	at weka.core.WekaPackageManager.<clinit>(WekaPackageManager.java:255)
+	at weka.core.ResourceUtils.readProperties(ResourceUtils.java:241)
+	at weka.core.ResourceUtils.readProperties(ResourceUtils.java:184)
+	at weka.core.Utils.readProperties(Utils.java:183)
+	at weka.core.Capabilities.<clinit>(Capabilities.java:104)
+	at weka.classifiers.trees.J48.getCapabilities(J48.java:250)
+	at weka.classifiers.trees.J48.buildClassifier(J48.java:300)
+	at weka.classifiers.evaluation.Evaluation.evaluateModel(Evaluation.java:1632)
+	at weka.classifiers.Evaluation.evaluateModel(Evaluation.java:668)
+	at weka.classifiers.AbstractClassifier.runClassifier(AbstractClassifier.java:141)
+	at weka.classifiers.trees.J48.main(J48.java:1221)
