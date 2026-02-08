@@ -1,0 +1,21 @@
+@relation all.2025-12-26_09_17_31.598594
+
+
+@attribute QUANTIFIERS0 {ForAll,Exists}
+@attribute TERM0 {t,distance[t],brake[t]}
+@attribute RELATIONALS0 {<,>,<=,>=}
+@attribute NUM0 NUMERIC
+@attribute LOGICALS0 {And,Or,Implies}
+@attribute TERM1 {t,distance[t],brake[t]}
+@attribute RELATIONALS1 {<,>,<=,>=}
+@attribute NUM1 NUMERIC
+@attribute TERM2 {t,distance[t],brake[t]}
+@attribute RELATIONALS2 {<,>,<=,>=}
+@attribute NUM2 NUMERIC
+@attribute LOGICALS1 {And,Or,Implies}
+@attribute TERM3 {t,distance[t],brake[t]}
+@attribute EQUALS0 {==,!=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data

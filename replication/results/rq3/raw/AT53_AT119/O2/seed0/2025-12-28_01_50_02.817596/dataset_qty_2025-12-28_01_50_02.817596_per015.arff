@@ -1,0 +1,35 @@
+@relation all.2025-12-28_01_50_02.817596
+
+
+@attribute QUANTIFIERS0 {ForAll,Exists}
+@attribute TERM0 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute RELATIONALS0 {<,>,<=,>=}
+@attribute NUM0 NUMERIC
+@attribute LOGICALS0 {And,Or,Implies}
+@attribute TERM1 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute RELATIONALS1 {<,>,<=,>=}
+@attribute NUM1 NUMERIC
+@attribute TERM2 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute EQUALS0 {==,!=}
+@attribute NUM2 NUMERIC
+@attribute LOGICALS1 {And,Or,Implies}
+@attribute TERM3 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute EQUALS1 {==,!=}
+@attribute NUM3 NUMERIC
+@attribute LOGICALS2 {And,Or,Implies}
+@attribute QUANTIFIERS1 {ForAll,Exists}
+@attribute TERM4 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute RELATIONALS2 {<,>,<=,>=}
+@attribute TERM5 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute LOGICALS3 {And,Or,Implies}
+@attribute TERM6 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute RELATIONALS3 {<,>,<=,>=}
+@attribute TERM7 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute ARITHMETICS0 {+,-,*,/}
+@attribute NUM4 NUMERIC
+@attribute TERM8 {i,gear[i],t2,timestamps[i],gear[ToInt((RealVal(0)+((t2-0.0)/10000.0)))],gear[(i-1)]}
+@attribute EQUALS2 {==,!=}
+@attribute NUM5 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data

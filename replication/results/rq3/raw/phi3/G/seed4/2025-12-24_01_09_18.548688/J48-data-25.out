@@ -1,0 +1,93 @@
+WARNING: core mtj jar files are not available as resources to this classloader (jdk.internal.loader.ClassLoaders$AppClassLoader@5c29bfd)
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+NUM1 <= 5193979.207036: TRUE (257.0/2.0)
+NUM1 > 5193979.207036
+|   NUM3 <= 2.776305
+|   |   LOGICALS3 = And: TRUE (75.0)
+|   |   LOGICALS3 = Or: FALSE (2.0)
+|   |   LOGICALS3 = Implies: TRUE (0.0)
+|   NUM3 > 2.776305: FALSE (413.0)
+
+Number of Leaves  : 	5
+
+Size of the tree : 	8
+
+
+Time taken to build model: 0.02 seconds
+
+Time taken to test model on training data: 0.01 seconds
+
+=== Error on training data ===
+
+Correctly Classified Instances         745               99.7323 %
+Incorrectly Classified Instances         2                0.2677 %
+Kappa statistic                          0.9946
+K&B Relative Info Score                 99.0703 %
+K&B Information Score                  734.2225 bits      0.9829 bits/instance
+Class complexity | order 0             741.1122 bits      0.9921 bits/instance
+Class complexity | scheme               16.8854 bits      0.0226 bits/instance
+Complexity improvement     (Sf)        724.2269 bits      0.9695 bits/instance
+Mean absolute error                      0.0035
+Root mean squared error                  0.0421
+Relative absolute error                  1.0757 %
+Root relative squared error             10.3789 %
+Total Number of Instances              747     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.005    0.994      1.000    0.997      0.995    0.998     0.995     TRUE
+                 0.995    0.000    1.000      0.995    0.998      0.995    0.998     0.998     FALSE
+                 ?        0.000    ?          ?        ?          ?        ?         ?         UNKNOWN
+Weighted Avg.    0.997    0.002    0.997      0.997    0.997      0.995    0.998     0.997     
+
+
+=== Confusion Matrix ===
+
+   a   b   c   <-- classified as
+ 330   0   0 |   a = TRUE
+   2 415   0 |   b = FALSE
+   0   0   0 |   c = UNKNOWN
+
+Time taken to perform cross-validation: 0.03 seconds
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances         743               99.4645 %
+Incorrectly Classified Instances         4                0.5355 %
+Kappa statistic                          0.9892
+K&B Relative Info Score                 98.682  %
+K&B Information Score                  731.5049 bits      0.9793 bits/instance
+Class complexity | order 0             741.2752 bits      0.9923 bits/instance
+Class complexity | scheme               29.7704 bits      0.0399 bits/instance
+Complexity improvement     (Sf)        711.5048 bits      0.9525 bits/instance
+Mean absolute error                      0.0046
+Root mean squared error                  0.0593
+Relative absolute error                  1.4009 %
+Root relative squared error             14.6195 %
+Total Number of Instances              747     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.010    0.988      1.000    0.994      0.989    0.998     0.996     TRUE
+                 0.990    0.000    1.000      0.990    0.995      0.989    0.998     0.999     FALSE
+                 ?        0.000    ?          ?        ?          ?        ?         ?         UNKNOWN
+Weighted Avg.    0.995    0.004    0.995      0.995    0.995      0.989    0.998     0.998     
+
+
+=== Confusion Matrix ===
+
+   a   b   c   <-- classified as
+ 330   0   0 |   a = TRUE
+   4 413   0 |   b = FALSE
+   0   0   0 |   c = UNKNOWN
+

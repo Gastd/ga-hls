@@ -1,0 +1,1 @@
+	scripts/test3/outputs/sensitivity/phi4/G/seed4/2025-12-26_08_52_09.057712/property_phi4_normal.py

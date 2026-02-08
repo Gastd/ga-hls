@@ -1,0 +1,103 @@
+WARNING: core mtj jar files are not available as resources to this classloader (jdk.internal.loader.ClassLoaders$AppClassLoader@5c29bfd)
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+NUM1 <= 5099525.201562
+|   NUM1 <= 4711311.530471: TRUE (928.0)
+|   NUM1 > 4711311.530471
+|   |   LOGICALS3 = And: TRUE (165.0)
+|   |   LOGICALS3 = Or: FALSE (73.0)
+|   |   LOGICALS3 = Implies: TRUE (0.0)
+NUM1 > 5099525.201562
+|   NUM3 <= 2.798636
+|   |   LOGICALS3 = And: TRUE (190.0)
+|   |   LOGICALS3 = Or: FALSE (104.0)
+|   |   LOGICALS3 = Implies: TRUE (0.0)
+|   NUM3 > 2.798636
+|   |   NUM1 <= 5198362.887423
+|   |   |   LOGICALS3 = And: TRUE (36.0)
+|   |   |   LOGICALS3 = Or: FALSE (37.0)
+|   |   |   LOGICALS3 = Implies: FALSE (0.0)
+|   |   NUM1 > 5198362.887423: FALSE (1191.0)
+
+Number of Leaves  : 	11
+
+Size of the tree : 	18
+
+
+Time taken to build model: 0.04 seconds
+
+Time taken to test model on training data: 0.01 seconds
+
+=== Error on training data ===
+
+Correctly Classified Instances        2724              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+K&B Relative Info Score                100      %
+K&B Information Score                 2723.4825 bits      0.9998 bits/instance
+Class complexity | order 0            2723.4825 bits      0.9998 bits/instance
+Class complexity | scheme                0      bits      0      bits/instance
+Complexity improvement     (Sf)       2723.4825 bits      0.9998 bits/instance
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances             2724     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     TRUE
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     FALSE
+                 ?        0.000    ?          ?        ?          ?        ?         ?         UNKNOWN
+Weighted Avg.    1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     
+
+
+=== Confusion Matrix ===
+
+    a    b    c   <-- classified as
+ 1319    0    0 |    a = TRUE
+    0 1405    0 |    b = FALSE
+    0    0    0 |    c = UNKNOWN
+
+Time taken to perform cross-validation: 0.09 seconds
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances        2723               99.9633 %
+Incorrectly Classified Instances         1                0.0367 %
+Kappa statistic                          0.9993
+K&B Relative Info Score                 99.9265 %
+K&B Information Score                 2721.6437 bits      0.9991 bits/instance
+Class complexity | order 0            2723.6452 bits      0.9999 bits/instance
+Class complexity | scheme             1074      bits      0.3943 bits/instance
+Complexity improvement     (Sf)       1649.6452 bits      0.6056 bits/instance
+Mean absolute error                      0.0002
+Root mean squared error                  0.0156
+Relative absolute error                  0.0735 %
+Root relative squared error              3.8339 %
+Total Number of Instances             2724     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.999    0.000    1.000      0.999    1.000      0.999    1.000     1.000     TRUE
+                 1.000    0.001    0.999      1.000    1.000      0.999    1.000     0.999     FALSE
+                 ?        0.000    ?          ?        ?          ?        ?         ?         UNKNOWN
+Weighted Avg.    1.000    0.000    1.000      1.000    1.000      0.999    1.000     0.999     
+
+
+=== Confusion Matrix ===
+
+    a    b    c   <-- classified as
+ 1318    1    0 |    a = TRUE
+    0 1405    0 |    b = FALSE
+    0    0    0 |    c = UNKNOWN
+
