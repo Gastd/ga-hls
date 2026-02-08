@@ -1,0 +1,47 @@
+{
+  "ga": {
+    "crossover_rate": 0.95,
+    "generations": 10,
+    "mutation_rate": 0.9,
+    "population_size": 250,
+    "seed": 3,
+    "target_sats": 1000
+  },
+  "input": {
+    "output_dir": "scripts/test3/outputs/sensitivity/RR/G2/seed3",
+    "requirement_file": "scripts/test3/configs/property_trace/property_RR_RR.py",
+    "traces_file": "na"
+  },
+  "mutation": {
+    "allowed_changes": {
+      "12": {
+        "numeric": [
+          0.3,
+          0.8
+        ]
+      },
+      "17": {
+        "numeric": [
+          0.2,
+          1.2
+        ]
+      },
+      "9": {
+        "logical": [
+          "And",
+          "Or"
+        ]
+      }
+    },
+    "allowed_positions": [
+      9,
+      12,
+      17
+    ],
+    "enable_logical_flip": true,
+    "enable_numeric_perturbation": true,
+    "enable_quantifier_flip": false,
+    "enable_relop_flip": false,
+    "max_mutations": 2
+  }
+}

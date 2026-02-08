@@ -1,0 +1,40 @@
+{
+  "ga": {
+    "crossover_rate": 0.95,
+    "generations": 10,
+    "mutation_rate": 0.9,
+    "population_size": 250,
+    "seed": 0,
+    "target_sats": 1000
+  },
+  "input": {
+    "output_dir": "outputs/sensitivity/phi3/O3/seed0",
+    "requirement_file": "configs/sensitivity/property_trace/property_phi3_retry.py",
+    "traces_file": "na"
+  },
+  "mutation": {
+    "allowed_changes": {
+      "10": {
+        "logical": [
+          "And",
+          "Or"
+        ]
+      },
+      "40": {
+        "numeric": [
+          0.5,
+          2.0
+        ]
+      }
+    },
+    "allowed_positions": [
+      10,
+      40
+    ],
+    "enable_logical_flip": true,
+    "enable_numeric_perturbation": true,
+    "enable_quantifier_flip": false,
+    "enable_relop_flip": false,
+    "max_mutations": 1
+  }
+}

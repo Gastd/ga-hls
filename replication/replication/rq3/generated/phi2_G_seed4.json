@@ -1,0 +1,40 @@
+{
+  "ga": {
+    "crossover_rate": 0.95,
+    "generations": 10,
+    "mutation_rate": 0.9,
+    "population_size": 250,
+    "seed": 4,
+    "target_sats": 1000
+  },
+  "input": {
+    "output_dir": "outputs/sensitivity/phi2/G/seed4",
+    "requirement_file": "configs/sensitivity/property_trace/property_phi2_cutin.py",
+    "traces_file": "na"
+  },
+  "mutation": {
+    "allowed_changes": {
+      "12": {
+        "numeric": [
+          -4.5,
+          -2.0
+        ]
+      },
+      "15": {
+        "numeric": [
+          1.0,
+          3.0
+        ]
+      }
+    },
+    "allowed_positions": [
+      12,
+      15
+    ],
+    "enable_logical_flip": false,
+    "enable_numeric_perturbation": true,
+    "enable_quantifier_flip": false,
+    "enable_relop_flip": false,
+    "max_mutations": 1
+  }
+}

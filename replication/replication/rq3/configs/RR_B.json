@@ -1,0 +1,28 @@
+{
+  "input": {
+    "requirement_file": "scripts/test3/configs/property_trace/property_RR_RR.py",
+    "traces_file": "na",
+    "output_dir": "scripts/test3/configs/outputs/RR/B"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.9,
+    "seed": 0,
+    "target_sats": 1000
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": true,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [9, 12, 17],
+    "allowed_changes": {
+      "9": { "logical": ["And", "Or", "Implies"] },
+      "12": { "numeric": [0.05, 1.50] },
+      "17": { "numeric": [0.0, 5.0] }
+    }
+  }
+}
