@@ -24,7 +24,7 @@ This page documents:
 - Precision/recall per experiment: `replication/results/summary/precision_recall.csv`
 
 **Experiment registry (maps Exp IDs to artifact paths)**
-- `replication/docs/experiments/experiments.csv`
+- `replication/docs/experiments/effectiveness_runs.csv`
 
 **Per-experiment diagnostic outputs**
 - Extracted trees and Weka outputs: `replication/results/trees/`

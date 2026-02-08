@@ -28,7 +28,7 @@ All replication artifacts are stored under the `replication/` directory:
 - `replication/docs/`  
   Documentation and indices:
   - `replication/docs/rq/`: documentation per research question
-  - `replication/docs/experiments/experiments.csv`: registry for Exp1–Exp34 (main evaluation runs)
+  - `replication/docs/experiments/effectiveness_runs.csv`: registry for Exp1–Exp34 (main evaluation runs)
   - `replication/docs/experiments/sensitivity_runs.csv`: registry for sensitivity runs
 
 ## Quick start (Docker)
@@ -48,7 +48,7 @@ docker compose -f docker/docker-compose.yml run --rm ga-hls --help
 ### Effectiveness/Efficiency evaluation runs (Exp1–Exp34)
 - Precision/recall per experiment: `replication/results/summary/precision_recall.csv`
 - Per-experiment artifacts: `replication/results/trees/`, `replication/results/arff/`, `replication/results/timings/`, `replication/results/logs/`
-- Registry: `replication/docs/experiments/experiments.csv`
+- Registry: `replication/docs/experiments/effectiveness_runs.csv`
 
 ### Sensitivity runs (RQ3)
 - Raw outputs: `replication/results/raw/sensitivity/`
