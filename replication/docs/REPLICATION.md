@@ -45,7 +45,7 @@ docker compose -f docker/docker-compose.yml run --rm ga-hls --help
 
 ## Results overview
 
-### Main evaluation runs (Exp1–Exp34)
+### Effectiveness/Efficiency evaluation runs (Exp1–Exp34)
 - Precision/recall per experiment: `replication/results/summary/precision_recall.csv`
 - Per-experiment artifacts: `replication/results/trees/`, `replication/results/arff/`, `replication/results/timings/`, `replication/results/logs/`
 - Registry: `replication/docs/experiments/experiments.csv`
