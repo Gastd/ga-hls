@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ga-hls"
+version = "1.0.0"
+description = "Genetic algorithm-based HLS requirement mutation and diagnostics"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Gabriel Araujo" },
+  { name = "Ricardo Caldas" },
+  { name = "Federico Formica"}
+]
+
+dependencies = [
+  "numpy",
+  "matplotlib",
+  "scipy",
+  "z3-solver",
+  "tqdm"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Gastd/ga-hls"
+
+[project.scripts]
+ga-hls = "ga_hls.cli:main"
+
+[tool.setuptools]
+packages = ["ga_hls", "ga_hls.lang"]
+
+
+[tool.setuptools.package-dir]
+ga_hls = "ga-hls"

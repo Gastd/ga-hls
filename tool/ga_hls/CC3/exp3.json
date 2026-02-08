@@ -1,5 +1,0 @@
-{
-    "0": ["op", ["ForAll", "Exists"]],
-    "2": ["op", ["And", "Or"]],
-    "20": ["op", ["ForAll", "Exists"]]
-}

@@ -1,0 +1,35 @@
+{
+  "input": {
+    "requirement_file": "ga-hls/examples/AT1_AT001.py",
+    "traces_file": "ga-hls/tracesAT.csv",
+    "output_dir": "outputs"
+  },
+  "ga": {
+    "population_size": 5,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.10,
+    "seed": 42
+  },
+  "mutation": {
+    "max_mutations": 1,
+
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": true,
+    "enable_logical_flip": true,
+    "enable_quantifier_flip": false,
+
+    "allowed_positions": [2,6,11],
+    "allowed_changes": {
+      "2": {
+        "logical": ["And","Or"]
+      },
+      "6": {
+        "relational": ["<", ">"]
+      },
+      "11": {
+        "numeric": [100.0, 140.0]
+      }
+    }
+  }
+}

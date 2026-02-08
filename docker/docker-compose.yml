@@ -1,0 +1,27 @@
+services:
+  ga-hls:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: ga-hls:latest
+    working_dir: /opt/ga-hls
+    environment:
+      WEKA_JAR: /opt/weka/weka.jar
+      GA_HLS_OUTPUT_DIR: /opt/ga-hls/outputs
+    volumes:
+      - ..:/opt/ga-hls
+    command: ["--help"]
+
+  ga-hls-shell:
+    image: ga-hls:latest
+    depends_on:
+      - ga-hls
+    working_dir: /opt/ga-hls
+    environment:
+      WEKA_JAR: /opt/weka/weka.jar
+      GA_HLS_OUTPUT_DIR: /opt/ga-hls/outputs
+    volumes:
+      - ..:/opt/ga-hls
+    entrypoint: ["/bin/bash"]
+    tty: true
+    stdin_open: true

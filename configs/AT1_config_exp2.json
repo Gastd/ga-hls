@@ -1,0 +1,28 @@
+{
+  "input": {
+    "requirement_file": "ga-hls/benchmark/property_distance_obs_r2.py",
+    "traces_file": "ga-hls/tracesAT.csv",
+    "output_dir": "outputs"
+  },
+  "ga": {
+    "population_size": 50,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.10,
+    "seed": 42
+  },
+  "mutation": {
+  "max_mutations": 5,
+  "enable_numeric_perturbation": true,
+  "enable_relop_flip": true,
+  "enable_logical_flip": true,
+  "enable_quantifier_flip": true,
+
+  "allowed_positions": [3, 7, 11],
+  "numeric_bounds": {
+    "3": { "min": 0.0, "max": 10.0 },
+    "7": { "min": 10.0, "max": 30.0 },
+    "11": { "min": 100.0, "max": 140.0 }
+    }
+  }
+}
