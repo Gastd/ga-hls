@@ -47,6 +47,9 @@ from .fitness import Fitness, SmithWatermanFitness
 
 from .mutation import MutationConfig
 
+# Prints check-in and checkout timings
+CHECK_PRINT = False
+
 class GA(object):
     """GA over requirement formulas with AST-based mutation and harness-backed evaluation."""
     def __init__(
@@ -134,7 +137,6 @@ class GA(object):
             self.seed_ast = None
 
         self.target_sats = int(target_sats)
-        self.target_mutation = False
 
         self.init_population()
         self.execution_report = {'TOTAL': 0}
@@ -160,6 +162,41 @@ class GA(object):
             print('[ga-hls] WARNING: no property script copied (property_path not set?)')
 
         self.formula_layout = formula_layout
+
+                # --- Instrumentation: lightweight run statistics (for sensitivity experiments) ---
+        self.stats = {
+            "generations_completed": 0,
+            "individuals_evaluated": 0,
+            "best_fitness": None,
+            "best_fitness_by_gen": [],
+        }
+
+    def _update_stats_after_evaluate(self):
+        """
+        Update self.stats after self.evaluate() has assigned fitness values.
+        Assumes larger fitness is better (consistent with reverse=True sorting).
+        """
+        try:
+            pop = getattr(self, "population", None) or []
+            n = len(pop)
+            self.stats["individuals_evaluated"] += n
+
+            if n > 0:
+                # Some individuals may have None fitness if evaluation errored; ignore them
+                fitness_vals = [c.fitness for c in pop if getattr(c, "fitness", None) is not None]
+                if fitness_vals:
+                    gen_best = max(fitness_vals)
+                    self.stats["best_fitness_by_gen"].append(gen_best)
+
+                    best_so_far = self.stats["best_fitness"]
+                    if best_so_far is None or gen_best > best_so_far:
+                        self.stats["best_fitness"] = gen_best
+
+            # generations_completed tracks how many GA generations have been *produced* so far
+            self.stats["generations_completed"] = int(getattr(self, "generation_counter", 0))
+        except Exception:
+            # Never let instrumentation break the GA
+            pass
 
     def _progress(self, iterable, desc: str = ""):
         """
@@ -271,9 +308,71 @@ class GA(object):
         [self.unknown.append(x) for x in self.population if (x not in self.unknown) and (x.madeit == 'Unknown')]
         [self.unsats.append(x) for x in self.population if (x not in self.unsats) and (x.madeit == 'False')]
         [self.sats.append(x) for x in self.population if (x not in self.sats) and (x.madeit == 'True')]
-        print(f'\nWe have so far {len(self.sats)} satisfied')
-        print(f'and {len(self.unsats)} unsatisfied')
-        print(f'and {len(self.unknown)} unknown')
+
+        # --- current (per-population) view ---
+        pop = self.population
+        cur_sat = sum(1 for x in pop if x.madeit == "True")
+        cur_unsat = sum(1 for x in pop if x.madeit == "False")
+        cur_unk = sum(1 for x in pop if x.madeit == "Unknown")
+        cur_total = len(pop)
+
+        # --- cumulative (ever-seen) view (used by check_evolution) ---
+        cum_sat = len(self.sats)
+        cum_unsat = len(self.unsats)
+        cum_unk = len(self.unknown)
+        cum_total = cum_sat + cum_unsat + cum_unk
+
+        # Skip the "pre-eval" view (it is typically all-Unknown).
+        if cur_total > 0 and cur_unk == cur_total:
+            return
+
+        def pct(part, whole):
+            return (100.0 * part / whole) if whole else 0.0
+
+        def tri_bar(sat, unsat, unk, total, width=20):
+            if not total:
+                return "░" * width
+            sat_w = int(round(width * sat / total))
+            unsat_w = int(round(width * unsat / total))
+
+            # Clamp to avoid rounding overflow
+            sat_w = max(0, min(width, sat_w))
+            unsat_w = max(0, min(width - sat_w, unsat_w))
+            unk_w = width - sat_w - unsat_w
+
+            return ("█" * sat_w) + ("▓" * unsat_w) + ("░" * unk_w)
+
+        BAR_W = 20
+        BAR_COL = 110  # <- pick a column that fits your terminal width (100–130 is typical)
+
+        cur_bar = tri_bar(cur_sat, cur_unsat, cur_unk, cur_total, width=BAR_W)
+        cum_bar = tri_bar(cum_sat, cum_unsat, cum_unk, cum_total, width=BAR_W)
+
+        gen = getattr(self, "generation_counter", None)
+        gen_str = f"gen={gen:02d}" if isinstance(gen, int) else "gen=NA"
+
+        target = getattr(self, "target_sats", None)
+        stop_str = f"stop criteria: sat {cum_sat}/{target} & unsat {cum_unsat}/{target}"
+
+        def fmt_counts(total, sat, unsat, unk) -> str:
+            return (
+                f"total={total:5d}  "
+                f"sat={sat:5d}({pct(sat,total):5.1f}%)  "
+                f"unsat={unsat:5d}({pct(unsat,total):5.1f}%)  "
+                f"unk={unk:5d}({pct(unk,total):5.1f}%)"
+            )
+
+        # Left parts (no bar yet)
+        cur_left = f"[eval] {gen_str}  cur {fmt_counts(cur_total, cur_sat, cur_unsat, cur_unk)}"
+        cum_left = f"            cum {fmt_counts(cum_total, cum_sat, cum_unsat, cum_unk)}"
+        stop_left = f"            {stop_str}"
+
+        # Pad to a fixed column, then append the bar
+        print(cur_left.ljust(BAR_COL) + f"|{cur_bar}|")
+        print(cum_left.ljust(BAR_COL) + f"|{cum_bar}|")
+        print(stop_left)
+
+
 
     def store_dataset_all(self):
         return write_dataset_all(
@@ -299,21 +398,18 @@ class GA(object):
         return deepcopy(np.random.choice(self.population, p=chromosome_probabilities))
 
     def check_evolution(self):
-        if self.target_mutation == True:
-            evolved = (len(self.sats)+len(self.unsats)) >= self.target_sats
-        else:
-            evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
+        evolved = (len(self.sats) >= self.target_sats) and (len(self.unsats) >= self.target_sats)
         return (evolved)
 
     def checkin(self, logtype: str):
         self.checkin_start[logtype] = time.time()
-        print(f'Check in: {logtype} {self.checkin_start[logtype]} seconds')
+        if CHECK_PRINT: print(f'Check in: {logtype} {self.checkin_start[logtype]} seconds')
 
     def checkout(self, logtype: str):
         self.checkin_start[logtype] = time.time() - self.checkin_start[logtype]
-        print(f'Check out: {logtype} {self.checkin_start[logtype]} seconds')
+        if CHECK_PRINT: print(f'Check out: {logtype} {self.checkin_start[logtype]} seconds')
         self.timespan_log[logtype] = self.timespan_log[logtype] + self.checkin_start[logtype]
-        print(f'Timespan: {logtype} {self.timespan_log[logtype]} seconds')
+        if CHECK_PRINT: print(f'Timespan: {logtype} {self.timespan_log[logtype]} seconds')
 
     def write_timespan_log(self):
         json_object = json.dumps(self.timespan_log, indent=4)
@@ -332,6 +428,7 @@ class GA(object):
         
         self.checkin('tracheck_timestamp')
         self.evaluate()
+        self._update_stats_after_evaluate()
         self.checkout('tracheck_timestamp')
         
         while (not self.check_evolution()) and (self.generation_counter < self.max_generations):
@@ -391,6 +488,7 @@ class GA(object):
             ## score population
             self.checkin('tracheck_timestamp')
             self.evaluate()
+            self._update_stats_after_evaluate()
 
             s100 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=1.0)
             s025 = write_dataset_qty(self.path, self.now, self.seed, self.seed_ch, self.sats, self.unsats, self.unknown, self.formula_layout, per_cut=.25)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 from .config import Config
@@ -8,6 +9,7 @@ from .config import Config
 from .lang.theodore_parser import load_formula_from_property
 from .lang.internal_encoder import formula_to_internal_obj, encode_with_layout, FormulaLayout
 from .diagnostics.j48 import run_j48
+from .diagnostics.summary import write_summary, parse_j48_out, sha256_file
 from .mutation import MutationConfig
 
 
@@ -61,6 +63,7 @@ def build_ga_from_config(cfg: Config) -> GA:
     # 2) Build the GA instance.
     ga = GA(
         init_form=internal,
+        target_sats=cfg.ga.target_sats,
         population_size=cfg.ga.population_size,
         max_generations=cfg.ga.generations,
         crossover_rate=cfg.ga.crossover_rate,
@@ -86,16 +89,69 @@ def run_diagnostics(cfg: Config) -> None:
            (population logs, datasets, reports) under the GA run directory.
         4. Delegate ARFF/J48 work to the diagnostics layer (outside GA).
     """
+    t0 = time.time()
 
-       # 1. Ensure the configured output root exists and get it as a Path
     output_root = _ensure_output_dir(cfg.input.output_dir)
 
-    # 2. Build GA from config (property Python -> AST -> internal format -> GA)
-    ga = build_ga_from_config(cfg)
+    summary = {
+        "requirement_file": str(cfg.input.requirement_file),
+        "traces_file": str(cfg.input.traces_file),
+        "output_dir": str(output_root),
+        "seed": cfg.ga.seed,
+        "success": False,
+        "error": None,
+        "runtime_sec": None,
+        "ga_sec": None,
+        "j48_runs": [],        # list of {qty, arff_path, out_path, tree_*}
+        "requirement_sha256": sha256_file(str(cfg.input.requirement_file)),
+        "traces_sha256": sha256_file(str(cfg.input.traces_file)),
+    }
 
-    # 3. Run evolution. GA.evolve() returns {fraction_used -> arff_path}.
-    datasets = ga.evolve()
+    ga = None
+    try:
+        ga = build_ga_from_config(cfg)
 
-    # 4. Run J48 for each dataset via diagnostics layer.
-    for qty, arff_path in datasets.items():
-        run_j48(arff_path, qty, ga.path)
+        t_ga = time.time()
+        datasets = ga.evolve()
+        if hasattr(ga, "stats") and isinstance(ga.stats, dict):
+            summary.update({f"ga_{k}": v for k, v in ga.stats.items()})
+        summary["ga_sec"] = time.time() - t_ga
+
+        # J48 per dataset
+        for qty, arff_path in datasets.items():
+            out_path = run_j48(arff_path, qty, ga.path)
+
+            out_text = ""
+            try:
+                out_text = Path(out_path).read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                out_text = ""
+
+            tree_stats = parse_j48_out(out_text)
+            summary["j48_runs"].append({
+                "qty": qty,
+                "arff_path": str(arff_path),
+                "j48_out_path": str(out_path),
+                **tree_stats
+            })
+
+        # Define success: at least one J48 run produced a non-empty tree root
+        summary["success"] = any(r.get("root_split") for r in summary["j48_runs"])
+
+    except Exception as exc:
+        summary["error"] = f"{type(exc).__name__}: {exc}"
+
+    finally:
+        summary["runtime_sec"] = time.time() - t0
+
+        # If GA exposes anything useful already, capture it opportunistically
+        if ga is not None:
+            # These are safe and won't crash if attrs don't exist.
+            summary["ga_path"] = getattr(ga, "path", None)
+            summary["population_size"] = getattr(ga, "population_size", None) or getattr(ga, "size", None)
+            summary["max_generations"] = getattr(ga, "max_generations", None)
+            summary["ga_target_sats"] = getattr(ga, "target_sats", None)
+
+        # Write summary in the GA run directory if available; else output_root
+        out_dir = getattr(ga, "path", None) or output_root
+        write_summary(out_dir, summary)
