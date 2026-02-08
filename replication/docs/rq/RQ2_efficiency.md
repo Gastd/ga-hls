@@ -19,7 +19,7 @@ This page documents:
 - Timing logs per experiment: `replication/results/timings/exp*_timespan.json`
 
 **Experiment registry**
-- `replication/docs/experiments/experiments.csv` (maps Exp IDs to timing files and raw outputs)
+- `replication/docs/experiments/effectiveness_runs.csv` (maps Exp IDs to timing files and raw outputs)
 
 **Analysis script**
 - Runtime aggregation/statistics script: `replication/analysis/scripts/RQ2.py`
