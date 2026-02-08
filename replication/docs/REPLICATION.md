@@ -14,6 +14,7 @@ This repository accompanies the paper and contains:
    docker compose -f docker/docker-compose.yml run --rm ga-hls --help
 
 ## Results
+- Precision/recall per experiment: `results/summary/precision_recall.csv`
 See `results/summary/` (precision/recall) and `results/timings/` (runtime tables).
 Per-experiment artifacts are under `results/trees/` and `results/arff/`.
 
