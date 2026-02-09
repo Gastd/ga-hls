@@ -1,6 +1,6 @@
 {
   "input": {
-    "requirement_file": "scripts/test3/configs/property_trace/property_RR_RR.py",
+    "requirement_file": "replication/evaluation_inputs/sensitivity/property_RR_RR.py",
     "traces_file": "na",
     "output_dir": "scripts/test3/configs/outputs/RR/O"
   },

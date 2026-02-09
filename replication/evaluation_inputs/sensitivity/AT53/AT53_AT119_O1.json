@@ -1,6 +1,6 @@
 {
   "input": {
-    "requirement_file": "scripts/test3/configs/property_trace/property_AT53_AT119.py",
+    "requirement_file": "replication/evaluation_inputs/sensitivity/property_AT53_AT119.py",
     "traces_file": "na",
     "output_dir": "scripts/test3/configs/outputs/AT53/G"
   },

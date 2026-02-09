@@ -1,6 +1,6 @@
 {
   "input": {
-    "requirement_file": "scripts/test3/configs/property_trace/property_phi2_cutin.py",
+    "requirement_file": "replication/evaluation_inputs/sensitivity/property_phi2_cutin.py",
     "traces_file": "na",
     "output_dir": "scripts/test3/configs/outputs/phi2/B"
   },

@@ -8,8 +8,8 @@
     "target_sats": 1000
   },
   "input": {
-    "output_dir": "scripts/test3/outputs/sensitivity/phi4/G3/seed0",
-    "requirement_file": "scripts/test3/configs/property_trace/property_phi4_normal.py",
+    "output_dir": "replication/evaluation_inputs/sensitivity/phi4/G3/seed0",
+    "requirement_file": "replication/evaluation_inputs/sensitivity/property_phi4_normal.py",
     "traces_file": "na"
   },
   "mutation": {
