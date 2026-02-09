@@ -1,5 +1,46 @@
 {
-    "0": ["op", ["ForAll", "Exists"]],
-    "4": ["op", ["ForAll", "Exists"]],
-    "7": ["float", [6.0, 10.0]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/CC4/CC4_CC128.py",
+    "traces_file": "replication/analysis/data/tracesCC.csv",
+    "output_dir": "replication/results/_rerun/CC4/exp3"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": true,
+    "allowed_positions": [
+      0,
+      20,
+      35
+    ],
+    "allowed_changes": {
+      "0": {
+        "quantifier": [
+          "ForAll",
+          "Exists"
+        ]
+      },
+      "20": {
+        "quantifier": [
+          "ForAll",
+          "Exists"
+        ]
+      },
+      "35": {
+        "numeric": [
+          6.0,
+          10.0
+        ]
+      }
+    }
+  }
 }

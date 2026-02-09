@@ -1,4 +1,39 @@
 {
-    "8": ["float", [7.0, 11.0]],
-    "27": ["float", [7.0, 11.0]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/CC5/CC5_CC031.py",
+    "traces_file": "replication/analysis/data/tracesCC.csv",
+    "output_dir": "replication/results/_rerun/CC5/exp1"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      36,
+      54
+    ],
+    "allowed_changes": {
+      "36": {
+        "numeric": [
+          7.0,
+          11.0
+        ]
+      },
+      "54": {
+        "numeric": [
+          7.0,
+          11.0
+        ]
+      }
+    }
+  }
 }

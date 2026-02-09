@@ -60046,16 +60046,16 @@ def CCX():
 
 
 
-	interval_t1=And((0*1000000)<=t1, t1<=(50*1000000))
+	interval_t1=And(0<=t1, t1<=50000000)
 	conditions_t1=((y5[ToInt(RealVal(0)+(t1-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t1-0.0)/10000.0)]))>7.5
 
-	interval_t2=And((0*1000000)<=t2, t2<=(50*1000000))
+	interval_t2=And(0<=t2, t2<=50000000)
 	conditions_t2=((y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)])-(y3[ToInt(RealVal(0)+(t2-0.0)/10000.0)]))>7.5
 
-	interval_t3=And((0*1000000)<=t3, t3<=(50*1000000))
+	interval_t3=And(0<=t3, t3<=50000000)
 	conditions_t3=((y3[ToInt(RealVal(0)+(t3-0.0)/10000.0)])-(y2[ToInt(RealVal(0)+(t3-0.0)/10000.0)]))>7.5
 
-	interval_t4=And((0*1000000)<=t4, t4<=(50*1000000))
+	interval_t4=And(0<=t4, t4<=50000000)
 	conditions_t4=((y2[ToInt(RealVal(0)+(t4-0.0)/10000.0)])-(y1[ToInt(RealVal(0)+(t4-0.0)/10000.0)]))>7.5
 	z3solver.add(Not(And(And(And(ForAll([t1], Implies(interval_t1, conditions_t1)), ForAll([t2], Implies(interval_t2, conditions_t2))), ForAll([t3], Implies(interval_t3, conditions_t3))), ForAll([t4], Implies(interval_t4, conditions_t4)))))
 	status=z3solver.check()

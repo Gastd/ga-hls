@@ -1,6 +1,53 @@
 {
-    "4": ["float", [50.0, 80.0]],
-    "8": ["int", [15000000, 25000000]],
-    "17": ["float", [2800.0, 3200.0]],
-    "21": ["int", [20000000, 40000000]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/AT6C/AT6C_AT311.py",
+    "traces_file": "replication/analysis/data/tracesAT.csv",
+    "output_dir": "replication/results/_rerun/AT6C/exp3"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      24,
+      21,
+      12,
+      9
+    ],
+    "allowed_changes": {
+      "24": {
+        "numeric": [
+          50.0,
+          80.0
+        ]
+      },
+      "21": {
+        "numeric": [
+          15000000.0,
+          25000000.0
+        ]
+      },
+      "12": {
+        "numeric": [
+          2800.0,
+          3200.0
+        ]
+      },
+      "9": {
+        "numeric": [
+          20000000.0,
+          40000000.0
+        ]
+      }
+    }
+  }
 }

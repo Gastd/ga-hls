@@ -1,5 +1,46 @@
 {
-    "11": ["int", [0, 5000000]],
-    "29": ["int", [15000000, 45000000]],
-    "34": ["int", [0, 15000000]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/AT51/AT51_AT055.py",
+    "traces_file": "replication/analysis/data/tracesAT.csv",
+    "output_dir": "replication/results/_rerun/AT51/exp3"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      5,
+      8,
+      27
+    ],
+    "allowed_changes": {
+      "5": {
+        "numeric": [
+          0.0,
+          5000000.0
+        ]
+      },
+      "8": {
+        "numeric": [
+          15000000.0,
+          45000000.0
+        ]
+      },
+      "27": {
+        "numeric": [
+          0.0,
+          15000000.0
+        ]
+      }
+    }
+  }
 }

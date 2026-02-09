@@ -1,5 +1,46 @@
 {
-    "3": ["float", [4700.0, 4800.0]],
-    "7":["int", [5000000, 15000000]],
-    "11": ["int", [0, 5000000]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/AT2/AT2_AT015.py",
+    "traces_file": "replication/analysis/data/tracesAT.csv",
+    "output_dir": "replication/results/_rerun/AT2/exp3"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      11,
+      8,
+      4
+    ],
+    "allowed_changes": {
+      "11": {
+        "numeric": [
+          4700.0,
+          4800.0
+        ]
+      },
+      "8": {
+        "numeric": [
+          5000000.0,
+          15000000.0
+        ]
+      },
+      "4": {
+        "numeric": [
+          0.0,
+          5000000.0
+        ]
+      }
+    }
+  }
 }

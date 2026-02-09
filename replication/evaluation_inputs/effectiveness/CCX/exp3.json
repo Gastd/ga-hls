@@ -1,5 +1,46 @@
 {
-    "51": ["float", [5.0, 10.0]],
-    "57": ["int", [25000000, 75000000]],
-    "61": ["int", [0, 25000000]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/CCX/CCX_CC041.py",
+    "traces_file": "replication/analysis/data/tracesCC.csv",
+    "output_dir": "replication/results/_rerun/CCX/exp3"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      16,
+      11,
+      7
+    ],
+    "allowed_changes": {
+      "16": {
+        "numeric": [
+          5.0,
+          10.0
+        ]
+      },
+      "11": {
+        "numeric": [
+          25000000.0,
+          75000000.0
+        ]
+      },
+      "7": {
+        "numeric": [
+          0.0,
+          25000000.0
+        ]
+      }
+    }
+  }
 }

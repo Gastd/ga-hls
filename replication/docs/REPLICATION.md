@@ -59,3 +59,7 @@ docker compose -f docker/docker-compose.yml run --rm ga-hls --help
 - RQ1 (effectiveness): `replication/docs/rq/RQ1_effectiveness.md`
 - RQ2 (efficiency): `replication/docs/rq/RQ2_efficiency.md`
 - RQ3 (sensitivity): `replication/docs/rq/RQ3_sensitivity.md`
+
+## Reproducing results
+
+See `docs/REPRODUCE.md` for step-by-step commands to rerun ga-hls and the analysis scripts.

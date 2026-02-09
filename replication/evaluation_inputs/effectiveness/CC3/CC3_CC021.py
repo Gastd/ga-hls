@@ -50041,12 +50041,12 @@ def CC3():
 
 
 
-	interval_t1=And((0*1000000)<=t1, t1<=(80*1000000))
+	interval_t1=And(0<=t1, t1<=80000000)
 
-	interval_t3=And(t1<=t3, t3<=t1+(20*1000000))
+	interval_t3=And(t1<=t3, t3<=t1+20000000)
 	conditions_t3=((y2[ToInt(RealVal(0)+(t3-0.0)/10000.0)])-(y1[ToInt(RealVal(0)+(t3-0.0)/10000.0)]))<20
 
-	interval_t2=And(t1<=t2, t2<=t1+(20*1000000))
+	interval_t2=And(t1<=t2, t2<=t1+20000000)
 	conditions_t2=((y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]))>40
 	conditions_t1=Or(ForAll([t3], Implies(interval_t3, conditions_t3)), Exists([t2], And(interval_t2, conditions_t2)))
 	z3solver.add(Not(ForAll([t1], Implies(interval_t1, conditions_t1))))

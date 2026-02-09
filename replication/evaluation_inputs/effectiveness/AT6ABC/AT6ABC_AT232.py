@@ -15036,22 +15036,22 @@ def AT6ABC():
 
 
 
-	interval_t1=And(0<=t1, t1<=(30*1000000))
+	interval_t1=And(0<=t1, t1<=30000000)
 	conditions_t1=e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)]<3000
 
-	interval_t2=And(0<=t2, t2<=(4*1000000))
+	interval_t2=And(0<=t2, t2<=4000000)
 	conditions_t2=v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)]<35
 
-	interval_t3=And(0<=t3, t3<=(30*1000000))
+	interval_t3=And(0<=t3, t3<=30000000)
 	conditions_t3=e_speed[ToInt(RealVal(0)+(t3-0.0)/10000.0)]<3000
 
-	interval_t4=And(0<=t4, t4<=(8*1000000))
+	interval_t4=And(0<=t4, t4<=8000000)
 	conditions_t4=v_speed[ToInt(RealVal(0)+(t4-0.0)/10000.0)]<50
 
-	interval_t5=And(0<=t5, t5<=(30*1000000))
+	interval_t5=And(0<=t5, t5<=30000000)
 	conditions_t5=e_speed[ToInt(RealVal(0)+(t5-0.0)/10000.0)]<3000
 
-	interval_t6=And(0<=t6, t6<=(20*1000000))
+	interval_t6=And(0<=t6, t6<=20000000)
 	conditions_t6=v_speed[ToInt(RealVal(0)+(t6-0.0)/10000.0)]<65
 	z3solver.add(Not(And(And(Implies(ForAll([t1], Implies(interval_t1, conditions_t1)), ForAll([t2], Implies(interval_t2, conditions_t2))), Implies(ForAll([t3], Implies(interval_t3, conditions_t3)), ForAll([t4], Implies(interval_t4, conditions_t4)))), Implies(ForAll([t5], Implies(interval_t5, conditions_t5)), ForAll([t6], Implies(interval_t6, conditions_t6))))))
 	status=z3solver.check()

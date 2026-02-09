@@ -10027,7 +10027,7 @@ def AT1():
 
 
 
-	interval_t=And(0<=t, t<=(20*1000000))
+	interval_t=And(0<=t, t<=20000000)
 	conditions_t=(v_speed[ToInt(RealVal(0)+(t-0.0)/10000.0)])<120
 	z3solver.add(Not(ForAll([t], Implies(interval_t, conditions_t))))
 	status=z3solver.check()

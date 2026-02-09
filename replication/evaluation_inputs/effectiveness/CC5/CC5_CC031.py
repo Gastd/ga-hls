@@ -50042,14 +50042,14 @@ def CC5():
 
 
 
-	interval_t4=And((0*1000000)<=t4, t4<=(72*1000000))
+	interval_t4=And(0<=t4, t4<=72000000)
 
-	interval_t3=And(t4<=t3, t3<=t4+(8*1000000))
+	interval_t3=And(t4<=t3, t3<=t4+8000000)
 
-	interval_t2=And(t3<=t2, t2<=t3+(5*1000000))
+	interval_t2=And(t3<=t2, t2<=t3+5000000)
 	conditions_t2=((y2[ToInt(RealVal(0)+(t2-0.0)/10000.0)])-(y1[ToInt(RealVal(0)+(t2-0.0)/10000.0)]))>9
 
-	interval_t1=And(t2+(5*1000000)<=t1, t1<=t2+(20*1000000))
+	interval_t1=And(t2+5000000<=t1, t1<=t2+20000000)
 	conditions_t1=((y5[ToInt(RealVal(0)+(t1-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t1-0.0)/10000.0)]))>9
 	conditions_t3=Implies(ForAll([t2], Implies(interval_t2, conditions_t2)), ForAll([t1], Implies(interval_t1, conditions_t1)))
 	conditions_t4=Exists([t3], And(interval_t3, conditions_t3))

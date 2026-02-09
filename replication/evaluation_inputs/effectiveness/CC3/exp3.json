@@ -1,5 +1,46 @@
 {
-    "0": ["op", ["ForAll", "Exists"]],
-    "2": ["op", ["And", "Or"]],
-    "20": ["op", ["ForAll", "Exists"]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/CC3/CC3_CC021.py",
+    "traces_file": "replication/analysis/data/tracesCC.csv",
+    "output_dir": "replication/results/_rerun/CC3/exp3"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": false,
+    "enable_relop_flip": false,
+    "enable_logical_flip": true,
+    "enable_quantifier_flip": true,
+    "allowed_positions": [
+      0,
+      9,
+      10
+    ],
+    "allowed_changes": {
+      "0": {
+        "quantifier": [
+          "ForAll",
+          "Exists"
+        ]
+      },
+      "9": {
+        "logical": [
+          "And",
+          "Or"
+        ]
+      },
+      "10": {
+        "quantifier": [
+          "ForAll",
+          "Exists"
+        ]
+      }
+    }
+  }
 }

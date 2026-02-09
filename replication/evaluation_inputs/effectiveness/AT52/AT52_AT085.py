@@ -10029,9 +10029,9 @@ def AT52():
 
 
 
-	interval_i=And(i>=ToInt(RealVal(0)+((0*1000000)-0.0)/10000.0), i<ToInt(RealVal(0)+((30*1000000)-0.0)/10000.0))
+	interval_i=And(i>=0.0, i<30000000)
 
-	interval_t2=And(timestamps[i]<=t2, t2<=timestamps[i]+((2.5*1000000)))
+	interval_t2=And(timestamps[i]<=t2, t2<=timestamps[i]+((2500000)))
 	conditions_t2=gear[ToInt(RealVal(0)+(t2-0.0)/10000.0)]==2
 	conditions_i=Implies(And(gear[(i-1)]!=2, gear[i]==2), ForAll([t2], Implies(interval_t2, conditions_t2)))
 	z3solver.add(Not(ForAll([i], Implies(interval_i, conditions_i))))

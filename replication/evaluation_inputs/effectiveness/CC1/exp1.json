@@ -1,3 +1,32 @@
 {
-    "3": ["float", [30.0, 50.0]]
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/CC1/CC1_CC001.py",
+    "traces_file": "replication/analysis/data/tracesCC.csv",
+    "output_dir": "replication/results/_rerun/CC1/exp1"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      13
+    ],
+    "allowed_changes": {
+      "13": {
+        "numeric": [
+          30.0,
+          50.0
+        ]
+      }
+    }
+  }
 }

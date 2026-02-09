@@ -30032,9 +30032,9 @@ def CC2():
 
 
 
-	interval_t1=And((0*1000000)<=t1, t1<=(70*1000000))
+	interval_t1=And(0<=t1, t1<=70000000)
 
-	interval_t2=And(t1<=t2, t2<=t1+(30*1000000))
+	interval_t2=And(t1+(0)<=t2, t2<=t1+(30000000))
 	conditions_t2=((y5[ToInt(RealVal(0)+(t2-0.0)/10000.0)])-(y4[ToInt(RealVal(0)+(t2-0.0)/10000.0)]))>15
 	conditions_t1=Exists([t2], And(interval_t2, conditions_t2))
 	z3solver.add(Not(ForAll([t1], Implies(interval_t1, conditions_t1))))

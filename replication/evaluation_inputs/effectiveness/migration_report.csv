@@ -1,0 +1,43 @@
+req,config,changed,note
+AT1,exp1.json,True,OK 3->11:in-range
+AT1,exp2.json,True,OK 3->11:in-range
+AT1,exp3.json,True,OK 3->11:in-range ; 7->8:in-range ; 11->4:exact-endpoint
+AT2,exp1.json,True,OK 3->11:in-range
+AT2,exp2.json,True,OK 3->11:in-range
+AT2,exp3.json,True,OK 3->11:in-range ; 7->8:in-range ; 11->4:exact-endpoint
+AT51,exp1.json,True,OK 11->5:exact-endpoint
+AT51,exp2.json,True,OK 11->5:exact-endpoint
+AT51,exp3.json,True,OK 11->5:exact-endpoint ; 29->8:in-range ; 34->27:in-range-ambiguous(4)
+AT52,exp1.json,True,OK 11->27:in-range-ambiguous(4)
+AT52,exp2.json,True,OK 11->27:in-range-ambiguous(4)
+AT52,exp3.json,True,OK 11->27:in-range-ambiguous(4) ; 29->8:in-range ; 34->13:in-range-ambiguous(3)
+AT53,exp1.json,True,OK 11->27:in-range-ambiguous(4)
+AT53,exp2.json,True,OK 11->27:in-range-ambiguous(4)
+AT53,exp3.json,True,OK 11->27:in-range-ambiguous(4) ; 29->8:in-range ; 34->13:in-range-ambiguous(3)
+AT54,exp1.json,True,OK 11->27:in-range-ambiguous(4)
+AT54,exp2.json,True,OK 11->27:in-range-ambiguous(4)
+AT54,exp3.json,True,OK 11->27:in-range-ambiguous(4) ; 29->8:in-range ; 34->13:in-range-ambiguous(3)
+AT6A,exp1.json,True,OK 4->24:in-range ; 17->12:in-range
+AT6A,exp2.json,True,OK 4->24:in-range ; 17->12:in-range
+AT6A,exp3.json,True,OK 4->24:in-range ; 8->21:in-range ; 17->12:in-range ; 21->9:in-range
+AT6ABC,exp1.json,True,OK 6->51:exact-endpoint ; 19->14:in-range-ambiguous(3)
+AT6ABC,exp2.json,True,OK 6->51:exact-endpoint ; 19->14:in-range-ambiguous(3)
+AT6ABC,exp3.json,True,OK 6->51:exact-endpoint ; 10->73:in-range ; 19->14:in-range-ambiguous(3) ; 23->11:in-range-ambiguous(3)
+AT6B,exp1.json,True,OK 4->24:in-range ; 17->12:in-range
+AT6B,exp2.json,True,OK 4->24:in-range ; 17->12:in-range
+AT6B,exp3.json,True,OK 4->24:in-range ; 8->21:in-range ; 17->12:in-range ; 21->9:in-range
+AT6C,exp1.json,True,OK 4->24:in-range ; 17->12:in-range
+AT6C,exp2.json,True,OK 4->24:in-range ; 17->12:in-range
+AT6C,exp3.json,True,OK 4->24:in-range ; 8->21:in-range ; 17->12:in-range ; 21->9:in-range
+CC1,exp1.json,True,OK 3->13:in-range
+CC1,exp3.json,True,OK 3->13:in-range ; 9->8:exact-endpoint ; 13->4:exact-endpoint
+CC2,exp1.json,True,OK 27->4:exact-endpoint
+CC2,exp3.json,True,OK 5->24:in-range ; 18->4:exact-endpoint ; 27->19:closest-out-of-range
+CC3,exp1.json,True,OK 0->0:prefer-ForAll(ForAll)
+CC3,exp3.json,True,OK 0->0:prefer-ForAll(ForAll) ; 2->9:prefer-Or(Or) ; 20->10:prefer-ForAll(ForAll)
+CC4,exp1.json,True,OK 7->35:in-range
+CC4,exp3.json,True,OK 0->0:prefer-ForAll(ForAll) ; 4->20:prefer-ForAll(ForAll) ; 7->35:in-range
+CC5,exp1.json,True,OK 8->36:in-range-ambiguous(2) ; 27->54:in-range
+CC5,exp3.json,True,OK 7->3:match-relop(<=) ; 8->36:in-range-ambiguous(2) ; 26->6:match-relop(<=) ; 27->54:in-range
+CCX,exp1.json,True,OK 51->16:in-range-ambiguous(4)
+CCX,exp3.json,True,OK 51->16:in-range-ambiguous(4) ; 57->11:in-range-ambiguous(4) ; 61->7:in-range-ambiguous(4)
