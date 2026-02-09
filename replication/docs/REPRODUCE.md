@@ -45,16 +45,6 @@ docker compose -f docker/docker-compose.yml run --rm ga-hls \
 
 The command should produce a fresh output folder (depending on your config’s `output_dir`).
 
-### 1.2 Run via the provided scripts
-
-Example:
-
-```bash
-bash replication/evaluation_inputs/effectiveness/AT1/run.sh
-```
-
-Repeat for other folders under `replication/evaluation_inputs/effectiveness/`.
-
 ---
 
 ## 2) RQ1 — Precision/recall (Exp1–Exp34)

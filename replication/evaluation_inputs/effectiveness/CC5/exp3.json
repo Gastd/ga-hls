@@ -9,7 +9,8 @@
     "generations": 10,
     "crossover_rate": 0.95,
     "mutation_rate": 0.1,
-    "seed": 0
+    "seed": 0,
+    "target_sats": 1000
   },
   "mutation": {
     "max_mutations": 1,
