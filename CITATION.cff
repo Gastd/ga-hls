@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: "If you use ga-hls in your research, please cite the accompanying paper (preferred) and/or this software."
+type: software
+title: "ga-hls"
+abstract: "Research tool for diagnosing falsified requirements in HLS/ThEodorE-based workflows using search-based mutation and decision-tree learning."
+url: "https://github.com/Gastd/ga-hls"
+license: "MIT"
+repository-code: "https://github.com/Gastd/ga-hls"
+keywords:
+  - requirements diagnosis
+  - search-based software engineering
+  - genetic algorithms
+  - decision trees
+  - Z3
+  - Weka
+authors:
+  - family-names: "Caldas"
+    given-names: "Ricardo"
+  - family-names: "Araujo"
+    given-names: "Gabriel"
+  - family-names: "Formica"
+    given-names: "Federico"
+  - family-names: "Rodrigues"
+    given-names: "Genaína"
+  - family-names: "Pelliccione"
+    given-names: "Patrizio"
+  - family-names: "Menghi"
+    given-names: "Claudio"
+
+# Suggested: set this to the git tag corresponding to the artifact/release.
+# version: "vX.Y.Z"
+# date-released: "YYYY-MM-DD"
+
+preferred-citation:
+  type: article
+  title: "Search-based Trace Diagnostic"
+  authors:
+    - family-names: "Caldas"
+      given-names: "Ricardo"
+    - family-names: "Araujo"
+      given-names: "Gabriel"
+    - family-names: "Formica"
+      given-names: "Federico"
+    - family-names: "Rodrigues"
+      given-names: "Genaína"
+    - family-names: "Pelliccione"
+      given-names: "Patrizio"
+    - family-names: "Menghi"
+      given-names: "Claudio"
+  year: 2026
+  doi: "TBD"
+  url: "TBD"
