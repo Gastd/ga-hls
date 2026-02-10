@@ -20,6 +20,23 @@ The result is a **diagnostic decision tree** that relates parts of the requireme
 
 ---
 
+## Replication package
+
+This repository includes a self-contained replication package under:
+
+- `replication/`
+
+It contains the evaluation inputs, collected run artifacts (effectiveness study + sensitivity study), analysis scripts, and documentation that binds each research question (RQ1–RQ3) to the concrete inputs/outputs used in the paper.
+
+Start here:
+
+- `replication/README.md` — high-level entry point and folder map
+- `replication/docs/REPLICATION.md` — step-by-step reproduction instructions
+- `replication/docs/rq/` — per-RQ artifact mappings and notes
+- `replication/docs/experiments/` — registries mapping paper experiment IDs to artifact paths
+
+---
+
 ## Package layout (`ga-hls`)
 
 ```text
