@@ -1,0 +1,41 @@
+@relation all.2025-12-26_20_44_03.317450
+
+
+@attribute QUANTIFIERS0 {ForAll,Exists}
+@attribute TERM0 {t,distance[t],brake[t]}
+@attribute LOGICALS0 {And,Or,Implies}
+@attribute LOGICALS1 {And,Or,Implies}
+@attribute TERM1 {t,distance[t],brake[t]}
+@attribute RELATIONALS0 {<,>,<=,>=}
+@attribute NUM0 NUMERIC
+@attribute TERM2 {t,distance[t],brake[t]}
+@attribute RELATIONALS1 {<,>,<=,>=}
+@attribute NUM1 NUMERIC
+@attribute LOGICALS2 {And,Or,Implies}
+@attribute TERM3 {t,distance[t],brake[t]}
+@attribute RELATIONALS2 {<,>,<=,>=}
+@attribute NUM2 NUMERIC
+@attribute TERM4 {t,distance[t],brake[t]}
+@attribute EQUALS0 {==,!=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,3.040714,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,53,Implies,distance[t],<,3.472220,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,81,Implies,distance[t],<,3.040714,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,20,Implies,distance[t],<,3.840052,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,21,Implies,distance[t],<,4.308694,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,20,Implies,distance[t],<,5.556345,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,1.000000,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,0.417821,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,0.990592,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,1.431029,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,1.480734,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,0.374432,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,1.000000,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,0.417821,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,0.990592,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,1.431029,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,1.480734,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.000000,brake[t],==,0.374432,FALSE

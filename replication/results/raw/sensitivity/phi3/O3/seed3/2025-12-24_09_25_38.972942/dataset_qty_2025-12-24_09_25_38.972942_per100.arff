@@ -1,0 +1,43 @@
+@relation all.2025-12-24_09_25_38.972942
+
+
+@attribute QUANTIFIERS0 {ForAll,Exists}
+@attribute NUM0 NUMERIC
+@attribute RELATIONALS0 {<,>,<=,>=}
+@attribute TERM0 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute LOGICALS0 {And,Or,Implies}
+@attribute TERM1 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS1 {<,>,<=,>=}
+@attribute NUM1 NUMERIC
+@attribute TERM2 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS2 {<,>,<=,>=}
+@attribute NUM2 NUMERIC
+@attribute LOGICALS1 {And,Or,Implies}
+@attribute TERM3 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS3 {<,>,<=,>=}
+@attribute NUM3 NUMERIC
+@attribute LOGICALS2 {And,Or,Implies}
+@attribute TERM4 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS4 {<,>,<=,>=}
+@attribute NUM4 NUMERIC
+@attribute LOGICALS3 {And,Or,Implies}
+@attribute TERM5 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS5 {<,>,<=,>=}
+@attribute NUM5 NUMERIC
+@attribute LOGICALS4 {And,Or,Implies}
+@attribute QUANTIFIERS1 {ForAll,Exists}
+@attribute TERM6 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS6 {<,>,<=,>=}
+@attribute TERM7 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute LOGICALS5 {And,Or,Implies}
+@attribute TERM8 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS7 {<,>,<=,>=}
+@attribute TERM9 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute ARITHMETICS0 {+,-,*,/}
+@attribute NUM6 NUMERIC
+@attribute TERM10 {t1,t0,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))]}
+@attribute RELATIONALS8 {<,>,<=,>=}
+@attribute NUM7 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data

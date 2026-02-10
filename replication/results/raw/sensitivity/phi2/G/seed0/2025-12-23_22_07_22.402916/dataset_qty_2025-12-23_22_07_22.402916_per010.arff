@@ -1,0 +1,122 @@
+@relation all.2025-12-23_22_07_22.402916
+
+
+@attribute QUANTIFIERS0 {ForAll,Exists}
+@attribute TERM0 {TTC[t],t,ego_acc[t]}
+@attribute LOGICALS0 {And,Or,Implies}
+@attribute LOGICALS1 {And,Or,Implies}
+@attribute TERM1 {TTC[t],t,ego_acc[t]}
+@attribute RELATIONALS0 {<,>,<=,>=}
+@attribute NUM0 NUMERIC
+@attribute TERM2 {TTC[t],t,ego_acc[t]}
+@attribute RELATIONALS1 {<,>,<=,>=}
+@attribute NUM1 NUMERIC
+@attribute LOGICALS2 {And,Or,Implies}
+@attribute TERM3 {TTC[t],t,ego_acc[t]}
+@attribute RELATIONALS2 {<,>,<=,>=}
+@attribute NUM2 NUMERIC
+@attribute TERM4 {TTC[t],t,ego_acc[t]}
+@attribute RELATIONALS3 {<,>,<=,>=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.974518,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.151302,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.675730,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.043580,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.174149,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.297867,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.483149,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.220271,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.657806,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.420700,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.403032,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.816080,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.702479,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.893005,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.424715,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.504877,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.358637,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.996366,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.205173,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.165896,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.723807,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.937197,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.802181,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.070833,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.690984,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.885894,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.556297,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.300944,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.833775,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.014213,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.378933,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.874254,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.274089,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.080969,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.809868,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.716099,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.197527,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.944285,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.868344,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.885387,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.124559,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.182432,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.218116,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.889978,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.138170,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.901126,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.140009,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.700588,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.306826,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.099714,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.632354,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.559965,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.230219,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.744899,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.675022,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.721813,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.229793,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.829443,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.948009,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.075649,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.015702,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.897089,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.723284,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.070937,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.665372,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.768319,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.080969,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.809868,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.716099,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.974518,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.197527,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.944285,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.868344,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.885387,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.124559,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.182432,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.218116,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.889978,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.151302,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.138170,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.675730,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.043580,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.901126,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.174149,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.140009,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.700588,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.297867,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.306826,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.483149,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.220271,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.657806,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.420700,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.403032,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.816080,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.099714,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.632354,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.559965,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,1.230219,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,ego_acc[t],<,-3.000000,TTC[t],<,2.702479,TRUE

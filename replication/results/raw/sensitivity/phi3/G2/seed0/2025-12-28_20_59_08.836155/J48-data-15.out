@@ -1,0 +1,102 @@
+WARNING: core mtj jar files are not available as resources to this classloader (jdk.internal.loader.ClassLoaders$AppClassLoader@5c29bfd)
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+NUM1 <= 5181465.688365
+|   LOGICALS3 = And: TRUE (118.0)
+|   LOGICALS3 = Or
+|   |   NUM1 <= 4748844.540739: TRUE (25.0)
+|   |   NUM1 > 4748844.540739: FALSE (3.0)
+|   LOGICALS3 = Implies: TRUE (0.0)
+NUM1 > 5181465.688365
+|   NUM3 <= 2.834025
+|   |   LOGICALS3 = And
+|   |   |   NUM3 <= 2.79856: TRUE (26.0)
+|   |   |   NUM3 > 2.79856
+|   |   |   |   NUM1 <= 5457020.097207: TRUE (2.0)
+|   |   |   |   NUM1 > 5457020.097207: FALSE (2.0)
+|   |   LOGICALS3 = Or: FALSE (12.0)
+|   |   LOGICALS3 = Implies: TRUE (0.0)
+|   NUM3 > 2.834025: FALSE (172.0)
+
+Number of Leaves  : 	10
+
+Size of the tree : 	17
+
+
+Time taken to build model: 0.02 seconds
+
+Time taken to test model on training data: 0.01 seconds
+
+=== Error on training data ===
+
+Correctly Classified Instances         360              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+K&B Relative Info Score                100      %
+K&B Information Score                  360.7833 bits      1.0022 bits/instance
+Class complexity | order 0             360.7833 bits      1.0022 bits/instance
+Class complexity | scheme                0      bits      0      bits/instance
+Complexity improvement     (Sf)        360.7833 bits      1.0022 bits/instance
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances              360     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     TRUE
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     FALSE
+                 ?        0.000    ?          ?        ?          ?        ?         ?         UNKNOWN
+Weighted Avg.    1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     
+
+
+=== Confusion Matrix ===
+
+   a   b   c   <-- classified as
+ 171   0   0 |   a = TRUE
+   0 189   0 |   b = FALSE
+   0   0   0 |   c = UNKNOWN
+
+Time taken to perform cross-validation: 0.02 seconds
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances         352               97.7778 %
+Incorrectly Classified Instances         8                2.2222 %
+Kappa statistic                          0.9555
+K&B Relative Info Score                 95.7387 %
+K&B Information Score                  345.5767 bits      0.9599 bits/instance
+Class complexity | order 0             360.9581 bits      1.0027 bits/instance
+Class complexity | scheme             1107.4215 bits      3.0762 bits/instance
+Complexity improvement     (Sf)       -746.4634 bits     -2.0735 bits/instance
+Mean absolute error                      0.0142
+Root mean squared error                  0.1113
+Relative absolute error                  4.2712 %
+Root relative squared error             27.301  %
+Total Number of Instances              360     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.982    0.026    0.971      0.982    0.977      0.956    0.995     0.993     TRUE
+                 0.974    0.018    0.984      0.974    0.979      0.956    0.995     0.992     FALSE
+                 ?        0.000    ?          ?        ?          ?        ?         ?         UNKNOWN
+Weighted Avg.    0.978    0.022    0.978      0.978    0.978      0.956    0.995     0.993     
+
+
+=== Confusion Matrix ===
+
+   a   b   c   <-- classified as
+ 168   3   0 |   a = TRUE
+   5 184   0 |   b = FALSE
+   0   0   0 |   c = UNKNOWN
+

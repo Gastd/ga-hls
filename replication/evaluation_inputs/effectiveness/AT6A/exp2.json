@@ -1,0 +1,40 @@
+{
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/AT6A/AT6A_AT192.py",
+    "traces_file": "replication/analysis/data/tracesAT.csv",
+    "output_dir": "replication/results/_rerun/AT6A/exp2"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0,
+    "target_sats": 1000
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      24,
+      12
+    ],
+    "allowed_changes": {
+      "24": {
+        "numeric": [
+          30.0,
+          40.0
+        ]
+      },
+      "12": {
+        "numeric": [
+          2800.0,
+          3200.0
+        ]
+      }
+    }
+  }
+}

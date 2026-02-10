@@ -1,0 +1,71 @@
+@relation all.2025-12-29_00_41_28.216931
+
+
+@attribute QUANTIFIERS0 {ForAll,Exists}
+@attribute TERM0 {t,distance[t],brake[t]}
+@attribute LOGICALS0 {And,Or,Implies}
+@attribute LOGICALS1 {And,Or,Implies}
+@attribute TERM1 {t,distance[t],brake[t]}
+@attribute RELATIONALS0 {<,>,<=,>=}
+@attribute NUM0 NUMERIC
+@attribute TERM2 {t,distance[t],brake[t]}
+@attribute RELATIONALS1 {<,>,<=,>=}
+@attribute NUM1 NUMERIC
+@attribute LOGICALS2 {And,Or,Implies}
+@attribute TERM3 {t,distance[t],brake[t]}
+@attribute RELATIONALS2 {<,>,<=,>=}
+@attribute NUM2 NUMERIC
+@attribute TERM4 {t,distance[t],brake[t]}
+@attribute EQUALS0 {==,!=}
+@attribute NUM3 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data
+ForAll,t,Implies,And,t,>=,0,t,<=,13,Implies,distance[t],<,6.071773,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,10,Implies,distance[t],<,6.536187,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,11,Implies,distance[t],<,6.626834,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,12,Implies,distance[t],<,6.389683,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,12,Implies,distance[t],<,6.218102,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,15,Implies,distance[t],<,6.090724,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,14,Implies,distance[t],<,6.230189,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,10,Implies,distance[t],<,6.358187,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,15,Implies,distance[t],<,6.143829,brake[t],==,1.000000,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,11,Implies,distance[t],<,6.473546,brake[t],==,1.242166,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,13,Implies,distance[t],<,6.423497,brake[t],==,0.993411,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,11,Implies,distance[t],<,6.626834,brake[t],==,1.100308,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,10,Implies,distance[t],<,6.139924,brake[t],==,1.267026,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,10,Implies,distance[t],<,6.065351,brake[t],==,0.759580,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,10,Implies,distance[t],<,6.690612,brake[t],==,1.276459,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,14,Implies,distance[t],<,6.191784,brake[t],==,0.889438,TRUE
+ForAll,t,Implies,And,t,>=,0,t,<=,21,Implies,distance[t],<,7.000000,brake[t],==,1.249567,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,29,Implies,distance[t],<,7.000000,brake[t],==,0.707901,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.794269,brake[t],==,1.216613,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,26,Implies,distance[t],<,7.000000,brake[t],==,0.933962,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,15,Implies,distance[t],<,7.000000,brake[t],==,1.154938,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.789927,brake[t],==,1.180545,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.148045,brake[t],==,1.020462,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,20,Implies,distance[t],<,7.000000,brake[t],==,1.109189,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,30,Implies,distance[t],<,7.000000,brake[t],==,1.198965,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,22,Implies,distance[t],<,7.000000,brake[t],==,1.131064,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.010841,brake[t],==,1.299105,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,13,Implies,distance[t],<,7.000000,brake[t],==,1.059858,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,20,Implies,distance[t],<,7.000000,brake[t],==,0.888298,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.920819,brake[t],==,1.012044,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.862383,brake[t],==,1.132187,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.955595,brake[t],==,1.012676,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,21,Implies,distance[t],<,7.000000,brake[t],==,1.249567,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,29,Implies,distance[t],<,7.000000,brake[t],==,0.707901,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.794269,brake[t],==,1.216613,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,26,Implies,distance[t],<,7.000000,brake[t],==,0.933962,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,15,Implies,distance[t],<,7.000000,brake[t],==,1.154938,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.789927,brake[t],==,1.180545,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.148045,brake[t],==,1.020462,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,20,Implies,distance[t],<,7.000000,brake[t],==,1.109189,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,30,Implies,distance[t],<,7.000000,brake[t],==,1.198965,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,22,Implies,distance[t],<,7.000000,brake[t],==,1.131064,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.010841,brake[t],==,1.299105,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,13,Implies,distance[t],<,7.000000,brake[t],==,1.059858,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,20,Implies,distance[t],<,7.000000,brake[t],==,0.888298,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.920819,brake[t],==,1.012044,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,6.862383,brake[t],==,1.132187,FALSE
+ForAll,t,Implies,And,t,>=,0,t,<=,90,Implies,distance[t],<,7.955595,brake[t],==,1.012676,FALSE

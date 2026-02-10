@@ -1,0 +1,33 @@
+{
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/effectiveness/AT2/AT2_AT015.py",
+    "traces_file": "replication/analysis/data/tracesAT.csv",
+    "output_dir": "replication/results/_rerun/AT2/exp2"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.1,
+    "seed": 0,
+    "target_sats": 1000
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": false,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [
+      11
+    ],
+    "allowed_changes": {
+      "11": {
+        "numeric": [
+          4700.0,
+          4800.0
+        ]
+      }
+    }
+  }
+}

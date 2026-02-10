@@ -1,0 +1,28 @@
+{
+  "input": {
+    "requirement_file": "replication/evaluation_inputs/sensitivity/property_phi3_retry.py",
+    "traces_file": "na",
+    "output_dir": "scripts/test3/configs/outputs/phi3/O"
+  },
+  "ga": {
+    "population_size": 250,
+    "generations": 10,
+    "crossover_rate": 0.95,
+    "mutation_rate": 0.9,
+    "seed": 0,
+    "target_sats": 1000
+  },
+  "mutation": {
+    "max_mutations": 1,
+    "enable_numeric_perturbation": true,
+    "enable_relop_flip": false,
+    "enable_logical_flip": true,
+    "enable_quantifier_flip": false,
+    "allowed_positions": [10,18,40],
+    "allowed_changes": {
+      "10": { "logical": ["And", "Or"] },
+      "18": { "numeric": [2.5,3.5] },
+      "40": { "numeric": [0.5,2.0] }
+    }
+  }
+}

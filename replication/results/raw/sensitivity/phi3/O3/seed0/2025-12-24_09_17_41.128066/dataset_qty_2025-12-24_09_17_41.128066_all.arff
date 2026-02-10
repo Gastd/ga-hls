@@ -1,0 +1,48 @@
+@relation all.2025-12-24_09_17_41.128066
+
+
+@attribute QUANTIFIERS0 {ForAll,Exists}
+@attribute TERM0 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute LOGICALS0 {And,Or,Implies}
+@attribute LOGICALS1 {And,Or,Implies}
+@attribute NUM0 NUMERIC
+@attribute RELATIONALS0 {<,>,<=,>=}
+@attribute TERM1 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute TERM2 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS1 {<,>,<=,>=}
+@attribute NUM1 NUMERIC
+@attribute LOGICALS2 {And,Or,Implies}
+@attribute LOGICALS3 {And,Or,Implies}
+@attribute LOGICALS4 {And,Or,Implies}
+@attribute LOGICALS5 {And,Or,Implies}
+@attribute TERM3 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS2 {<,>,<=,>=}
+@attribute NUM2 NUMERIC
+@attribute TERM4 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS3 {<,>,<=,>=}
+@attribute NUM3 NUMERIC
+@attribute TERM5 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS4 {<,>,<=,>=}
+@attribute NUM4 NUMERIC
+@attribute TERM6 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS5 {<,>,<=,>=}
+@attribute NUM5 NUMERIC
+@attribute QUANTIFIERS1 {ForAll,Exists}
+@attribute TERM7 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute LOGICALS6 {And,Or,Implies}
+@attribute LOGICALS7 {And,Or,Implies}
+@attribute TERM8 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS6 {<,>,<=,>=}
+@attribute TERM9 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute TERM10 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS7 {<,>,<=,>=}
+@attribute TERM11 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute NUM6 NUMERIC
+@attribute TERM12 {target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t0,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],t1,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))]}
+@attribute RELATIONALS8 {<,>,<=,>=}
+@attribute NUM7 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data
+ForAll,t0,Implies,And,0,<=,t0,t0,<=,9900000.000000,Implies,And,And,And,target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],>,0.500000,target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],<,3.500000,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],<,2.000000,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],<,1.500000,ForAll,t1,Implies,And,t0,<=,t1,t1,<=,t0,1000000,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],>,1.000000,FALSE
+ForAll,t0,Implies,And,0,<=,t0,t0,<=,9900000.000000,Implies,Or,And,And,target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],>,0.500000,target_y[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],<,3.500000,x_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],<,2.000000,y_gap[ToInt((RealVal(0)+((t0-0.0)/100000.0)))],<,1.500000,ForAll,t1,Implies,And,t0,<=,t1,t1,<=,t0,1000000,y_gap[ToInt((RealVal(0)+((t1-0.0)/100000.0)))],>,1.000000,FALSE

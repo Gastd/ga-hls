@@ -1,0 +1,29 @@
+@relation all.2024-05-19_15_30_57.893964
+
+
+@attribute QUANTIFIERS0 {ForAll, Exists}
+@attribute NUM0 NUMERIC
+@attribute RELATIONALS0 {<, >, <=, >=}
+@attribute TERM0 {t2, v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)], e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)], t1}
+@attribute LOGICALS0 {And, Or}
+@attribute TERM1 {t2, v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)], e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)], t1}
+@attribute RELATIONALS1 {<, >, <=, >=}
+@attribute NUM1 NUMERIC
+@attribute TERM2 {t2, v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)], e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)], t1}
+@attribute RELATIONALS2 {<, >, <=, >=}
+@attribute NUM2 NUMERIC
+@attribute IMP0 {Implies}
+@attribute QUANTIFIERS1 {ForAll, Exists}
+@attribute NUM3 NUMERIC
+@attribute RELATIONALS3 {<, >, <=, >=}
+@attribute TERM3 {t2, v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)], e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)], t1}
+@attribute LOGICALS1 {And, Or}
+@attribute TERM4 {t2, v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)], e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)], t1}
+@attribute RELATIONALS4 {<, >, <=, >=}
+@attribute NUM4 NUMERIC
+@attribute TERM5 {t2, v_speed[ToInt(RealVal(0)+(t2-0.0)/10000.0)], e_speed[ToInt(RealVal(0)+(t1-0.0)/10000.0)], t1}
+@attribute RELATIONALS5 {<, >, <=, >=}
+@attribute NUM5 NUMERIC
+@attribute VEREDICT {TRUE, FALSE, UNKNOWN}
+
+@data
